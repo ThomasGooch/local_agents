@@ -1,0 +1,49 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "local-agents"
+version = "0.1.0"
+description = "A local-only suite of AI agents for planning, coding, testing, and reviewing"
+authors = ["Thomas Gooch <thomas@example.com>"]
+readme = "README.md"
+packages = [{include = "local_agents", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1.7"
+rich = "^13.7.0"
+pydantic = "^2.5.0"
+pyyaml = "^6.0.1"
+requests = "^2.31.0"
+httpx = "^0.26.0"
+psutil = "^7.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+black = "^23.11.0"
+isort = "^5.12.0"
+mypy = "^1.7.1"
+flake8 = "^6.1.0"
+
+[tool.poetry.scripts]
+lagents = "local_agents.cli:main"
+la-plan = "local_agents.cli:plan_command"
+la-code = "local_agents.cli:code_command"
+la-test = "local_agents.cli:test_command"
+la-review = "local_agents.cli:review_command"
+
+[tool.black]
+line-length = 100
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
