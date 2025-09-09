@@ -107,10 +107,10 @@ class TestWorkflowExecution:
                         )
 
         # Verify workflow completion
-        assert result["success"] is True
-        assert result["workflow_name"] == "feature-dev"
-        assert result["task"] == "Create a hello world function"
-        assert len(result["steps"]) == 4  # plan, code, test, review
+        assert result.success is True
+        assert result.workflow_name == "feature-dev"
+        assert result.task == "Create a hello world function"
+        assert len(result.steps) == 4  # plan, code, test, review
 
         # Verify all agents were called
         mock_agents["planner"].execute.assert_called_once()
@@ -144,9 +144,9 @@ class TestWorkflowExecution:
                     )
 
         # Verify workflow completion
-        assert result["success"] is True
-        assert result["workflow_name"] == "bug-fix"
-        assert len(result["steps"]) == 3  # plan, code, test
+        assert result.success is True
+        assert result.workflow_name == "bug-fix"
+        assert len(result.steps) == 3  # plan, code, test
 
         # Verify agents were called in correct order
         mock_agents["planner"].execute.assert_called_once()
@@ -167,9 +167,9 @@ class TestWorkflowExecution:
             )
 
         # Verify workflow completion
-        assert result["success"] is True
-        assert result["workflow_name"] == "code-review"
-        assert len(result["steps"]) == 1  # review only
+        assert result.success is True
+        assert result.workflow_name == "code-review"
+        assert len(result.steps) == 1  # review only
 
         # Only review agent should be called
         mock_agents["reviewer"].execute.assert_called_once()
@@ -208,8 +208,8 @@ class TestWorkflowExecution:
                         )
 
         # Workflow should complete but not be successful overall
-        assert result["success"] is False
-        assert len(result["steps"]) == 4
+        assert result.success is False
+        assert len(result.steps) == 4
 
         # All agents should still be called
         mock_agents["planner"].execute.assert_called_once()
@@ -248,8 +248,8 @@ class TestWorkflowExecution:
                         )
 
         # Workflow should stop after planning failure
-        assert result["success"] is False
-        assert len(result["steps"]) == 1  # Only planning step
+        assert result.success is False
+        assert len(result.steps) == 1  # Only planning step
 
         # Only planner should be called
         mock_agents["planner"].execute.assert_called_once()
@@ -274,9 +274,9 @@ class TestWorkflowExecution:
                 )
 
         # Verify custom workflow execution
-        assert result["success"] is True
-        assert result["workflow_name"] == "custom"
-        assert len(result["steps"]) == 2
+        assert result.success is True
+        assert result.workflow_name == "custom"
+        assert len(result.steps) == 2
 
         # Verify correct agents were called
         mock_agents["planner"].execute.assert_called_once()
@@ -395,15 +395,15 @@ class TestWorkflowStreamingAndOutput:
         workflow, mock_agents = workflow_with_mocks
 
         with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
         ):
             workflow.execute_workflow(
                 workflow_name="code-review", task="Test streaming", stream=True
             )
 
         # Verify streaming parameter was passed to agent
-        planner_call_args = mock_agents["planner"].execute.call_args
-        assert planner_call_args[1]["stream"] is True  # stream is keyword argument
+        reviewer_call_args = mock_agents["reviewer"].execute.call_args
+        assert reviewer_call_args[1]["stream"] is True  # stream is keyword argument
 
     def test_workflow_summary_generation(self, workflow_with_mocks):
         """Test that workflow generates proper summary."""
@@ -415,8 +415,8 @@ class TestWorkflowStreamingAndOutput:
             )
 
         # Verify summary is generated
-        assert "summary" in result
-        summary = result["summary"]
+        assert hasattr(result, 'summary')
+        summary = result.summary
         assert "Code-Review Workflow Summary" in summary
         assert "Test summary generation" in summary
         assert "1/1 steps successful" in summary
@@ -441,8 +441,8 @@ class TestWorkflowStreamingAndOutput:
             )
 
         # Verify failure summary
-        assert result["success"] is False
-        summary = result["summary"]
+        assert result.success is False
+        summary = result.summary
         assert "0/1 steps successful" in summary
         assert "1 failures" in summary
         assert "❌" in summary  # Failure indicator

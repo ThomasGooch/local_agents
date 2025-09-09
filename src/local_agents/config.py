@@ -111,7 +111,7 @@ class WorkflowConfig(BaseModel):
 
 class PerformanceConfig(BaseModel):
     """Performance and optimization settings."""
-    
+
     max_concurrent_agents: int = 2
     enable_response_cache: bool = True
     cache_size: int = 100
@@ -119,7 +119,7 @@ class PerformanceConfig(BaseModel):
     enable_parallel_workflows: bool = True
     memory_cleanup_interval: int = 300
     performance_monitoring: bool = False
-    
+
     @field_validator("max_concurrent_agents")
     @classmethod
     def validate_max_concurrent_agents(cls, v: int) -> int:
@@ -129,7 +129,7 @@ class PerformanceConfig(BaseModel):
         if v > 8:  # Reasonable upper limit
             raise ValueError("max_concurrent_agents too high (max 8)")
         return v
-    
+
     @field_validator("cache_size")
     @classmethod
     def validate_cache_size(cls, v: int) -> int:
@@ -139,7 +139,7 @@ class PerformanceConfig(BaseModel):
         if v > 1000:  # Reasonable upper limit
             raise ValueError("cache_size too large (max 1000)")
         return v
-    
+
     @field_validator("cache_ttl_seconds")
     @classmethod
     def validate_cache_ttl(cls, v: int) -> int:

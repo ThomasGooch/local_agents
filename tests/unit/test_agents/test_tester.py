@@ -37,10 +37,8 @@ def test_calculator_divide_by_zero():
     def test_agent_initialization(self, tester_agent):
         """Test testing agent initialization."""
         assert tester_agent.agent_type == "test"
-        assert (
-            tester_agent.role == "Senior Test Engineer and Quality Assurance Specialist"
-        )
-        assert "comprehensive tests" in tester_agent.goal
+        assert tester_agent.role == "Senior QA Engineer and Test Developer"
+        assert "comprehensive test" in tester_agent.goal
         assert tester_agent.model == "test:model"
 
     def test_execute_success(self, tester_agent):
@@ -143,7 +141,7 @@ def test_calculator_divide_by_zero():
 
         # Verify context contains code and framework
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "def add(a, b)" in prompt
         assert "Framework: pytest" in prompt
 
@@ -186,7 +184,7 @@ def test_calculator_divide_by_zero():
 
         # Verify format is included in context
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "json" in prompt.lower()
 
     def test_framework_detection_and_adaptation(self, tester_agent):
@@ -205,7 +203,7 @@ def test_calculator_divide_by_zero():
 
             assert result.success is True
             call_args = tester_agent.ollama_client.generate.call_args
-            prompt = call_args[0][1]
+            prompt = call_args.kwargs["prompt"]
             assert context["framework"] in prompt
             assert context["language"] in prompt
 
@@ -227,7 +225,7 @@ def test_calculator_divide_by_zero():
 
         assert result.success is True
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
 
         # Verify coverage requirements are mentioned
         for requirement in context["coverage_requirements"]:
@@ -246,7 +244,7 @@ def test_calculator_divide_by_zero():
 
         assert result.success is True
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "database" in prompt
         assert "pytest-mock" in prompt
         assert "external dependencies" in prompt.lower()
@@ -264,7 +262,7 @@ def test_calculator_divide_by_zero():
 
         assert result.success is True
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "pytest -v" in prompt
 
     def test_performance_test_generation(self, tester_agent):
@@ -283,7 +281,7 @@ def test_calculator_divide_by_zero():
 
         assert result.success is True
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "performance" in prompt.lower()
         assert "200ms" in prompt
 
@@ -298,7 +296,7 @@ def test_calculator_divide_by_zero():
         call_args = tester_agent.ollama_client.generate.call_args
         assert call_args.kwargs["stream"] is True
 
-    @patch("local_agents.config.get_model_for_agent")
+    @patch("local_agents.base.get_model_for_agent")
     def test_default_model_selection(self, mock_get_model, mock_ollama_client):
         """Test default model selection for testing agent."""
         mock_get_model.return_value = "deepseek-coder:6.7b"
@@ -325,7 +323,7 @@ def test_calculator_divide_by_zero():
 
         assert result.success is True
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "security" in prompt.lower()
         assert "SQL injection" in prompt
 
@@ -342,6 +340,6 @@ def test_calculator_divide_by_zero():
 
         assert result.success is True
         call_args = tester_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "5 passed" in prompt
         assert "AssertionError" in prompt

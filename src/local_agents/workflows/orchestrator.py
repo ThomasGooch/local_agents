@@ -1,10 +1,8 @@
 """Workflow orchestrator for managing multi-agent workflows."""
 
 import time
-import asyncio
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type, Union, Set
+from typing import Any, Dict, List, Optional, Type, Union
 
 from rich.console import Console
 from rich.panel import Panel
@@ -205,9 +203,9 @@ class Workflow:
             "average_execution_time": 0.0,
             "concurrent_executions": 0,
             "cache_hits": 0,
-            "total_steps": 0
+            "total_steps": 0,
         }
-        
+
         # Workflow definitions for tests compatibility
         self.workflow_definitions = {
             "feature-dev": {
@@ -281,7 +279,7 @@ class Workflow:
                     continue
 
                 # Execute step
-                result = self._execute_step(step, task, stream)
+                result = self._execute_step(step, task, None, stream)
                 results.append(result)
 
                 # Update context with results
@@ -397,24 +395,25 @@ class Workflow:
             ]
 
         return workflows.get(workflow_name, [])
-    
+
     def get_performance_stats(self) -> Dict[str, Any]:
         """Get workflow execution performance statistics."""
         from ..ollama_client import OllamaClient
-        
+
         # Get cache statistics
         cache_stats = OllamaClient.get_cache_stats()
-        
+
         return {
             **self.execution_stats,
             "cache_stats": cache_stats,
             "max_concurrent_agents": self.max_concurrent_agents,
             "success_rate": (
-                self.execution_stats["successful_workflows"] / 
-                max(1, self.execution_stats["total_workflows"])
-            ) * 100
+                self.execution_stats["successful_workflows"]
+                / max(1, self.execution_stats["total_workflows"])
+            )
+            * 100,
         }
-    
+
     def optimize_for_hardware(self, ram_gb: int = 16, cpu_cores: int = 6) -> None:
         """Optimize workflow settings for specific hardware configuration."""
         if ram_gb >= 16:
@@ -426,9 +425,13 @@ class Workflow:
         else:
             # Low memory - sequential execution only
             self.max_concurrent_agents = 1
-        
-        console.print(f"[blue]Optimized for {ram_gb}GB RAM, {cpu_cores} cores: max {self.max_concurrent_agents} concurrent agents[/blue]")
-    
+
+        opt_msg = (
+            f"Optimized for {ram_gb}GB RAM, {cpu_cores} cores: "
+            f"max {self.max_concurrent_agents} concurrent agents"
+        )
+        console.print(f"[blue]{opt_msg}[/blue]")
+
     def clear_performance_stats(self) -> None:
         """Reset performance statistics."""
         self.execution_stats = {
@@ -437,7 +440,7 @@ class Workflow:
             "average_execution_time": 0.0,
             "concurrent_executions": 0,
             "cache_hits": 0,
-            "total_steps": 0
+            "total_steps": 0,
         }
 
     def _execute_step(
@@ -467,6 +470,26 @@ class Workflow:
             agent_type = step
             task_description = main_task
             step_context = context or {}
+
+            # Check dependencies for legacy API
+            if not self._check_dependencies(agent_type, []):
+                # Return failed step for dependency failure
+                temp_step = WorkflowStep(agent_type, f"Execute {agent_type} agent")
+                task_result = TaskResult(
+                    success=False,
+                    output="",
+                    agent_type=agent_type,
+                    task=task_description,
+                    error="Dependency not satisfied",
+                    execution_time=0.0,
+                )
+                temp_step.result = task_result
+                temp_step.completed = False
+                temp_step.success = False
+                temp_step.output = ""
+                temp_step.execution_time = 0.0
+                temp_step.error = "Dependency not satisfied"
+                return temp_step
 
             # Create a temporary WorkflowStep for processing
             temp_step = WorkflowStep(agent_type, f"Execute {agent_type} agent")

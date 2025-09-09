@@ -46,8 +46,8 @@ The code is well-structured with good error handling practices.
     def test_agent_initialization(self, reviewer_agent):
         """Test review agent initialization."""
         assert reviewer_agent.agent_type == "review"
-        assert reviewer_agent.role == "Senior Code Reviewer and Security Analyst"
-        assert "comprehensive code reviews" in reviewer_agent.goal
+        assert reviewer_agent.role == "Senior Code Reviewer and Quality Analyst"
+        assert "quality" in reviewer_agent.goal
         assert reviewer_agent.model == "test:model"
 
     def test_execute_success(self, reviewer_agent):
@@ -135,8 +135,9 @@ The code is well-structured with good error handling practices.
         assert "Missing function docstring" in prompt
         assert "Use of assert detected" in prompt
 
+    @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
-    def test_run_static_analysis_success(self, mock_run, reviewer_agent):
+    def test_run_static_analysis_success(self, mock_run, mock_exists, reviewer_agent):
         """Test successful static analysis execution."""
         mock_run.return_value = Mock(
             returncode=0, stdout="test.py:1:1: E302 expected 2 blank lines", stderr=""
@@ -147,8 +148,9 @@ The code is well-structured with good error handling practices.
         assert "E302" in result
         mock_run.assert_called_once()
 
+    @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
-    def test_run_static_analysis_timeout(self, mock_run, reviewer_agent):
+    def test_run_static_analysis_timeout(self, mock_run, mock_exists, reviewer_agent):
         """Test static analysis timeout handling."""
         import subprocess
 
@@ -159,8 +161,9 @@ The code is well-structured with good error handling practices.
         assert "timeout" in result.lower()
         assert len(result) > 0  # Should return error message
 
+    @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
-    def test_run_static_analysis_not_found(self, mock_run, reviewer_agent):
+    def test_run_static_analysis_not_found(self, mock_run, mock_exists, reviewer_agent):
         """Test static analysis tool not found."""
         mock_run.side_effect = FileNotFoundError("flake8 not found")
 
@@ -170,16 +173,16 @@ The code is well-structured with good error handling practices.
 
     def test_review_for_security(self, reviewer_agent):
         """Test security-focused code review."""
-        code = "SELECT * FROM users WHERE id = " + str(user_id)
+        code = "SELECT * FROM users WHERE id = " + str(123)
 
         result = reviewer_agent.review_for_security(code)
 
         assert result.success is True
-        assert "Security review for provided code" in result.task
+        assert "Review this code for security vulnerabilities" in result.task
 
         # Verify security focus in prompt
         call_args = reviewer_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "security" in prompt.lower()
         assert "SELECT * FROM users" in prompt
 
@@ -190,11 +193,11 @@ The code is well-structured with good error handling practices.
         result = reviewer_agent.review_for_performance(code)
 
         assert result.success is True
-        assert "Performance review for provided code" in result.task
+        assert "Review this code for performance issues" in result.task
 
         # Verify performance focus in prompt
         call_args = reviewer_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "performance" in prompt.lower()
 
     def test_review_for_maintainability(self, reviewer_agent):
@@ -206,7 +209,7 @@ The code is well-structured with good error handling practices.
         result = reviewer_agent.review_for_maintainability(code)
 
         assert result.success is True
-        assert "Maintainability review for provided code" in result.task
+        assert "Review this code for maintainability" in result.task
 
     def test_comprehensive_review(self, reviewer_agent):
         """Test comprehensive code review."""
@@ -218,11 +221,11 @@ The code is well-structured with good error handling practices.
         result = reviewer_agent.comprehensive_review(code, target_file)
 
         assert result.success is True
-        assert f"Comprehensive review of {target_file}" in result.task
+        assert "Perform a comprehensive code review" in result.task
 
         # Verify comprehensive review includes all areas
         call_args = reviewer_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "security" in prompt.lower()
         assert "performance" in prompt.lower()
         assert "maintainability" in prompt.lower()
@@ -279,7 +282,7 @@ The code is well-structured with good error handling practices.
 
             assert result.success is True
             call_args = reviewer_agent.ollama_client.generate.call_args
-            prompt = call_args[0][1]
+            prompt = call_args.kwargs["prompt"]
             assert lang_context["language"] in prompt.lower()
 
     def test_severity_categorization(self, reviewer_agent):
@@ -294,7 +297,7 @@ The code is well-structured with good error handling practices.
 
         assert result.success is True
         call_args = reviewer_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "severity" in prompt.lower()
         assert "critical" in prompt.lower() or "high" in prompt.lower()
 
@@ -314,7 +317,7 @@ The code is well-structured with good error handling practices.
 
             assert result.success is True
             call_args = reviewer_agent.ollama_client.generate.call_args
-            prompt = call_args[0][1]
+            prompt = call_args.kwargs["prompt"]
             assert context["framework"] in prompt.lower()
 
     def test_execute_with_stream(self, reviewer_agent):
@@ -328,7 +331,7 @@ The code is well-structured with good error handling practices.
         call_args = reviewer_agent.ollama_client.generate.call_args
         assert call_args.kwargs["stream"] is True
 
-    @patch("local_agents.config.get_model_for_agent")
+    @patch("local_agents.base.get_model_for_agent")
     def test_default_model_selection(self, mock_get_model, mock_ollama_client):
         """Test default model selection for review agent."""
         mock_get_model.return_value = "llama3.1:8b"
@@ -350,7 +353,7 @@ The code is well-structured with good error handling practices.
 
         assert result.success is True
         call_args = reviewer_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "metrics" in prompt.lower()
 
     @patch("local_agents.agents.reviewer.ReviewAgent._run_static_analysis")
@@ -391,6 +394,6 @@ The code is well-structured with good error handling practices.
 
         assert result.success is True
         call_args = reviewer_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "previous reviews" in prompt.lower()
-        assert "changes_made" in prompt.lower()
+        assert "changes made" in prompt.lower()

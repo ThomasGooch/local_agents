@@ -1,6 +1,5 @@
 """Integration tests for agent interactions."""
 
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -9,7 +8,6 @@ from local_agents.agents.coder import CodingAgent
 from local_agents.agents.planner import PlanningAgent
 from local_agents.agents.reviewer import ReviewAgent
 from local_agents.agents.tester import TestingAgent
-from local_agents.base import TaskResult
 from local_agents.ollama_client import OllamaClient
 
 
@@ -38,15 +36,15 @@ def mock_ollama_response():
         "code": """```python
 def calculator(operation: str, a: float, b: float) -> float:
     \"\"\"Perform basic arithmetic operations.
-    
+
     Args:
         operation: The operation to perform (+, -, *, /)
         a: First operand
         b: Second operand
-    
+
     Returns:
         Result of the arithmetic operation
-    
+
     Raises:
         ValueError: If operation is not supported or division by zero
     \"\"\"
@@ -107,7 +105,9 @@ def test_calculator_invalid_operation():
         "review": """# Code Review Report
 
 ## Summary
-The calculator function is well-implemented with proper error handling, type hints, and comprehensive documentation. The code follows Python best practices.
+The calculator function is well-implemented with proper error handling,
+type hints, and comprehensive documentation. The code follows Python
+best practices.
 
 ## Positive Aspects
 - Excellent type hints usage

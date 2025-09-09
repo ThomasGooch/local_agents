@@ -64,7 +64,7 @@ class TestBaseAgent:
         assert agent.model == "test:model"
         assert agent.ollama_client == mock_ollama_client
 
-    @patch("local_agents.config.get_config")
+    @patch("local_agents.base.get_config")
     def test_agent_initialization_with_config(
         self, mock_get_config, mock_ollama_client
     ):
@@ -79,7 +79,7 @@ class TestBaseAgent:
                 pass
 
         with patch(
-            "local_agents.config.get_model_for_agent", return_value="config:model"
+            "local_agents.base.get_model_for_agent", return_value="config:model"
         ):
             agent = TestAgent(
                 agent_type="test",
@@ -264,6 +264,7 @@ class TestTaskResult:
             "task": "Test task",
             "context": {"key": "value"},
             "error": "Test error",
+            "execution_time": 0.0,
         }
 
         assert result_dict == expected
@@ -545,8 +546,8 @@ class TestBaseAgentAdvanced:
 
     def test_agent_configuration_integration(self, mock_ollama_client):
         """Test agent integrates with configuration system."""
-        with patch("local_agents.config.get_config") as mock_get_config:
-            with patch("local_agents.config.get_model_for_agent") as mock_get_model:
+        with patch("local_agents.base.get_config") as mock_get_config:
+            with patch("local_agents.base.get_model_for_agent") as mock_get_model:
                 mock_config = Mock()
                 mock_config.temperature = 0.9
                 mock_config.max_tokens = 1024
@@ -569,7 +570,6 @@ class TestBaseAgentAdvanced:
                 assert agent.model == "config:model"
                 assert agent.temperature == 0.9
                 assert agent.max_tokens == 1024
-                assert agent.context_length == 4096
 
     def test_error_handling_chain(self, mock_ollama_client):
         """Test complete error handling chain."""

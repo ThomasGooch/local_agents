@@ -215,7 +215,7 @@ class TestWorkflowOrchestrator:
             ):
                 workflow._execute_step("code", "Generate code", {})
 
-            mock_check.assert_called_once_with("code")
+            mock_check.assert_called_once_with("code", [])
 
     def test_dependency_failure_handling(self, workflow, mock_agents):
         """Test handling of dependency failures."""

@@ -48,18 +48,20 @@ class TestingAgent(BaseAgent):
         if context.get("target_file"):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
-        if context.get("code_content"):
+        if context.get("code_content") or context.get("code_to_test"):
             prompt_parts.append(
-                f"\n## Code to Test\n```\n{context['code_content']}\n```"
+                f"\n## Code to Test\n```\n{context.get('code_content') or context.get('code_to_test')}\n```"
             )
 
         if context.get("target_directory"):
             prompt_parts.append(f"\n## Target Directory\n{context['target_directory']}")
             self._add_testing_context(prompt_parts, Path(context["target_directory"]))
 
+        if context.get("language"):
+            prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
         if context.get("framework"):
             prompt_parts.append(
-                f"\n## Preferred Testing Framework\n{context['framework']}"
+                f"\n## Framework\nFramework: {context['framework']}"
             )
 
         if context.get("target_description"):
@@ -67,8 +69,93 @@ class TestingAgent(BaseAgent):
                 f"\n## Target Description\n{context['target_description']}"
             )
 
+        # Handle both 'specifications' and 'test_specifications' keys
+        specifications = context.get("specifications") or context.get("test_specifications")
+        if specifications:
+            if isinstance(specifications, list):
+                spec_text = "\n- " + "\n- ".join(specifications)
+            else:
+                spec_text = specifications
+            prompt_parts.append(
+                f"\n## Test Specifications\n{spec_text}"
+            )
+        if context.get("implementation_plan"):
+            prompt_parts.append(
+                f"\n## Implementation Plan\n{context['implementation_plan']}"
+            )
+
+        if context.get("requirements"):
+            prompt_parts.append(
+                f"\n## Requirements\n{context['requirements']}"
+            )
+
+        if context.get("style_guide"):
+            prompt_parts.append(
+                f"\n## Style Guide\n{context['style_guide']}"
+            )
+
+        if context.get("test_type"):
+            prompt_parts.append(
+                f"\n## Test Type\n{context['test_type']}"
+            )
+
+
+        if context.get("format_type"):
+            prompt_parts.append(
+                f"\n## Format Type\n{context['format_type']}"
+            )
+
+        if context.get("data_spec"):
+            prompt_parts.append(
+                f"\n## Data Specification\n{context['data_spec']}"
+            )
+
+        if context.get("api_spec"):
+            prompt_parts.append(
+                f"\n## API Specification\n{context['api_spec']}"
+            )
+
+        if context.get("security_concerns"):
+            prompt_parts.append(
+                f"\n## Security Concerns\n{', '.join(context['security_concerns']) if isinstance(context['security_concerns'], list) else context['security_concerns']}"
+            )
+
+        if context.get("performance_requirements"):
+            prompt_parts.append(
+                f"\n## Performance Requirements\n{context['performance_requirements']}"
+            )
+
+        if context.get("test_results"):
+            prompt_parts.append(
+                f"\n## Test Results\n{context['test_results']}"
+            )
+
+        if context.get("test_data"):
+            prompt_parts.append(
+                f"\n## Test Data\n{context['test_data']}"
+            )
+        if context.get("error_detail"):
+            prompt_parts.append(
+                f"\n## Error Details\n{context['error_detail']}"
+            )
+        if context.get("dependencies"):
+            prompt_parts.append(
+                f"\n## Dependencies\n{context['dependencies']}"
+            )
+
+        if context.get("database_setup"):
+            prompt_parts.append(
+                f"\n## Database Setup\n{context['database_setup']}"
+            )
         prompt_parts.extend(
             [
+                "\n## Test Coverage Requirements",
+                ("\nThis test suite should include:"
+                + "\n- Happy path scenarios"
+                + "\n- Edge cases and boundary conditions"
+                + "\n- Error conditions and exception handling"
+                + "\n- Input validation and data integrity tests"
+                + "\n- Integration and workflow tests"),
                 "\n## Testing Instructions",
                 """
 Please generate comprehensive tests that:
@@ -248,7 +335,15 @@ the code under test.
         if framework:
             context["framework"] = framework
 
-        task = f"Generate unit tests for {target_file}"
+        # Check if target_file is actually code content (contains function definitions)
+        if "def " in target_file or "class " in target_file:
+            task = "Generate unit tests for provided code"
+            context["code_content"] = target_file  # Store the actual code
+            context["target_file"] = "provided_code"  # Generic filename
+        elif Path(target_file).exists():
+            task = f"Generate unit tests for {target_file}"
+        else:
+            task = f"Generate unit tests for {target_file}"
         return self.execute(task, context)
 
     def generate_integration_tests(
@@ -327,3 +422,99 @@ the code under test.
                 continue
 
         return None
+
+    def generate_api_tests(
+        self,
+        api_spec: Dict[str, Any],
+        framework: str = "pytest",
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Generate API tests based on API specification."""
+        context = context or {}
+        context["api_spec"] = api_spec
+        context["framework"] = framework
+        context["test_type"] = "api"
+
+        endpoint = api_spec.get("endpoint", "unknown")
+        task = f"Generate API tests for endpoint: {endpoint}"
+        return self.execute(task, context)
+
+    def create_test_data(
+        self,
+        data_spec: str,
+        format_type: str = "json",
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Create test data based on specification."""
+        context = context or {}
+        context["data_spec"] = data_spec
+        context["format_type"] = format_type
+        context["test_type"] = "data"
+
+        task = f"Create test data: {data_spec}"
+        return self.execute(task, context)
+
+    def generate_function(
+        self,
+        function_spec: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Generate a specific test function."""
+        context = context or {}
+        context["function_spec"] = function_spec
+        context["test_type"] = "function"
+
+        task = f"Generate test function: {function_spec}"
+        return self.execute(task, context)
+
+    def generate_class(
+        self,
+        class_spec: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Generate test class."""
+        context = context or {}
+        context["class_spec"] = class_spec
+        context["test_type"] = "class"
+
+        task = f"Generate test class: {class_spec}"
+        return self.execute(task, context)
+
+    def implement_feature(
+        self,
+        feature_spec: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Implement test feature."""
+        context = context or {}
+        context["feature_spec"] = feature_spec
+        context["test_type"] = "feature"
+
+        task = f"Implement test feature: {feature_spec}"
+        return self.execute(task, context)
+
+    def fix_bug(
+        self,
+        bug_description: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Fix test bug."""
+        context = context or {}
+        context["bug_description"] = bug_description
+        context["test_type"] = "bugfix"
+
+        task = f"Fix test bug: {bug_description}"
+        return self.execute(task, context)
+
+    def refactor_code(
+        self,
+        refactor_spec: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Refactor test code."""
+        context = context or {}
+        context["refactor_spec"] = refactor_spec
+        context["test_type"] = "refactor"
+
+        task = f"Refactor test code: {refactor_spec}"
+        return self.execute(task, context)

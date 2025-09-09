@@ -12,6 +12,7 @@ from .agents.coder import CodingAgent
 from .agents.planner import PlanningAgent
 from .agents.reviewer import ReviewAgent
 from .agents.tester import TestingAgent
+from .benchmarks import benchmark_system
 from .config import config_manager
 from .exceptions import (
     AgentExecutionError,
@@ -19,10 +20,9 @@ from .exceptions import (
     ModelNotAvailableError,
     WorkflowError,
 )
-from .workflows.orchestrator import Workflow
-from .performance import performance_monitor
 from .hardware import hardware_optimizer
-from .benchmarks import benchmark_system
+from .performance import performance_monitor
+from .workflows.orchestrator import Workflow
 
 console = Console()
 
@@ -801,11 +801,12 @@ def export(filepath: Optional[str]):
     try:
         import time
         from pathlib import Path
+
         if not filepath:
             filepath = Path.cwd() / f"performance_metrics_{int(time.time())}.json"
         else:
             filepath = Path(filepath)
-        
+
         performance_monitor.export_metrics(filepath)
     except Exception as e:
         handle_common_errors(e)
@@ -837,30 +838,32 @@ def optimize():
     """Apply hardware-specific optimizations."""
     try:
         profile = hardware_optimizer.detect_best_profile()
-        
+
         console.print(f"[cyan]Detected Profile:[/cyan] {profile.name}")
         console.print("\n[bold]Optimization Changes:[/bold]")
-        
+
         # Show what will be changed
         config = hardware_optimizer.get_optimization_config(profile)
         settings_table = Table(title="Performance Settings")
         settings_table.add_column("Setting", style="yellow")
         settings_table.add_column("Value", style="green")
-        
+
         for key, value in config["performance_settings"].items():
             settings_table.add_row(key.replace("_", " ").title(), str(value))
-        
+
         console.print(settings_table)
-        
+
         if click.confirm("Apply these optimizations?"):
             success = hardware_optimizer.apply_optimization(config_manager, profile)
             if success:
-                console.print("[green]✓ Hardware optimization applied successfully[/green]")
+                console.print(
+                    "[green]✓ Hardware optimization applied successfully[/green]"
+                )
             else:
                 console.print("[red]✗ Failed to apply optimization[/red]")
         else:
             console.print("[dim]Optimization cancelled[/dim]")
-            
+
     except Exception as e:
         handle_common_errors(e)
 
@@ -878,34 +881,42 @@ def benchmark():
 
 
 @benchmark.command()
-@click.option("--suite", "-s", default="quick", 
-              type=click.Choice(["quick", "comprehensive", "stress"]),
-              help="Benchmark suite to run")
-@click.option("--concurrent", "-c", multiple=True, type=int,
-              help="Concurrent levels to test (can specify multiple)")
+@click.option(
+    "--suite",
+    "-s",
+    default="quick",
+    type=click.Choice(["quick", "comprehensive", "stress"]),
+    help="Benchmark suite to run",
+)
+@click.option(
+    "--concurrent",
+    "-c",
+    multiple=True,
+    type=int,
+    help="Concurrent levels to test (can specify multiple)",
+)
 @click.option("--repeat", "-r", default=1, help="Number of repetitions")
 @click.option("--export", "-e", type=click.Path(), help="Export results to file")
 def run(suite: str, concurrent: tuple, repeat: int, export: Optional[str]):
     """Run performance benchmark suite."""
     try:
         concurrent_levels = list(concurrent) if concurrent else [1, 2]
-        
+
         console.print(f"[bold blue]Running {suite} benchmark suite[/bold blue]")
         console.print(f"Concurrent levels: {concurrent_levels}")
         console.print(f"Repetitions: {repeat}")
-        
+
         results = benchmark_system.run_benchmark_suite(
-            suite_type=suite,
-            concurrent_levels=concurrent_levels, 
-            repeat_count=repeat
+            suite_type=suite, concurrent_levels=concurrent_levels, repeat_count=repeat
         )
-        
+
         benchmark_system.display_benchmark_results(results)
-        
+
         if export:
             from pathlib import Path
+
             benchmark_system.export_benchmark_results(results, Path(export))
-            
+
     except Exception as e:
         handle_common_errors(e)
 
@@ -917,13 +928,21 @@ def targets():
     targets_table.add_column("Target", style="cyan")
     targets_table.add_column("Value", style="green")
     targets_table.add_column("Description", style="dim")
-    
+
     targets = benchmark_system.performance_targets
-    targets_table.add_row("Memory Usage", f"< {targets['memory_usage']}MB", "Peak usage on 16GB systems")
-    targets_table.add_row("Response Time", f"< {targets['response_time']}s", "Individual agent execution")
-    targets_table.add_row("Workflow Time", f"< {targets['workflow_time']}s", "Complete workflow execution")
-    targets_table.add_row("Startup Time", f"< {targets['startup_time']}s", "CLI command initialization")
-    
+    targets_table.add_row(
+        "Memory Usage", f"< {targets['memory_usage']}MB", "Peak usage on 16GB systems"
+    )
+    targets_table.add_row(
+        "Response Time", f"< {targets['response_time']}s", "Individual agent execution"
+    )
+    targets_table.add_row(
+        "Workflow Time", f"< {targets['workflow_time']}s", "Complete workflow execution"
+    )
+    targets_table.add_row(
+        "Startup Time", f"< {targets['startup_time']}s", "CLI command initialization"
+    )
+
     console.print(targets_table)
 
 

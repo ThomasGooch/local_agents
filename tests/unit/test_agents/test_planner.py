@@ -137,7 +137,7 @@ class TestPlanningAgent:
         call_args = planner_agent.ollama_client.generate.call_args
         assert call_args.kwargs["stream"] is True
 
-    @patch("local_agents.config.get_model_for_agent")
+    @patch("local_agents.base.get_model_for_agent")
     def test_default_model_selection(self, mock_get_model, mock_ollama_client):
         """Test default model selection for planning agent."""
         mock_get_model.return_value = "llama3.1:8b"

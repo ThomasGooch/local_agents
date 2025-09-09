@@ -7,6 +7,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from local_agents.agents.planner import PlanningAgent
+from local_agents.base import TaskResult
 from local_agents.config import Config
 from local_agents.ollama_client import OllamaClient
 
@@ -55,16 +57,16 @@ def calculate_sum(a, b):
 
 class Calculator:
     """A simple calculator class."""
-    
+
     def __init__(self):
         self.history = []
-    
+
     def add(self, a, b):
         """Add two numbers and store in history."""
         result = a + b
         self.history.append(f"{a} + {b} = {result}")
         return result
-    
+
     def get_history(self):
         """Get calculation history."""
         return self.history
@@ -87,13 +89,13 @@ class Calculator {
     constructor() {
         this.history = [];
     }
-    
+
     add(a, b) {
         const result = a + b;
         this.history.push(`${a} + ${b} = ${result}`);
         return result;
     }
-    
+
     getHistory() {
         return this.history;
     }
@@ -144,7 +146,7 @@ console.log(calc.add(2, 3));
     constructor() {
         this.history = [];
     }
-    
+
     add(a, b) {
         const result = a + b;
         this.history.push(`${a} + ${b} = ${result}`);
@@ -205,16 +207,16 @@ line-length = 88
 
 class Calculator:
     """A simple calculator."""
-    
+
     def __init__(self):
         self.history = []
-    
+
     def add(self, a: int, b: int) -> int:
         """Add two numbers."""
         result = a + b
         self.history.append(f"{a} + {b} = {result}")
         return result
-    
+
     def get_history(self):
         """Get calculation history."""
         return self.history
@@ -257,7 +259,7 @@ def mock_ollama_responses():
 - Identify key functional and non-functional requirements
 - Define success criteria and acceptance tests
 
-## Architecture Design  
+## Architecture Design
 - Design system architecture and component structure
 - Define data models and interfaces
 - Plan security and performance considerations
@@ -303,30 +305,30 @@ class User:
 
 class UserManager:
     """Manages user operations with proper error handling."""
-    
+
     def __init__(self):
         self.users: Dict[int, User] = {}
         self._next_id = 1
         logger.info("UserManager initialized")
-    
+
     def create_user(self, username: str, email: str) -> User:
         """Create a new user with validation."""
         if not username or len(username) < 3:
             raise ValueError("Username must be at least 3 characters")
-        
+
         if not email or '@' not in email:
             raise ValueError("Invalid email format")
-        
+
         user = User(
             id=self._next_id,
             username=username,
             email=email,
             created_at=datetime.now()
         )
-        
+
         self.users[self._next_id] = user
         self._next_id += 1
-        
+
         logger.info(f"Created user: {username} (ID: {user.id})")
         return user
 ```''',
@@ -339,22 +341,22 @@ from mymodule import User, UserManager
 
 class TestUserManager:
     """Test UserManager class."""
-    
+
     @pytest.fixture
     def user_manager(self):
         """Create a UserManager instance for testing."""
         return UserManager()
-    
+
     def test_create_user_success(self, user_manager):
         """Test successful user creation."""
         user = user_manager.create_user("alice", "alice@example.com")
-        
+
         assert user.id == 1
         assert user.username == "alice"
         assert user.email == "alice@example.com"
         assert user.is_active is True
         assert isinstance(user.created_at, datetime)
-        
+
         # Verify user is stored
         assert len(user_manager.users) == 1
         assert user_manager.users[1] == user
@@ -395,7 +397,10 @@ def comprehensive_mock_agents():
     mock_planner.agent_type = "plan"
     mock_planner.execute.return_value = TaskResult(
         success=True,
-        output="# Implementation Plan\n\n## Phase 1: Core Setup\n- Set up project structure",
+        output=(
+            "# Implementation Plan\n\n## Phase 1: Core Setup\n"
+            "- Set up project structure"
+        ),
         agent_type="plan",
         task="Create implementation plan",
         context={},

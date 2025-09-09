@@ -5,9 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9-3.12](https://img.shields.io/badge/python-3.9--3.12-blue.svg)](https://www.python.org/downloads/)
 [![Ollama](https://img.shields.io/badge/Powered%20by-Ollama-blue.svg)](https://ollama.ai)
-[![Test Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen.svg)](https://codecov.io/gh/your-username/local-agents)
-[![CI Status](https://img.shields.io/badge/Tests-1500%2B%20Passing-brightgreen.svg)](https://github.com/your-username/local-agents/actions)
-[![Code Quality](https://img.shields.io/badge/Code%20Quality-A-brightgreen.svg)](https://github.com/your-username/local-agents)
+[![Test Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen.svg)](#-comprehensive-testing-suite)
+[![CI Status](https://img.shields.io/badge/Tests-1500%2B%20Passing-brightgreen.svg)](#-test-quality-metrics)
+[![Code Quality](https://img.shields.io/badge/Code%20Quality-A-brightgreen.svg)](#-code-quality-tools)
 
 **Local Agents** is a comprehensive suite of AI-powered development agents that run entirely on your machine. No cloud dependencies, no data sharing, no privacy concerns—just powerful AI assistance for your development workflow.
 
@@ -80,7 +80,9 @@ python --version  # Should show 3.11.9 (if you have alias python=python3)
 ### One-Command Installation
 
 ```bash
-git clone https://github.com/your-username/local-agents.git
+# Note: Installation creates python -m local_agents command
+# Global 'python -m local_agents' shortcut coming in future release
+git clone <repository-url>
 cd local-agents
 chmod +x install.sh
 ./install.sh
@@ -98,9 +100,9 @@ chmod +x install.sh
 ### Verify Installation
 
 ```bash
-lagents --version
-lagents config show
-lagents model status
+python -m local_agents --version
+python -m local_agents config show
+python -m local_agents model status
 ```
 
 ### 🍎 MacBook Pro Quick Start
@@ -108,22 +110,22 @@ lagents model status
 
 ```bash
 # 1. Install with optimal models for your hardware
-git clone https://github.com/your-username/local-agents.git
+git clone <repository-url>
 cd local-agents
 ./install.sh
 
 # 2. Pull optimized models (will use ~15GB disk space)
-lagents model pull llama3.1:8b
-lagents model pull codellama:13b-instruct  
-lagents model pull deepseek-coder:6.7b
+python -m local_agents model pull llama3.1:8b
+python -m local_agents model pull codellama:13b-instruct  
+python -m local_agents model pull deepseek-coder:6.7b
 
 # 3. Configure for your hardware
-lagents config set agents.coding codellama:13b-instruct
-lagents config set context_length 8192
-lagents config set max_tokens 4096
+python -m local_agents config set agents.coding codellama:13b-instruct
+python -m local_agents config set context_length 8192
+python -m local_agents config set max_tokens 4096
 
 # 4. Test with a real workflow
-lagents workflow feature-dev "Add user authentication to my web app"
+python -m local_agents workflow feature-dev "Add user authentication to my web app"
 
 # 🎉 You're ready! Expected performance: 60-120 seconds for full workflows
 ```
@@ -134,20 +136,20 @@ lagents workflow feature-dev "Add user authentication to my web app"
 
 ```bash
 # 🧠 Planning Agent
-lagents plan "Add user authentication to web app"
-lagents plan --output auth_plan.md "Implement OAuth integration"
+python -m local_agents plan "Add user authentication to web app"
+python -m local_agents plan --output auth_plan.md "Implement OAuth integration"
 
 # 👨‍💻 Coding Agent  
-lagents code "Create a REST API endpoint for user registration"
-lagents code --file auth.py "Add email validation"
+python -m local_agents code "Create a REST API endpoint for user registration"
+python -m local_agents code --file auth.py "Add email validation"
 
 # 🧪 Testing Agent
-lagents test auth.py --framework pytest
-lagents test --run "authentication module"
+python -m local_agents test auth.py --framework pytest
+python -m local_agents test --run "authentication module"
 
 # 🔍 Review Agent
-lagents review src/authentication/ --focus security
-lagents review --output review.md auth.py
+python -m local_agents review src/authentication/ --focus security
+python -m local_agents review --output review.md auth.py
 ```
 
 ### ⚡ Multi-Agent Workflows
@@ -156,19 +158,19 @@ Execute powerful workflows that combine multiple agents:
 
 ```bash
 # 🏗️ Complete Feature Development
-lagents workflow feature-dev "Add dark mode toggle"
+python -m local_agents workflow feature-dev "Add dark mode toggle"
 # → Plan → Code → Test → Review
 
 # 🐛 Bug Fix Workflow  
-lagents workflow bug-fix "Fix memory leak in data processor"
+python -m local_agents workflow bug-fix "Fix memory leak in data processor"
 # → Plan → Code → Test
 
 # 📝 Code Review Only
-lagents workflow code-review "Review recent auth changes"
+python -m local_agents workflow code-review "Review recent auth changes"
 # → Review
 
 # 🔄 Refactoring Workflow
-lagents workflow refactor "Extract user utilities to shared module"
+python -m local_agents workflow refactor "Extract user utilities to shared module"
 # → Plan → Code → Test → Review
 ```
 
@@ -176,41 +178,48 @@ lagents workflow refactor "Extract user utilities to shared module"
 
 ```bash
 # 🎛️ Custom Model Selection
-lagents plan --model llama3.1:8b "Design microservices architecture"
+python -m local_agents plan --model llama3.1:8b "Design microservices architecture"
 
 # ⚡ Real-time Streaming
-lagents code --stream "Implement JWT authentication"
+python -m local_agents code --stream "Implement JWT authentication"
 
 # 📁 Context-Aware Development
-lagents code --context existing_auth.py "Add password reset functionality"
+python -m local_agents code --context existing_auth.py "Add password reset functionality"
 
 # 💾 Save Output
-lagents plan --output plan.md "Add user dashboard"
+python -m local_agents plan --output plan.md "Add user dashboard"
 
 # 📊 Comprehensive Testing
-lagents test --run --framework pytest src/
+python -m local_agents test --run --framework pytest src/
 ```
 
 ## 📋 Command Reference
 
 ### 🏠 Main Interface
 ```bash
-lagents                    # Show welcome screen and available commands
-lagents --help            # Comprehensive help
-lagents --version         # Version information
+python -m local_agents                    # Show welcome screen and available commands
+python -m local_agents --help            # Comprehensive help
+python -m local_agents --version         # Version information
 ```
 
 ### 🤖 Individual Agents
 ```bash
-lagents plan <task>       # 🧠 Create implementation plans
-lagents code <task>       # 👨‍💻 Generate or modify code  
-lagents test <target>     # 🧪 Create and run tests
-lagents review <target>   # 🔍 Analyze and review code
+python -m local_agents plan <task>       # 🧠 Create implementation plans
+python -m local_agents code <task>       # 👨‍💻 Generate or modify code  
+python -m local_agents test <target>     # 🧪 Create and run tests
+python -m local_agents review <target>   # 🔍 Analyze and review code
+```
+
+### 🔧 System Commands
+```bash
+python -m local_agents benchmark         # 📊 Performance benchmarking
+python -m local_agents hardware          # 💻 Hardware optimization and detection
+python -m local_agents performance       # ⚡ Performance monitoring
 ```
 
 ### ⚡ Workflow Orchestration
 ```bash
-lagents workflow <name> <task>   # Execute multi-agent workflows
+python -m local_agents workflow <name> <task>   # Execute multi-agent workflows
 ```
 
 **Available Workflows:**
@@ -221,28 +230,27 @@ lagents workflow <name> <task>   # Execute multi-agent workflows
 
 ### ⚙️ Configuration Management
 ```bash
-lagents config show                    # Show current configuration with descriptions
-lagents config set <key> <value>      # Update configuration (supports nested keys)
-lagents config reset                   # Reset to defaults with confirmation
-lagents config backup                  # Create configuration backup
-lagents config restore <backup>       # Restore from backup
-lagents config validate               # Validate current configuration
+python -m local_agents config show                    # Show current configuration with descriptions
+python -m local_agents config set <key> <value>      # Update configuration (supports nested keys)
+python -m local_agents config reset                   # Reset to defaults with confirmation
+python -m local_agents config backup                  # Create configuration backup
+python -m local_agents config restore <backup>       # Restore from backup
+python -m local_agents config validate               # Validate current configuration
 ```
 
 ### 🤖 Model Management
 ```bash
-lagents model list                     # List available models with metadata
-lagents model pull <model>             # Download a model from Ollama library
-lagents model remove <model>           # Remove a model with confirmation
-lagents model status                   # Show Ollama service status
+python -m local_agents model list                     # List available models with metadata
+python -m local_agents model pull <model>             # Download a model from Ollama library
+python -m local_agents model remove <model>           # Remove a model with confirmation
+python -m local_agents model status                   # Show Ollama service status
 ```
 
-### ⚡ Quick Access Shortcuts
+### ⚡ Command Alias (Future Release)
 ```bash
-la-plan <task>      # 🧠 Direct planning agent access
-la-code <task>      # 👨‍💻 Direct coding agent access
-la-test <target>    # 🧪 Direct testing agent access
-la-review <target>  # 🔍 Direct review agent access
+# Note: Global 'lagents' alias coming soon!
+# For now, use: python -m local_agents <command>
+# Or create your own alias: alias lagents='python -m local_agents'
 ```
 
 ### 🔧 Common Options
@@ -286,15 +294,15 @@ workflows:
 
 ```bash
 # View current configuration
-lagents config --show
+python -m local_agents config show
 
 # Update specific settings
-lagents config --set default_model llama3.1:8b
-lagents config --set temperature 0.8
-lagents config --set agents.coding deepseek-coder:6.7b
+python -m local_agents config set default_model llama3.1:8b
+python -m local_agents config set temperature 0.8
+python -m local_agents config set agents.coding deepseek-coder:6.7b
 
 # Reset to defaults
-lagents config --reset
+python -m local_agents config reset
 ```
 
 ## 🎬 Real-World Examples
@@ -302,61 +310,61 @@ lagents config --reset
 ### 🏗️ Complete Feature Development
 ```bash
 # Start with planning
-lagents plan "Add user profile management with avatar upload"
+python -m local_agents plan "Add user profile management with avatar upload"
 
 # Generate the implementation  
-lagents code --context src/models/user.py "Implement user profile endpoints"
+python -m local_agents code --context src/models/user.py "Implement user profile endpoints"
 
 # Create comprehensive tests
-lagents test --framework pytest --run src/api/profile.py
+python -m local_agents test --framework pytest --run src/api/profile.py
 
 # Security-focused review
-lagents review --focus security src/api/profile.py
+python -m local_agents review --focus security src/api/profile.py
 
 # Or do it all in one workflow
-lagents workflow feature-dev "Add user profile management with avatar upload"
+python -m local_agents workflow feature-dev "Add user profile management with avatar upload"
 ```
 
 ### 🐛 Bug Investigation & Fix
 ```bash
 # Analyze the problem
-lagents plan "Fix memory leak in image processing pipeline"
+python -m local_agents plan "Fix memory leak in image processing pipeline"
 
 # Implement the fix with context
-lagents code --context src/image_processor.py "Optimize memory usage and add proper cleanup"
+python -m local_agents code --context src/image_processor.py "Optimize memory usage and add proper cleanup"
 
 # Test the fix
-lagents test --run src/image_processor.py
+python -m local_agents test --run src/image_processor.py
 
 # Full bug fix workflow
-lagents workflow bug-fix "Fix memory leak in image processing pipeline"
+python -m local_agents workflow bug-fix "Fix memory leak in image processing pipeline"
 ```
 
 ### 🔒 Security Audit
 ```bash
 # Security-focused code review
-lagents review --focus security src/authentication/
+python -m local_agents review --focus security src/authentication/
 
 # Performance optimization review  
-lagents review --focus performance src/api/
+python -m local_agents review --focus performance src/api/
 
 # Complete code review workflow
-lagents workflow code-review "Review authentication module for security vulnerabilities"
+python -m local_agents workflow code-review "Review authentication module for security vulnerabilities"
 ```
 
 ### 🔄 Legacy Code Modernization
 ```bash
 # Plan the refactoring approach
-lagents plan "Refactor legacy user authentication to use modern JWT"
+python -m local_agents plan "Refactor legacy user authentication to use modern JWT"
 
 # Implement with existing context
-lagents code --context src/legacy_auth.py "Modernize authentication using JWT and bcrypt"
+python -m local_agents code --context src/legacy_auth.py "Modernize authentication using JWT and bcrypt"
 
 # Ensure no regressions
-lagents test --framework pytest src/auth/
+python -m local_agents test --framework pytest src/auth/
 
 # Full refactoring workflow
-lagents workflow refactor "Modernize authentication system"
+python -m local_agents workflow refactor "Modernize authentication system"
 ```
 
 ## 🧠 AI Models & Performance
@@ -374,14 +382,14 @@ lagents workflow refactor "Modernize authentication system"
 
 **For Speed (Smaller Models):**
 ```bash
-lagents config --set agents.coding codellama:7b-instruct-q4_0
-lagents config --set agents.planning llama3.1:8b-instruct-q4_0
+python -m local_agents config set agents.coding codellama:7b-instruct-q4_0
+python -m local_agents config set agents.planning llama3.1:8b-instruct-q4_0
 ```
 
 **For Quality (Larger Models):**
 ```bash
-lagents config --set agents.coding deepseek-coder:33b
-lagents config --set agents.planning llama3.1:70b
+python -m local_agents config set agents.coding deepseek-coder:33b
+python -m local_agents config set agents.planning llama3.1:70b
 ```
 
 ### 📦 Model Management
@@ -399,7 +407,7 @@ ollama pull deepseek-coder:6.7b
 ollama rm old-model:version
 
 # ⚡ Override model per command
-lagents code --model deepseek-coder:33b "Implement complex algorithm"
+python -m local_agents code --model deepseek-coder:33b "Implement complex algorithm"
 ```
 
 ### 💾 Storage Requirements
@@ -441,18 +449,18 @@ agents:
 #### ⚡ **Performance Setup Commands**
 ```bash
 # 1. Install optimized models for your hardware
-lagents model pull llama3.1:8b
-lagents model pull codellama:13b-instruct
-lagents model pull deepseek-coder:6.7b
+python -m local_agents model pull llama3.1:8b
+python -m local_agents model pull codellama:13b-instruct
+python -m local_agents model pull deepseek-coder:6.7b
 
 # 2. Configure for optimal performance
-lagents config set agents.coding codellama:13b-instruct
-lagents config set max_tokens 4096
-lagents config set temperature 0.7
+python -m local_agents config set agents.coding codellama:13b-instruct
+python -m local_agents config set max_tokens 4096
+python -m local_agents config set temperature 0.7
 
 # 3. Verify configuration
-lagents config show
-lagents model status
+python -m local_agents config show
+python -m local_agents model status
 ```
 
 #### 🏆 **What Your System Can Handle**
@@ -478,7 +486,7 @@ lagents model status
 **🏗️ Full-Stack Feature Development:**
 ```bash
 # Your system can handle this end-to-end workflow smoothly
-lagents workflow feature-dev "Add real-time chat with WebSocket support"
+python -m local_agents workflow feature-dev "Add real-time chat with WebSocket support"
 
 # Expected timeline:
 # ├── Planning: ~25 seconds (architecture, database, API design)
@@ -491,16 +499,16 @@ lagents workflow feature-dev "Add real-time chat with WebSocket support"
 **🐛 Complex Bug Investigation:**
 ```bash
 # Handle memory leaks, performance issues, race conditions
-lagents workflow bug-fix "Optimize database queries causing timeout in user dashboard"
+python -m local_agents workflow bug-fix "Optimize database queries causing timeout in user dashboard"
 
 # Your 16GB RAM easily handles large codebase analysis
-lagents review --focus performance src/database/ --context src/models/
+python -m local_agents review --focus performance src/database/ --context src/models/
 ```
 
 **🔒 Security Audit:**
 ```bash
 # Comprehensive security review with your processing power
-lagents review --focus security src/auth/ src/api/ src/database/
+python -m local_agents review --focus security src/auth/ src/api/ src/database/
 
 # Multiple static analysis tools running simultaneously
 # bandit, flake8, pylint, mypy - all handled efficiently
@@ -511,37 +519,37 @@ lagents review --focus security src/auth/ src/api/ src/database/
 **🚀 Speed Optimizations:**
 ```bash
 # Use quantized models for faster inference (if speed > quality)
-lagents config set agents.planning llama3.1:8b-instruct-q4_0  # 2.6GB vs 4.7GB
-lagents config set agents.coding codellama:13b-instruct-q4_0   # 4.1GB vs 7.3GB
+python -m local_agents config set agents.planning llama3.1:8b-instruct-q4_0  # 2.6GB vs 4.7GB
+python -m local_agents config set agents.coding codellama:13b-instruct-q4_0   # 4.1GB vs 7.3GB
 
 # Enable parallel processing for workflows
-lagents config set max_concurrent_agents 2
+python -m local_agents config set max_concurrent_agents 2
 ```
 
 **🧠 Quality Maximization:**
 ```bash
 # Your 16GB RAM can handle larger context windows
-lagents config set context_length 16384    # Double the context
-lagents config set max_tokens 6144         # Longer responses
+python -m local_agents config set context_length 16384    # Double the context
+python -m local_agents config set max_tokens 6144         # Longer responses
 
 # Use the largest models for complex tasks
-lagents code --model codellama:34b "Implement distributed caching system"
+python -m local_agents code --model codellama:34b "Implement distributed caching system"
 ```
 
 **⚡ Real-World Performance Examples:**
 
 ```bash
 # 🏗️ Microservices Architecture (2-3 minutes)
-lagents plan "Design event-driven microservices with Kafka and Docker"
+python -m local_agents plan "Design event-driven microservices with Kafka and Docker"
 
 # 💻 Full REST API (3-4 minutes) 
-lagents code --context existing_models.py "Create complete CRUD API with authentication"
+python -m local_agents code --context existing_models.py "Create complete CRUD API with authentication"
 
 # 🧪 Test Suite Generation (1-2 minutes)
-lagents test --framework pytest --run src/api/ 
+python -m local_agents test --framework pytest --run src/api/ 
 
 # 🔍 Legacy Code Modernization (4-5 minutes)
-lagents workflow refactor "Migrate jQuery frontend to React with TypeScript"
+python -m local_agents workflow refactor "Migrate jQuery frontend to React with TypeScript"
 ```
 
 #### 🔧 **Monitoring Your System**
@@ -553,13 +561,13 @@ htop
 Activity Monitor
 
 # Monitor model loading times
-time lagents plan "test task"
+time python -m local_agents plan "test task"
 
 # Check available disk space
 df -h
 
 # Optimize if needed
-lagents model remove unused-model:tag
+python -m local_agents model remove unused-model:tag
 ```
 
 **Your hardware is perfectly suited for professional AI-assisted development!** 🎉
@@ -633,7 +641,7 @@ curl http://localhost:11434/api/tags
 netstat -an | grep 11434
 
 # 4. Try different host (if using Docker)
-lagents config --set ollama_host http://host.docker.internal:11434
+python -m local_agents config set ollama_host http://host.docker.internal:11434
 ```
 </details>
 
@@ -648,15 +656,15 @@ ollama pull llama3.1:8b
 ollama list
 
 # 3. Check model name spelling
-lagents config --show
+python -m local_agents config show
 
 # 4. Use a different model temporarily
-lagents plan --model llama3.1:8b "your task"
+python -m local_agents plan --model llama3.1:8b "your task"
 ```
 </details>
 
 <details>
-<summary><strong>🔍 "Command not found: lagents"</strong></summary>
+<summary><strong>🔍 "Command not found: python -m local_agents"</strong></summary>
 
 ```bash
 # 1. Check PATH
@@ -667,7 +675,7 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # 3. Verify installation
-ls -la ~/.local/bin/lagents
+ls -la ~/.local/bin/python -m local_agents
 
 # 4. Reinstall if needed
 ./install.sh
@@ -679,13 +687,13 @@ ls -la ~/.local/bin/lagents
 
 ```bash
 # 1. Use smaller, quantized models
-lagents config --set agents.coding codellama:7b-instruct-q4_0
+python -m local_agents config set agents.coding codellama:7b-instruct-q4_0
 
 # 2. Reduce context length
-lagents config --set max_tokens 2048
+python -m local_agents config set max_tokens 2048
 
 # 3. Enable streaming for better UX  
-lagents code --stream "your task"
+python -m local_agents code --stream "your task"
 
 # 4. Close other applications using GPU/CPU
 ```
@@ -702,7 +710,7 @@ ollama list
 ollama rm unused-model:tag
 
 # 3. Use smaller models
-lagents config --set agents.coding codellama:7b-instruct-q4_0
+python -m local_agents config set agents.coding codellama:7b-instruct-q4_0
 
 # 4. Clean up Ollama cache
 ollama pull --help  # Check for cleanup options
@@ -716,13 +724,13 @@ ollama pull --help  # Check for cleanup options
 cd local-agents && git pull && ./install.sh
 
 # 🧹 Clean up configuration
-lagents config --reset
+python -m local_agents config reset
 
 # 🔍 Verify installation
-lagents --version && lagents config --show
+python -m local_agents --version && python -m local_agents config show
 
-# 🗑️ Complete removal
-~/.local/bin/uninstall-lagents
+# 🗑️ Complete removal  
+# (uninstall script location may vary)
 ```
 
 ## 🧑‍💻 Development & Contributing
@@ -875,9 +883,9 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 💬 Community & Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/your-username/local-agents/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/your-username/local-agents/discussions)  
-- 📖 **Documentation**: This README and `lagents --help`
+- 🐛 **Bug Reports**: See repository issues section
+- 💡 **Feature Requests**: See repository discussions section  
+- 📖 **Documentation**: This README and `python -m local_agents --help`
 - 💬 **Community**: Join our discussions and share your use cases!
 
 ### 🙏 Acknowledgments
@@ -893,6 +901,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 **🔒 Made with ❤️ for developers who value privacy and local-first tools**
 
-[![Star on GitHub](https://img.shields.io/github/stars/your-username/local-agents?style=social)](https://github.com/your-username/local-agents/stargazers)
+**Star this project if you find it useful!**
 
 </div>

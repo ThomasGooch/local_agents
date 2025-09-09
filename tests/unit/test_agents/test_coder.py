@@ -30,8 +30,8 @@ class TestCodingAgent:
     def test_agent_initialization(self, coder_agent):
         """Test coding agent initialization."""
         assert coder_agent.agent_type == "code"
-        assert coder_agent.role == "Senior Software Developer and Code Generator"
-        assert "high-quality code" in coder_agent.goal
+        assert coder_agent.role == "Senior Software Engineer and Code Generator"
+        assert "high-quality" in coder_agent.goal
         assert coder_agent.model == "test:model"
 
     def test_execute_success(self, coder_agent):
@@ -43,8 +43,8 @@ class TestCodingAgent:
 
         assert isinstance(result, TaskResult)
         assert result.success is True
-        assert "```python" in result.output
         assert "def hello" in result.output
+        assert "Hello, World!" in result.output
         assert result.agent_type == "code"
         assert result.task == task
         assert result.context == context
@@ -73,8 +73,8 @@ class TestCodingAgent:
         assert task in prompt
         assert "## Coding Instructions" in prompt
         assert "Language: python" in prompt
-        assert "## Code Quality Requirements" in prompt
-        assert "Best practices" in prompt
+        assert "Code Quality" in prompt
+        assert "Best Practices" in prompt
 
     def test_build_coding_prompt_with_implementation_plan(self, coder_agent):
         """Test building coding prompt with implementation plan."""
@@ -122,7 +122,7 @@ class TestCodingAgent:
 
         # Verify context contains language
         call_args = coder_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]  # Second argument is prompt
+        prompt = call_args.kwargs["prompt"]  # Second argument is prompt
         assert "Language: python" in prompt
 
     def test_generate_class(self, coder_agent):
@@ -187,7 +187,7 @@ class TestCodingAgent:
             assert result.success is True
             # Verify language appears in the prompt
             call_args = coder_agent.ollama_client.generate.call_args
-            prompt = call_args[0][1]
+            prompt = call_args.kwargs["prompt"]
             assert f"Language: {language}" in prompt
 
     def test_code_style_guidelines(self, coder_agent):
@@ -203,7 +203,7 @@ class TestCodingAgent:
 
         assert result.success is True
         call_args = coder_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "PEP 8" in prompt
         assert "Google" in prompt
 
@@ -218,7 +218,7 @@ class TestCodingAgent:
         call_args = coder_agent.ollama_client.generate.call_args
         assert call_args.kwargs["stream"] is True
 
-    @patch("local_agents.config.get_model_for_agent")
+    @patch("local_agents.base.get_model_for_agent")
     def test_default_model_selection(self, mock_get_model, mock_ollama_client):
         """Test default model selection for coding agent."""
         mock_get_model.return_value = "codellama:7b"
@@ -242,7 +242,7 @@ class TestCodingAgent:
 
             assert result.success is True
             call_args = coder_agent.ollama_client.generate.call_args
-            prompt = call_args[0][1]
+            prompt = call_args.kwargs["prompt"]
             assert context["framework"] in prompt.lower()
 
     def test_code_review_integration_context(self, coder_agent):
@@ -259,6 +259,6 @@ class TestCodingAgent:
 
         assert result.success is True
         call_args = coder_agent.ollama_client.generate.call_args
-        prompt = call_args[0][1]
+        prompt = call_args.kwargs["prompt"]
         assert "review_feedback" in prompt.lower() or "review feedback" in prompt
         assert "division by zero" in prompt

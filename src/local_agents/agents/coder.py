@@ -42,6 +42,10 @@ class CodingAgent(BaseAgent):
             f"\n## Task Description\n{task}",
         ]
 
+        # Add language specification if provided
+        if context.get("language"):
+            prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
+
         if context.get("target_file"):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
@@ -53,6 +57,61 @@ class CodingAgent(BaseAgent):
         if context.get("specification"):
             prompt_parts.append(
                 f"\n## Detailed Specification\n{context['specification']}"
+            )
+
+        if context.get("implementation_plan"):
+            prompt_parts.append(
+                f"\n## Implementation Plan\n{context['implementation_plan']}"
+            )
+
+        if context.get("requirements"):
+            prompt_parts.append(
+                f"\n## Requirements\n{context['requirements']}"
+            )
+
+        if context.get("style_guide"):
+            prompt_parts.append(
+                f"\n## Style Guide\n{context['style_guide']}"
+            )
+
+        if context.get("docstring_style"):
+            prompt_parts.append(
+                f"\n## Docstring Style\n{context['docstring_style']}"
+            )
+
+        if context.get("review_feedback"):
+            prompt_parts.append(
+                f"\n## Review Feedback\n{context['review_feedback']}"
+            )
+
+        if context.get("framework"):
+            prompt_parts.append(
+                f"\n## Framework\n{context['framework']}"
+            )
+
+        if context.get("database"):
+            prompt_parts.append(
+                f"\n## Database\n{context['database']}"
+            )
+
+        if context.get("buggy_code"):
+            prompt_parts.append(
+                f"\n## Buggy Code\n```\n{context['buggy_code']}\n```"
+            )
+
+        if context.get("error_message"):
+            prompt_parts.append(
+                f"\n## Error Message\n{context['error_message']}"
+            )
+
+        if context.get("code_to_refactor"):
+            prompt_parts.append(
+                f"\n## Code to Refactor\n```\n{context['code_to_refactor']}\n```"
+            )
+
+        if context.get("target_structure"):
+            prompt_parts.append(
+                f"\n## Target Structure\n{context['target_structure']}"
             )
 
         if context.get("file_content"):
@@ -161,23 +220,15 @@ important design decisions.
 
     def generate_function(
         self,
-        function_name: str,
-        description: str,
-        parameters: Optional[List[str]] = None,
-        return_type: Optional[str] = None,
+        function_spec: str,
         language: str = "python",
         context: Optional[Dict[str, Any]] = None,
     ) -> TaskResult:
         """Generate a specific function."""
         context = context or {}
-        context["function_name"] = function_name
-        context["parameters"] = parameters or []
-        context["return_type"] = return_type
         context["language"] = language
 
-        task = (
-            f"Generate a {language} function named '{function_name}' that {description}"
-        )
+        task = f"Generate function: {function_spec}"
         return self.execute(task, context)
 
     def modify_code(
@@ -194,6 +245,19 @@ important design decisions.
             context["existing_code"] = Path(file_path).read_text()
 
         task = f"Modify the code in {file_path}: {modification_description}"
+        return self.execute(task, context)
+
+    def generate_class(
+        self,
+        class_spec: str,
+        language: str = "python",
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Generate a specific class."""
+        context = context or {}
+        context["language"] = language
+
+        task = f"Generate class: {class_spec}"
         return self.execute(task, context)
 
     def create_class(
@@ -213,6 +277,33 @@ important design decisions.
         context["language"] = language
 
         task = f"Create a {language} class named '{class_name}' that {description}"
+        return self.execute(task, context)
+
+    def implement_feature(
+        self,
+        feature_description: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Implement a feature."""
+        task = f"Implement feature: {feature_description}"
+        return self.execute(task, context)
+
+    def fix_bug(
+        self,
+        bug_description: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Fix a bug."""
+        task = f"Fix bug: {bug_description}"
+        return self.execute(task, context)
+
+    def refactor_code(
+        self,
+        refactor_description: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> TaskResult:
+        """Refactor code."""
+        task = f"Refactor code: {refactor_description}"
         return self.execute(task, context)
 
     def implement_interface(

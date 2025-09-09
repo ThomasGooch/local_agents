@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 from local_agents.base import TaskResult
-from local_agents.cli import code, config, main, plan, review, test, workflow
+from local_agents.cli import code, main, plan, review, test, workflow
 from local_agents.workflows.orchestrator import WorkflowResult
 
 
