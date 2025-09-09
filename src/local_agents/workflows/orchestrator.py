@@ -1,8 +1,10 @@
 """Workflow orchestrator for managing multi-agent workflows."""
 
 import time
+import asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type, Union, Set
 
 from rich.console import Console
 from rich.panel import Panel
@@ -183,9 +185,10 @@ class WorkflowStep:
 
 
 class Workflow:
-    """Orchestrates multi-agent workflows."""
+    """Orchestrates multi-agent workflows with performance optimization."""
 
-    def __init__(self) -> None:
+    def __init__(self, max_concurrent_agents: int = 2) -> None:
+        self.max_concurrent_agents = max_concurrent_agents
         self.agents: Dict[str, Type[BaseAgent]] = {
             "plan": PlanningAgent,
             "code": CodingAgent,
@@ -195,6 +198,16 @@ class Workflow:
         self.current_context: Dict[str, Any] = {}
         self.completed_steps: Dict[str, bool] = {}
 
+        # Performance monitoring
+        self.execution_stats: Dict[str, Any] = {
+            "total_workflows": 0,
+            "successful_workflows": 0,
+            "average_execution_time": 0.0,
+            "concurrent_executions": 0,
+            "cache_hits": 0,
+            "total_steps": 0
+        }
+        
         # Workflow definitions for tests compatibility
         self.workflow_definitions = {
             "feature-dev": {
@@ -225,6 +238,7 @@ class Workflow:
         task: str,
         initial_context: Optional[Dict[str, Any]] = None,
         stream: bool = False,
+        enable_parallel: bool = True,
     ) -> WorkflowResult:
         """Execute a predefined workflow."""
         start_time = time.time()
@@ -383,6 +397,48 @@ class Workflow:
             ]
 
         return workflows.get(workflow_name, [])
+    
+    def get_performance_stats(self) -> Dict[str, Any]:
+        """Get workflow execution performance statistics."""
+        from ..ollama_client import OllamaClient
+        
+        # Get cache statistics
+        cache_stats = OllamaClient.get_cache_stats()
+        
+        return {
+            **self.execution_stats,
+            "cache_stats": cache_stats,
+            "max_concurrent_agents": self.max_concurrent_agents,
+            "success_rate": (
+                self.execution_stats["successful_workflows"] / 
+                max(1, self.execution_stats["total_workflows"])
+            ) * 100
+        }
+    
+    def optimize_for_hardware(self, ram_gb: int = 16, cpu_cores: int = 6) -> None:
+        """Optimize workflow settings for specific hardware configuration."""
+        if ram_gb >= 16:
+            # High memory - can run more concurrent agents
+            self.max_concurrent_agents = min(cpu_cores // 2, 4)
+        elif ram_gb >= 8:
+            # Medium memory - limited concurrency
+            self.max_concurrent_agents = 2
+        else:
+            # Low memory - sequential execution only
+            self.max_concurrent_agents = 1
+        
+        console.print(f"[blue]Optimized for {ram_gb}GB RAM, {cpu_cores} cores: max {self.max_concurrent_agents} concurrent agents[/blue]")
+    
+    def clear_performance_stats(self) -> None:
+        """Reset performance statistics."""
+        self.execution_stats = {
+            "total_workflows": 0,
+            "successful_workflows": 0,
+            "average_execution_time": 0.0,
+            "concurrent_executions": 0,
+            "cache_hits": 0,
+            "total_steps": 0
+        }
 
     def _execute_step(
         self,

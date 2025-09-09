@@ -20,6 +20,9 @@ from .exceptions import (
     WorkflowError,
 )
 from .workflows.orchestrator import Workflow
+from .performance import performance_monitor
+from .hardware import hardware_optimizer
+from .benchmarks import benchmark_system
 
 console = Console()
 
@@ -764,6 +767,164 @@ def status():
                 border_style="red",
             )
         )
+
+
+# Performance and hardware optimization commands
+@main.group()
+def performance():
+    """Performance monitoring and optimization."""
+    pass
+
+
+@performance.command()
+def monitor():
+    """Start performance monitoring."""
+    performance_monitor.start_monitoring()
+
+
+@performance.command()
+def stop():
+    """Stop performance monitoring."""
+    performance_monitor.stop_monitoring()
+
+
+@performance.command()
+def report():
+    """Display performance report."""
+    performance_monitor.display_performance_report()
+
+
+@performance.command()
+@click.option("--filepath", "-f", type=click.Path(), help="Export file path")
+def export(filepath: Optional[str]):
+    """Export performance metrics to file."""
+    try:
+        import time
+        from pathlib import Path
+        if not filepath:
+            filepath = Path.cwd() / f"performance_metrics_{int(time.time())}.json"
+        else:
+            filepath = Path(filepath)
+        
+        performance_monitor.export_metrics(filepath)
+    except Exception as e:
+        handle_common_errors(e)
+
+
+@performance.command()
+def clear():
+    """Clear performance metrics."""
+    if click.confirm("Clear all performance metrics?"):
+        performance_monitor.clear_metrics()
+    else:
+        console.print("[dim]Operation cancelled[/dim]")
+
+
+@main.group()
+def hardware():
+    """Hardware optimization and detection."""
+    pass
+
+
+@hardware.command()
+def detect():
+    """Detect hardware configuration."""
+    hardware_optimizer.display_hardware_info()
+
+
+@hardware.command()
+def optimize():
+    """Apply hardware-specific optimizations."""
+    try:
+        profile = hardware_optimizer.detect_best_profile()
+        
+        console.print(f"[cyan]Detected Profile:[/cyan] {profile.name}")
+        console.print("\n[bold]Optimization Changes:[/bold]")
+        
+        # Show what will be changed
+        config = hardware_optimizer.get_optimization_config(profile)
+        settings_table = Table(title="Performance Settings")
+        settings_table.add_column("Setting", style="yellow")
+        settings_table.add_column("Value", style="green")
+        
+        for key, value in config["performance_settings"].items():
+            settings_table.add_row(key.replace("_", " ").title(), str(value))
+        
+        console.print(settings_table)
+        
+        if click.confirm("Apply these optimizations?"):
+            success = hardware_optimizer.apply_optimization(config_manager, profile)
+            if success:
+                console.print("[green]✓ Hardware optimization applied successfully[/green]")
+            else:
+                console.print("[red]✗ Failed to apply optimization[/red]")
+        else:
+            console.print("[dim]Optimization cancelled[/dim]")
+            
+    except Exception as e:
+        handle_common_errors(e)
+
+
+@hardware.command()
+def profiles():
+    """Show all hardware profiles."""
+    hardware_optimizer.display_all_profiles()
+
+
+@main.group()
+def benchmark():
+    """Performance benchmarking."""
+    pass
+
+
+@benchmark.command()
+@click.option("--suite", "-s", default="quick", 
+              type=click.Choice(["quick", "comprehensive", "stress"]),
+              help="Benchmark suite to run")
+@click.option("--concurrent", "-c", multiple=True, type=int,
+              help="Concurrent levels to test (can specify multiple)")
+@click.option("--repeat", "-r", default=1, help="Number of repetitions")
+@click.option("--export", "-e", type=click.Path(), help="Export results to file")
+def run(suite: str, concurrent: tuple, repeat: int, export: Optional[str]):
+    """Run performance benchmark suite."""
+    try:
+        concurrent_levels = list(concurrent) if concurrent else [1, 2]
+        
+        console.print(f"[bold blue]Running {suite} benchmark suite[/bold blue]")
+        console.print(f"Concurrent levels: {concurrent_levels}")
+        console.print(f"Repetitions: {repeat}")
+        
+        results = benchmark_system.run_benchmark_suite(
+            suite_type=suite,
+            concurrent_levels=concurrent_levels, 
+            repeat_count=repeat
+        )
+        
+        benchmark_system.display_benchmark_results(results)
+        
+        if export:
+            from pathlib import Path
+            benchmark_system.export_benchmark_results(results, Path(export))
+            
+    except Exception as e:
+        handle_common_errors(e)
+
+
+@benchmark.command()
+def targets():
+    """Show performance targets."""
+    targets_table = Table(title="Performance Targets (Phase 2)")
+    targets_table.add_column("Target", style="cyan")
+    targets_table.add_column("Value", style="green")
+    targets_table.add_column("Description", style="dim")
+    
+    targets = benchmark_system.performance_targets
+    targets_table.add_row("Memory Usage", f"< {targets['memory_usage']}MB", "Peak usage on 16GB systems")
+    targets_table.add_row("Response Time", f"< {targets['response_time']}s", "Individual agent execution")
+    targets_table.add_row("Workflow Time", f"< {targets['workflow_time']}s", "Complete workflow execution")
+    targets_table.add_row("Startup Time", f"< {targets['startup_time']}s", "CLI command initialization")
+    
+    console.print(targets_table)
 
 
 # Individual command functions for direct script access
