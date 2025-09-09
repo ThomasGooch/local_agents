@@ -284,7 +284,7 @@ class PerformanceBenchmark:
         results = []
 
         # Group tasks into batches for concurrent executions
-        batches = [tasks[i:i + concurrent_level] for i in range(0, len(tasks), concurrent_level)]
+        batches = [tasks[i : i + concurrent_level] for i in range(0, len(tasks), concurrent_level)]
         for batch in batches:
             start_time = time.time()
             start_memory = self._get_memory_usage()
