@@ -34,7 +34,7 @@ class TestingAgent(BaseAgent):
         """Execute testing task."""
         # Initialize file manager if not already done
         if not self.file_manager:
-            # Use output_directory from CLI first, then fallback to directory or current dir
+            # Use output_directory from CLI first, fallback to directory
             working_dir = (
                 context.get("output_directory")
                 or context.get("directory", ".")
@@ -84,8 +84,11 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("code_content") or context.get("code_to_test"):
+            code_content = (
+                context.get('code_content') or context.get('code_to_test')
+            )
             prompt_parts.append(
-                f"\n## Code to Test\n```\n{context.get('code_content') or context.get('code_to_test')}\n```"
+                f"\n## Code to Test\n```\n{code_content}\n```"
             )
 
         if context.get("target_directory"):
@@ -165,8 +168,13 @@ class TestingAgent(BaseAgent):
                 f"\n## Coverage Requirements\n{requirements_text}"
             )
         if context.get("security_concerns"):
+            concerns = context['security_concerns']
+            if isinstance(concerns, list):
+                concerns_text = ', '.join(concerns)
+            else:
+                concerns_text = concerns
             prompt_parts.append(
-                f"\n## Security Concerns\n{', '.join(context['security_concerns']) if isinstance(context['security_concerns'], list) else context['security_concerns']}"
+                f"\n## Security Concerns\n{concerns_text}"
             )
 
         if context.get("performance_requirements"):
@@ -187,8 +195,13 @@ class TestingAgent(BaseAgent):
             )
 
         if context.get("external_dependencies"):
+            deps = context['external_dependencies']
+            if isinstance(deps, list):
+                deps_text = ', '.join(deps)
+            else:
+                deps_text = deps
             prompt_parts.append(
-                f"\n## External Dependencies\n{', '.join(context['external_dependencies']) if isinstance(context['external_dependencies'], list) else context['external_dependencies']}"
+                f"\n## External Dependencies\n{deps_text}"
             )
 
         if context.get("mock_strategy"):
