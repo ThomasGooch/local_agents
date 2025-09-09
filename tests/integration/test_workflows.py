@@ -70,10 +70,20 @@ def workflow_with_mocks(mock_agents):
     workflow = Workflow()
 
     # Replace agent classes with mock instances
-    with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-        with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
-            with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+    with patch.object(
+        PlanningAgent, "__new__", return_value=mock_agents["planner"]
+    ):
+        with patch.object(
+            CodingAgent, "__new__", return_value=mock_agents["coder"]
+        ):
+            with patch.object(
+                TestingAgent, "__new__", return_value=mock_agents["tester"]
+            ):
+                with patch.object(
+                    ReviewAgent,
+                    "__new__",
+                    return_value=mock_agents["reviewer"],
+                ):
                     yield workflow, mock_agents
 
 
@@ -84,10 +94,20 @@ class TestWorkflowExecution:
         """Test successful feature development workflow."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
-                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
+                with patch.object(
+                    TestingAgent, "__new__", return_value=mock_agents["tester"]
+                ):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             workflow_name="feature-dev",
                             task="Create a hello world function",
@@ -116,9 +136,15 @@ class TestWorkflowExecution:
         """Test successful bug fix workflow."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
-                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
+                with patch.object(
+                    TestingAgent, "__new__", return_value=mock_agents["tester"]
+                ):
                     result = workflow.execute_workflow(
                         workflow_name="bug-fix",
                         task="Fix null pointer exception",
@@ -141,7 +167,9 @@ class TestWorkflowExecution:
         """Test code review only workflow."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
+        ):
             result = workflow.execute_workflow(
                 workflow_name="code-review",
                 task="Review existing code",
@@ -172,10 +200,20 @@ class TestWorkflowExecution:
             error="Code generation failed",
         )
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
-                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
+                with patch.object(
+                    TestingAgent, "__new__", return_value=mock_agents["tester"]
+                ):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             workflow_name="feature-dev",
                             task="Create a hello world function",
@@ -204,10 +242,20 @@ class TestWorkflowExecution:
             error="Planning failed",
         )
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
-                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
+                with patch.object(
+                    TestingAgent, "__new__", return_value=mock_agents["tester"]
+                ):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             workflow_name="feature-dev",
                             task="Create a hello world function",
@@ -227,8 +275,12 @@ class TestWorkflowExecution:
         """Test creation and execution of custom workflow."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                TestingAgent, "__new__", return_value=mock_agents["tester"]
+            ):
                 result = workflow.create_custom_workflow(
                     steps=["plan", "test"],
                     task="Create test-first workflow",
@@ -250,8 +302,12 @@ class TestWorkflowExecution:
         """Test that context is properly passed between workflow steps."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
                 result = workflow.execute_workflow(
                     workflow_name="feature-dev",
                     task="Create a hello world function",
@@ -260,28 +316,37 @@ class TestWorkflowExecution:
 
         # Check that planner received initial context
         planner_call_args = mock_agents["planner"].execute.call_args
-        assert "framework" in planner_call_args[0][1]  # context is second argument
+        assert (
+            "framework" in planner_call_args[0][1]
+        )  # context is second argument
         assert planner_call_args[0][1]["framework"] == "flask"
 
         # Check that coder received context including planner output
         coder_call_args = mock_agents["coder"].execute.call_args
         coder_context = coder_call_args[0][1]
         assert "framework" in coder_context
-        assert "plan_output" in coder_context or "implementation_plan" in coder_context
+        assert (
+            "plan_output" in coder_context
+            or "implementation_plan" in coder_context
+        )
 
     def test_unknown_workflow_raises_error(self):
         """Test that unknown workflow name raises appropriate error."""
         workflow = Workflow()
 
         with pytest.raises(ValueError, match="Unknown workflow: nonexistent"):
-            workflow.execute_workflow(workflow_name="nonexistent", task="Test task")
+            workflow.execute_workflow(
+                workflow_name="nonexistent", task="Test task"
+            )
 
     def test_custom_workflow_invalid_agent(self):
         """Test that custom workflow with invalid agent raises error."""
         workflow = Workflow()
 
         with pytest.raises(ValueError, match="Unknown agent type: invalid"):
-            workflow.create_custom_workflow(steps=["plan", "invalid", "test"], task="Test task")
+            workflow.create_custom_workflow(
+                steps=["plan", "invalid", "test"], task="Test task"
+            )
 
 
 class TestWorkflowDependencies:
@@ -300,10 +365,16 @@ class TestWorkflowDependencies:
             error="Planning failed",
         )
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
                 # Force workflow to continue after planning failure
-                workflow._should_continue_after_failure = Mock(return_value=True)
+                workflow._should_continue_after_failure = Mock(
+                    return_value=True
+                )
 
                 result = workflow.execute_workflow(
                     workflow_name="feature-dev", task="Test dependencies"
@@ -314,14 +385,21 @@ class TestWorkflowDependencies:
         # Note: Actual dependency checking behavior depends on implementation details
         # This test verifies the framework is in place
 
-    def test_successful_dependencies_allow_execution(self, workflow_with_mocks):
+    def test_successful_dependencies_allow_execution(
+        self, workflow_with_mocks
+    ):
         """Test that successful dependencies allow subsequent steps."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
+        with patch.object(
+            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        ):
+            with patch.object(
+                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            ):
                 result = workflow.execute_workflow(
-                    workflow_name="feature-dev", task="Test successful dependencies"
+                    workflow_name="feature-dev",
+                    task="Test successful dependencies",
                 )
 
         # Both steps should execute successfully
@@ -342,20 +420,26 @@ class TestWorkflowStreamingAndOutput:
         """Test that streaming parameter is passed to agents."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
+        ):
             workflow.execute_workflow(
                 workflow_name="code-review", task="Test streaming", stream=True
             )
 
         # Verify streaming parameter was passed to agent
         reviewer_call_args = mock_agents["reviewer"].execute.call_args
-        assert reviewer_call_args[1]["stream"] is True  # stream is keyword argument
+        assert (
+            reviewer_call_args[1]["stream"] is True
+        )  # stream is keyword argument
 
     def test_workflow_summary_generation(self, workflow_with_mocks):
         """Test that workflow generates proper summary."""
         workflow, mock_agents = workflow_with_mocks
 
-        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
+        ):
             result = workflow.execute_workflow(
                 workflow_name="code-review", task="Test summary generation"
             )
@@ -381,7 +465,9 @@ class TestWorkflowStreamingAndOutput:
             error="Review failed",
         )
 
-        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+        with patch.object(
+            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
+        ):
             result = workflow.execute_workflow(
                 workflow_name="code-review", task="Test failure summary"
             )

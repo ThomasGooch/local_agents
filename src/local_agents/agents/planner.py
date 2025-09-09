@@ -22,14 +22,19 @@ class PlanningAgent(BaseAgent):
 
     @handle_agent_execution
     def execute(
-        self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
     ) -> TaskResult:
         """Execute planning task."""
         prompt = self._build_planning_prompt(task, context)
         response = self._call_ollama(prompt, stream=stream)
         return self._create_success_result(response, task, context)
 
-    def _build_planning_prompt(self, task: str, context: Dict[str, Any]) -> str:
+    def _build_planning_prompt(
+        self, task: str, context: Dict[str, Any]
+    ) -> str:
         """Build a structured prompt for planning tasks."""
         prompt_parts = [
             "# Implementation Planning Task",
@@ -37,7 +42,9 @@ class PlanningAgent(BaseAgent):
         ]
 
         if context.get("file_content"):
-            prompt_parts.append(f"\n## Context File Content\n```\n{context['file_content']}\n```")
+            prompt_parts.append(
+                f"\n## Context File Content\n```\n{context['file_content']}\n```"
+            )
 
         # Use output_directory or directory for context
         work_dir = context.get("output_directory") or context.get("directory")
@@ -45,7 +52,9 @@ class PlanningAgent(BaseAgent):
             prompt_parts.append(f"\n## Working Directory\n{work_dir}")
 
         if context.get("specification"):
-            prompt_parts.append(f"\n## Additional Specifications\n{context['specification']}")
+            prompt_parts.append(
+                f"\n## Additional Specifications\n{context['specification']}"
+            )
 
         prompt_parts.extend(
             [
@@ -99,12 +108,17 @@ followed.
         return "\n".join(prompt_parts)
 
     def plan_feature(
-        self, feature_description: str, context: Optional[Dict[str, Any]] = None
+        self,
+        feature_description: str,
+        context: Optional[Dict[str, Any]] = None,
     ) -> TaskResult:
         """Create a plan specifically for a new feature."""
         context = context or {}
         context["plan_type"] = "feature"
-        return self.execute(f"Plan implementation of new feature: {feature_description}", context)
+        return self.execute(
+            f"Plan implementation of new feature: {feature_description}",
+            context,
+        )
 
     def plan_bugfix(
         self, bug_description: str, context: Optional[Dict[str, Any]] = None
@@ -115,9 +129,13 @@ followed.
         return self.execute(f"Plan bug fix for: {bug_description}", context)
 
     def plan_refactor(
-        self, refactor_description: str, context: Optional[Dict[str, Any]] = None
+        self,
+        refactor_description: str,
+        context: Optional[Dict[str, Any]] = None,
     ) -> TaskResult:
         """Create a plan specifically for refactoring."""
         context = context or {}
         context["plan_type"] = "refactor"
-        return self.execute(f"Plan refactoring: {refactor_description}", context)
+        return self.execute(
+            f"Plan refactoring: {refactor_description}", context
+        )

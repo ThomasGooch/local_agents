@@ -137,7 +137,11 @@ best practices.
 
     def mock_generate(model, prompt, **kwargs):
         # Determine response based on prompt content first (more reliable)
-        if "Test Generation Task" in prompt or "QA Engineer" in prompt or "test suites" in prompt:
+        if (
+            "Test Generation Task" in prompt
+            or "QA Engineer" in prompt
+            or "test suites" in prompt
+        ):
             return responses["test"]
         elif "Code Generation Task" in prompt:
             return responses["code"]
@@ -174,7 +178,9 @@ class TestingAgentChaining:
     """Test chaining agents together with realistic scenarios."""
 
     @patch("local_agents.base.OllamaClient")
-    def test_plan_to_code_integration(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_plan_to_code_integration(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test integrating planning and coding agents."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
@@ -199,7 +205,9 @@ class TestingAgentChaining:
             "target_file": "calculator.py",
         }
 
-        code_result = coder.execute("Implement the calculator based on the plan", code_context)
+        code_result = coder.execute(
+            "Implement the calculator based on the plan", code_context
+        )
 
         assert code_result.success
         assert "def calculator" in code_result.output
@@ -207,7 +215,9 @@ class TestingAgentChaining:
         assert "float" in code_result.output
 
     @patch("local_agents.base.OllamaClient")
-    def test_code_to_test_integration(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_code_to_test_integration(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test integrating coding and testing agents."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
@@ -216,7 +226,9 @@ class TestingAgentChaining:
         tester = TestingAgent()
 
         # Generate code first
-        code_result = coder.execute("Create a calculator function", {"language": "python"})
+        code_result = coder.execute(
+            "Create a calculator function", {"language": "python"}
+        )
 
         assert code_result.success
 
@@ -228,7 +240,8 @@ class TestingAgentChaining:
         }
 
         test_result = tester.execute(
-            "Generate comprehensive tests for the calculator function", test_context
+            "Generate comprehensive tests for the calculator function",
+            test_context,
         )
 
         assert test_result.success
@@ -237,7 +250,9 @@ class TestingAgentChaining:
         assert "calculator" in test_result.output
 
     @patch("local_agents.base.OllamaClient")
-    def test_code_to_review_integration(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_code_to_review_integration(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test integrating coding and review agents."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
@@ -246,7 +261,9 @@ class TestingAgentChaining:
         reviewer = ReviewAgent()
 
         # Generate code first
-        code_result = coder.execute("Create a calculator function", {"language": "python"})
+        code_result = coder.execute(
+            "Create a calculator function", {"language": "python"}
+        )
 
         assert code_result.success
 
@@ -257,7 +274,9 @@ class TestingAgentChaining:
             "target_file": "calculator.py",
         }
 
-        review_result = reviewer.execute("Review the calculator implementation", review_context)
+        review_result = reviewer.execute(
+            "Review the calculator implementation", review_context
+        )
 
         assert review_result.success
         assert "Code Review" in review_result.output
@@ -268,7 +287,9 @@ class TestingAgentChaining:
         )
 
     @patch("local_agents.base.OllamaClient")
-    def test_full_agent_chain(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_full_agent_chain(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test full chain: Plan -> Code -> Test -> Review."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
@@ -279,7 +300,10 @@ class TestingAgentChaining:
         reviewer = ReviewAgent()
 
         task = "Create a robust calculator function"
-        context = {"language": "python", "requirements": "basic arithmetic operations"}
+        context = {
+            "language": "python",
+            "requirements": "basic arithmetic operations",
+        }
 
         # Step 1: Planning
         plan_result = planner.execute(task, context)
@@ -289,7 +313,9 @@ class TestingAgentChaining:
         code_context = context.copy()
         code_context["implementation_plan"] = plan_result.output
 
-        code_result = coder.execute("Implement calculator based on the plan", code_context)
+        code_result = coder.execute(
+            "Implement calculator based on the plan", code_context
+        )
         assert code_result.success
 
         # Step 3: Testing (using code output)
@@ -297,7 +323,9 @@ class TestingAgentChaining:
         test_context["code_to_test"] = code_result.output
         test_context["framework"] = "pytest"
 
-        test_result = tester.execute("Generate tests for the calculator", test_context)
+        test_result = tester.execute(
+            "Generate tests for the calculator", test_context
+        )
         assert test_result.success
 
         # Step 4: Review (using code output)
@@ -305,7 +333,9 @@ class TestingAgentChaining:
         review_context["code_content"] = code_result.output
         review_context["focus_area"] = "all"
 
-        review_result = reviewer.execute("Review the complete implementation", review_context)
+        review_result = reviewer.execute(
+            "Review the complete implementation", review_context
+        )
         assert review_result.success
 
         # Verify all results contain expected content
@@ -370,7 +400,10 @@ class TestingAgentContextHandling:
 
     @patch("local_agents.base.OllamaClient")
     def test_agent_handles_rich_context(
-        self, mock_ollama_class, mock_ollama_client_with_responses, sample_python_file
+        self,
+        mock_ollama_class,
+        mock_ollama_client_with_responses,
+        sample_python_file,
     ):
         """Test agent handles context with file content."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
@@ -392,7 +425,9 @@ class TestingAgentContextHandling:
         assert result.context == context
 
     @patch("local_agents.base.OllamaClient")
-    def test_agent_context_propagation(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_agent_context_propagation(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test that context is properly propagated through agent execution."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
@@ -417,7 +452,9 @@ class TestingAgentStreamingSupport:
     """Test streaming functionality across agents."""
 
     @patch("local_agents.base.OllamaClient")
-    def test_agent_streaming_mode(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_agent_streaming_mode(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test that agents properly support streaming mode."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
@@ -425,7 +462,9 @@ class TestingAgentStreamingSupport:
 
         # Test with streaming enabled
         result = planner.execute(
-            "Create implementation plan", {"project": "calculator"}, stream=True
+            "Create implementation plan",
+            {"project": "calculator"},
+            stream=True,
         )
 
         assert result.success
@@ -435,14 +474,18 @@ class TestingAgentStreamingSupport:
         assert call_args[1]["stream"] is True
 
     @patch("local_agents.base.OllamaClient")
-    def test_agent_non_streaming_mode(self, mock_ollama_class, mock_ollama_client_with_responses):
+    def test_agent_non_streaming_mode(
+        self, mock_ollama_class, mock_ollama_client_with_responses
+    ):
         """Test that agents work in non-streaming mode."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
 
         planner = PlanningAgent()
 
         # Test with streaming disabled (default)
-        result = planner.execute("Create implementation plan", {"project": "calculator"})
+        result = planner.execute(
+            "Create implementation plan", {"project": "calculator"}
+        )
 
         assert result.success
         # Verify streaming parameter was passed as False

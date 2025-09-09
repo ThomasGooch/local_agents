@@ -34,7 +34,9 @@ class ModelConfig(BaseModel):
     def validate_temperature(cls, v: float) -> float:
         """Validate temperature is in valid range."""
         if not 0.0 <= v <= 2.0:
-            raise ValueError(f"Temperature must be between 0.0 and 2.0, got {v}")
+            raise ValueError(
+                f"Temperature must be between 0.0 and 2.0, got {v}"
+            )
         return v
 
     @field_validator("max_tokens")
@@ -54,7 +56,9 @@ class ModelConfig(BaseModel):
         if v <= 0:
             raise ValueError("context_length must be greater than 0")
         if v > 1000000:  # Reasonable upper limit
-            raise ValueError(f"context_length too large (max 1,000,000), got {v}")
+            raise ValueError(
+                f"context_length too large (max 1,000,000), got {v}"
+            )
         return v
 
 
@@ -87,7 +91,9 @@ class WorkflowConfig(BaseModel):
     code_review: list[str] = ["review"]
     refactoring: list[str] = ["plan", "code", "test", "review"]
 
-    @field_validator("feature_development", "bug_fix", "code_review", "refactoring")
+    @field_validator(
+        "feature_development", "bug_fix", "code_review", "refactoring"
+    )
     @classmethod
     def validate_workflow_steps(cls, v: list[str]) -> list[str]:
         """Validate workflow steps."""
@@ -193,13 +199,17 @@ class Config(BaseModel):
             raise ValueError("ollama_host must be a valid HTTP/HTTPS URL")
 
         # Check for localhost or valid IP patterns
-        host_part = v.replace("http://", "").replace("https://", "").split("/")[0]
+        host_part = (
+            v.replace("http://", "").replace("https://", "").split("/")[0]
+        )
         if ":" in host_part:
             host, port = host_part.split(":")
             try:
                 port_num = int(port)
                 if not 1 <= port_num <= 65535:
-                    raise ValueError(f"Port must be between 1 and 65535, got: {port_num}")
+                    raise ValueError(
+                        f"Port must be between 1 and 65535, got: {port_num}"
+                    )
             except ValueError as e:
                 if "Port must be" in str(e):
                     raise
@@ -212,7 +222,9 @@ class Config(BaseModel):
     def validate_temperature(cls, v: float) -> float:
         """Validate temperature is in valid range."""
         if not 0.0 <= v <= 2.0:
-            raise ValueError(f"Temperature must be between 0.0 and 2.0, got {v}")
+            raise ValueError(
+                f"Temperature must be between 0.0 and 2.0, got {v}"
+            )
         return v
 
     @field_validator("max_tokens")
@@ -232,7 +244,9 @@ class Config(BaseModel):
         if v <= 0:
             raise ValueError("context_length must be greater than 0")
         if v > 1000000:
-            raise ValueError(f"context_length too large (max 1,000,000), got {v}")
+            raise ValueError(
+                f"context_length too large (max 1,000,000), got {v}"
+            )
         return v
 
 
@@ -240,7 +254,9 @@ class ConfigManager:
     """Manages configuration loading and saving."""
 
     def __init__(self, config_path: Optional[str] = None):
-        self.config_path = Path(config_path or "~/.local_agents_config.yml").expanduser()
+        self.config_path = Path(
+            config_path or "~/.local_agents_config.yml"
+        ).expanduser()
         self._config: Optional[Config] = None
 
     def load_config(self) -> Config:
@@ -261,11 +277,15 @@ class ConfigManager:
                 print("Using default configuration.")
                 self._config = Config()
             except yaml.YAMLError as e:
-                print(f"Warning: Invalid YAML in config file {self.config_path}: {e}")
+                print(
+                    f"Warning: Invalid YAML in config file {self.config_path}: {e}"
+                )
                 print("Using default configuration.")
                 self._config = Config()
             except Exception as e:
-                print(f"Warning: Failed to load config from {self.config_path}: {e}")
+                print(
+                    f"Warning: Failed to load config from {self.config_path}: {e}"
+                )
                 print("Using default configuration.")
                 self._config = Config()
         else:
@@ -278,15 +298,24 @@ class ConfigManager:
         """Save current configuration to file."""
         if config is not None:
             # Validate before saving by checking individual field constraints
-            if hasattr(config, "temperature") and not (0.0 <= config.temperature <= 2.0):
+            if hasattr(config, "temperature") and not (
+                0.0 <= config.temperature <= 2.0
+            ):
                 raise ValueError(
                     f"Invalid configuration: temperature must be between 0.0 and "
                     f"2.0, got {config.temperature}"
                 )
             if hasattr(config, "max_tokens") and config.max_tokens <= 0:
-                raise ValueError("Invalid configuration: max_tokens must be greater than 0")
-            if hasattr(config, "context_length") and config.context_length <= 0:
-                raise ValueError("Invalid configuration: context_length must be greater than 0")
+                raise ValueError(
+                    "Invalid configuration: max_tokens must be greater than 0"
+                )
+            if (
+                hasattr(config, "context_length")
+                and config.context_length <= 0
+            ):
+                raise ValueError(
+                    "Invalid configuration: context_length must be greater than 0"
+                )
             self._config = config
         elif self._config is None:
             self._config = Config()
@@ -350,7 +379,9 @@ class ConfigManager:
             # Create current config first
             self.save_config()
 
-        backup_path = self.config_path.with_suffix(f"{self.config_path.suffix}.backup")
+        backup_path = self.config_path.with_suffix(
+            f"{self.config_path.suffix}.backup"
+        )
         shutil.copy2(self.config_path, backup_path)
         return backup_path
 
@@ -371,7 +402,9 @@ class ConfigManager:
         except (yaml.YAMLError, ValidationError) as e:
             raise ValueError(f"Invalid backup file: {e}")
 
-    def validate_config_dict(self, config_data: Dict[str, Any]) -> tuple[bool, list[str]]:
+    def validate_config_dict(
+        self, config_data: Dict[str, Any]
+    ) -> tuple[bool, list[str]]:
         """Validate configuration dictionary without creating Config instance.
 
         Returns:
@@ -389,7 +422,9 @@ class ConfigManager:
         except Exception as e:
             return False, [f"Configuration error: {e}"]
 
-    def update_config_dict(self, updates: Dict[str, Any]) -> tuple[bool, list[str]]:
+    def update_config_dict(
+        self, updates: Dict[str, Any]
+    ) -> tuple[bool, list[str]]:
         """Update configuration with validation.
 
         Args:

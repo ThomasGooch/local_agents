@@ -26,15 +26,20 @@ class CodingAgent(BaseAgent):
 
     @handle_agent_execution
     def execute(
-        self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
     ) -> TaskResult:
         """Execute coding task."""
         # Initialize file manager if not already done
         if not self.file_manager:
             # Use output_directory from CLI first, then fallback to directory or current dir
             working_dir = (
-                context.get("output_directory") or 
-                context.get("directory", ".") if context else "."
+                context.get("output_directory")
+                or context.get("directory", ".")
+                if context
+                else "."
             )
             self.file_manager = FileManager(working_dir)
 
@@ -50,9 +55,13 @@ class CodingAgent(BaseAgent):
         context_with_agent["task"] = task
 
         # Skip file creation during unit tests to improve performance
-        if context.get("create_files", True) and not context.get("_test_mode", False):
-            created_files = self.file_manager.extract_and_write_files_from_response(
-                processed_output, context_with_agent
+        if context.get("create_files", True) and not context.get(
+            "_test_mode", False
+        ):
+            created_files = (
+                self.file_manager.extract_and_write_files_from_response(
+                    processed_output, context_with_agent
+                )
             )
             if created_files:
                 # Add file creation info to the output
@@ -70,31 +79,45 @@ class CodingAgent(BaseAgent):
 
         # Add language specification if provided
         if context.get("language"):
-            prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
+            prompt_parts.append(
+                f"\n## Language\nLanguage: {context['language']}"
+            )
 
         if context.get("target_file"):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("existing_code"):
-            prompt_parts.append(f"\n## Existing Code\n```\n{context['existing_code']}\n```")
+            prompt_parts.append(
+                f"\n## Existing Code\n```\n{context['existing_code']}\n```"
+            )
 
         if context.get("specification"):
-            prompt_parts.append(f"\n## Detailed Specification\n{context['specification']}")
+            prompt_parts.append(
+                f"\n## Detailed Specification\n{context['specification']}"
+            )
 
         if context.get("implementation_plan"):
-            prompt_parts.append(f"\n## Implementation Plan\n{context['implementation_plan']}")
+            prompt_parts.append(
+                f"\n## Implementation Plan\n{context['implementation_plan']}"
+            )
 
         if context.get("requirements"):
-            prompt_parts.append(f"\n## Requirements\n{context['requirements']}")
+            prompt_parts.append(
+                f"\n## Requirements\n{context['requirements']}"
+            )
 
         if context.get("style_guide"):
             prompt_parts.append(f"\n## Style Guide\n{context['style_guide']}")
 
         if context.get("docstring_style"):
-            prompt_parts.append(f"\n## Docstring Style\n{context['docstring_style']}")
+            prompt_parts.append(
+                f"\n## Docstring Style\n{context['docstring_style']}"
+            )
 
         if context.get("review_feedback"):
-            prompt_parts.append(f"\n## Review Feedback\n{context['review_feedback']}")
+            prompt_parts.append(
+                f"\n## Review Feedback\n{context['review_feedback']}"
+            )
 
         if context.get("framework"):
             prompt_parts.append(f"\n## Framework\n{context['framework']}")
@@ -103,19 +126,29 @@ class CodingAgent(BaseAgent):
             prompt_parts.append(f"\n## Database\n{context['database']}")
 
         if context.get("buggy_code"):
-            prompt_parts.append(f"\n## Buggy Code\n```\n{context['buggy_code']}\n```")
+            prompt_parts.append(
+                f"\n## Buggy Code\n```\n{context['buggy_code']}\n```"
+            )
 
         if context.get("error_message"):
-            prompt_parts.append(f"\n## Error Message\n{context['error_message']}")
+            prompt_parts.append(
+                f"\n## Error Message\n{context['error_message']}"
+            )
 
         if context.get("code_to_refactor"):
-            prompt_parts.append(f"\n## Code to Refactor\n```\n{context['code_to_refactor']}\n```")
+            prompt_parts.append(
+                f"\n## Code to Refactor\n```\n{context['code_to_refactor']}\n```"
+            )
 
         if context.get("target_structure"):
-            prompt_parts.append(f"\n## Target Structure\n{context['target_structure']}")
+            prompt_parts.append(
+                f"\n## Target Structure\n{context['target_structure']}"
+            )
 
         if context.get("file_content"):
-            prompt_parts.append(f"\n## Context File Content\n```\n{context['file_content']}\n```")
+            prompt_parts.append(
+                f"\n## Context File Content\n```\n{context['file_content']}\n```"
+            )
 
         # Use output_directory or directory for context
         work_dir = context.get("output_directory") or context.get("directory")
@@ -174,7 +207,9 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
 
         return "\n".join(prompt_parts)
 
-    def _add_project_context(self, prompt_parts: List[str], directory: Path) -> None:
+    def _add_project_context(
+        self, prompt_parts: List[str], directory: Path
+    ) -> None:
         """Add project context information to the prompt."""
         if not directory.exists():
             return
@@ -193,10 +228,20 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
                 project_files.append(file_pattern)
 
         if project_files:
-            prompt_parts.append(f"\n## Detected Project Files\n{', '.join(project_files)}")
+            prompt_parts.append(
+                f"\n## Detected Project Files\n{', '.join(project_files)}"
+            )
 
         # Look for common directory structures
-        common_dirs = ["src", "lib", "app", "components", "utils", "tests", "test"]
+        common_dirs = [
+            "src",
+            "lib",
+            "app",
+            "components",
+            "utils",
+            "tests",
+            "test",
+        ]
         found_dirs = [d for d in common_dirs if (directory / d).exists()]
 
         if found_dirs:
@@ -204,7 +249,9 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
                 f"\n## Project Structure\nDetected directories: {', '.join(found_dirs)}"
             )
 
-    def _post_process_code_response(self, response: str, context: Dict[str, Any]) -> str:
+    def _post_process_code_response(
+        self, response: str, context: Dict[str, Any]
+    ) -> str:
         """Post-process the code response to extract and format code blocks."""
         # If the response contains code blocks, extract the main one
         code_blocks = re.findall(r"```(\w*)\n(.*?)\n```", response, re.DOTALL)

@@ -41,12 +41,16 @@ The code is well-structured with good error handling practices.
     @pytest.fixture
     def reviewer_agent(self, mock_ollama_client):
         """Create a ReviewAgent instance for testing."""
-        return ReviewAgent(model="test:model", ollama_client=mock_ollama_client)
+        return ReviewAgent(
+            model="test:model", ollama_client=mock_ollama_client
+        )
 
     def test_agent_initialization(self, reviewer_agent):
         """Test review agent initialization."""
         assert reviewer_agent.agent_type == "review"
-        assert reviewer_agent.role == "Senior Code Reviewer and Quality Analyst"
+        assert (
+            reviewer_agent.role == "Senior Code Reviewer and Quality Analyst"
+        )
         assert "quality" in reviewer_agent.goal
         assert reviewer_agent.model == "test:model"
 
@@ -71,7 +75,9 @@ The code is well-structured with good error handling practices.
 
     def test_execute_failure(self, reviewer_agent):
         """Test execution failure handling."""
-        reviewer_agent.ollama_client.generate.side_effect = Exception("Review error")
+        reviewer_agent.ollama_client.generate.side_effect = Exception(
+            "Review error"
+        )
 
         task = "Review code"
         result = reviewer_agent.execute(task)
@@ -137,10 +143,14 @@ The code is well-structured with good error handling practices.
 
     @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
-    def test_run_static_analysis_success(self, mock_run, mock_exists, reviewer_agent):
+    def test_run_static_analysis_success(
+        self, mock_run, mock_exists, reviewer_agent
+    ):
         """Test successful static analysis execution."""
         mock_run.return_value = Mock(
-            returncode=0, stdout="test.py:1:1: E302 expected 2 blank lines", stderr=""
+            returncode=0,
+            stdout="test.py:1:1: E302 expected 2 blank lines",
+            stderr="",
         )
 
         result = reviewer_agent._run_static_analysis("test.py", "flake8")
@@ -150,7 +160,9 @@ The code is well-structured with good error handling practices.
 
     @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
-    def test_run_static_analysis_timeout(self, mock_run, mock_exists, reviewer_agent):
+    def test_run_static_analysis_timeout(
+        self, mock_run, mock_exists, reviewer_agent
+    ):
         """Test static analysis timeout handling."""
         import subprocess
 
@@ -163,7 +175,9 @@ The code is well-structured with good error handling practices.
 
     @patch("os.path.exists", return_value=True)
     @patch("subprocess.run")
-    def test_run_static_analysis_not_found(self, mock_run, mock_exists, reviewer_agent):
+    def test_run_static_analysis_not_found(
+        self, mock_run, mock_exists, reviewer_agent
+    ):
         """Test static analysis tool not found."""
         mock_run.side_effect = FileNotFoundError("flake8 not found")
 
@@ -236,7 +250,9 @@ The code is well-structured with good error handling practices.
         test_file.write_text("def test(): pass")
 
         # Mock static analysis results
-        mock_static_analysis.return_value = "test_code.py:1:1: C0111 Missing function docstring"
+        mock_static_analysis.return_value = (
+            "test_code.py:1:1: C0111 Missing function docstring"
+        )
 
         task = "Review with static analysis"
         context = {
@@ -262,7 +278,10 @@ The code is well-structured with good error handling practices.
                 "language": "java",
                 "code": "public void hello() { System.out.println('Hello'); }",
             },
-            {"language": "go", "code": "func hello() { fmt.Println('Hello') }"},
+            {
+                "language": "go",
+                "code": "func hello() { fmt.Println('Hello') }",
+            },
         ]
 
         for lang_context in languages:
@@ -351,7 +370,9 @@ The code is well-structured with good error handling practices.
         assert "metrics" in prompt.lower()
 
     @patch("local_agents.agents.reviewer.ReviewAgent._run_static_analysis")
-    def test_fallback_analysis_when_tools_unavailable(self, mock_static_analysis, reviewer_agent):
+    def test_fallback_analysis_when_tools_unavailable(
+        self, mock_static_analysis, reviewer_agent
+    ):
         """Test fallback analysis when static analysis tools are unavailable."""
         # Mock all tools as unavailable
         mock_static_analysis.side_effect = [
@@ -361,7 +382,10 @@ The code is well-structured with good error handling practices.
         ]
 
         task = "Review with fallback analysis"
-        context = {"code_content": "def test(): pass", "enable_static_analysis": True}
+        context = {
+            "code_content": "def test(): pass",
+            "enable_static_analysis": True,
+        }
 
         result = reviewer_agent.execute(task, context)
 

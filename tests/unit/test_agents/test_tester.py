@@ -32,7 +32,9 @@ def test_calculator_divide_by_zero():
     @pytest.fixture
     def tester_agent(self, mock_ollama_client):
         """Create a TestingAgent instance for testing."""
-        return TestingAgent(model="test:model", ollama_client=mock_ollama_client)
+        return TestingAgent(
+            model="test:model", ollama_client=mock_ollama_client
+        )
 
     def test_agent_initialization(self, tester_agent):
         """Test testing agent initialization."""
@@ -62,7 +64,9 @@ def test_calculator_divide_by_zero():
 
     def test_execute_failure(self, tester_agent):
         """Test execution failure handling."""
-        tester_agent.ollama_client.generate.side_effect = Exception("Test generation error")
+        tester_agent.ollama_client.generate.side_effect = Exception(
+            "Test generation error"
+        )
 
         task = "Generate tests"
         result = tester_agent.execute(task)
@@ -132,7 +136,9 @@ def test_calculator_divide_by_zero():
         code_to_test = "def add(a, b): return a + b"
         framework = "pytest"
 
-        result = tester_agent.generate_unit_tests(code_to_test, framework=framework)
+        result = tester_agent.generate_unit_tests(
+            code_to_test, framework=framework
+        )
 
         assert result.success is True
         assert "Generate unit tests for provided code" in result.task
@@ -148,10 +154,15 @@ def test_calculator_divide_by_zero():
         system_description = "User authentication system with database"
         framework = "pytest"
 
-        result = tester_agent.generate_integration_tests(system_description, framework)
+        result = tester_agent.generate_integration_tests(
+            system_description, framework
+        )
 
         assert result.success is True
-        assert "Generate integration tests for: User authentication system" in result.task
+        assert (
+            "Generate integration tests for: User authentication system"
+            in result.task
+        )
 
     def test_generate_api_tests(self, tester_agent):
         """Test generating API tests."""

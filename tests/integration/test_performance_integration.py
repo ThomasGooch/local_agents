@@ -149,7 +149,9 @@ class TestPerformanceIntegration:
 
         # Test optimization config generation
         profile = hardware_optimizer.detect_best_profile()
-        optimization_config = hardware_optimizer.get_optimization_config(profile)
+        optimization_config = hardware_optimizer.get_optimization_config(
+            profile
+        )
 
         assert isinstance(optimization_config, dict)
         assert "profile_name" in optimization_config
@@ -246,7 +248,12 @@ class TestPerformanceBenchmarkIntegration:
             hardware_profile="test_profile",
             timestamp=1234567890,
             results=mock_results,
-            summary={"target_validation": {"response_time_met": True, "memory_target_met": True}},
+            summary={
+                "target_validation": {
+                    "response_time_met": True,
+                    "memory_target_met": True,
+                }
+            },
         )
 
         validation = benchmark_system.validate_performance_targets(mock_suite)

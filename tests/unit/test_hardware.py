@@ -35,7 +35,9 @@ class TestHardwareOptimizer:
     @pytest.fixture
     def optimizer(self):
         """Create a fresh HardwareOptimizer for testing."""
-        with patch("local_agents.hardware.HardwareOptimizer._detect_hardware") as mock_detect:
+        with patch(
+            "local_agents.hardware.HardwareOptimizer._detect_hardware"
+        ) as mock_detect:
             mock_detect.return_value = {
                 "platform": "Darwin",
                 "cpu_count": 6,
@@ -92,7 +94,9 @@ class TestHardwareOptimizer:
 """
         mock_subprocess.return_value = mock_result
 
-        with patch("local_agents.hardware.platform.system", return_value="Darwin"):
+        with patch(
+            "local_agents.hardware.platform.system", return_value="Darwin"
+        ):
             optimizer = HardwareOptimizer()
             assert "mac_model" in optimizer.detected_hardware
             assert "MacBook Pro" in optimizer.detected_hardware["mac_model"]
@@ -103,13 +107,17 @@ class TestHardwareOptimizer:
         # Mock failed system_profiler
         mock_subprocess.side_effect = FileNotFoundError()
 
-        with patch("local_agents.hardware.platform.system", return_value="Darwin"):
+        with patch(
+            "local_agents.hardware.platform.system", return_value="Darwin"
+        ):
             optimizer = HardwareOptimizer()
             assert optimizer.detected_hardware["mac_model"] == "Unknown Mac"
 
     def test_detect_macbook_pro_profile(self):
         """Test detection of MacBook Pro Intel i7 16GB profile."""
-        with patch("local_agents.hardware.HardwareOptimizer._detect_hardware") as mock_detect:
+        with patch(
+            "local_agents.hardware.HardwareOptimizer._detect_hardware"
+        ) as mock_detect:
             mock_detect.return_value = {
                 "platform": "Darwin",
                 "cpu_count": 6,
@@ -127,7 +135,9 @@ class TestHardwareOptimizer:
 
     def test_detect_generic_high_end_profile(self):
         """Test detection of generic high-end profile."""
-        with patch("local_agents.hardware.HardwareOptimizer._detect_hardware") as mock_detect:
+        with patch(
+            "local_agents.hardware.HardwareOptimizer._detect_hardware"
+        ) as mock_detect:
             mock_detect.return_value = {
                 "platform": "Linux",
                 "cpu_count": 16,
@@ -144,7 +154,9 @@ class TestHardwareOptimizer:
 
     def test_create_custom_profile_high_performance(self):
         """Test creation of custom high-performance profile."""
-        with patch("local_agents.hardware.HardwareOptimizer._detect_hardware") as mock_detect:
+        with patch(
+            "local_agents.hardware.HardwareOptimizer._detect_hardware"
+        ) as mock_detect:
             mock_detect.return_value = {
                 "platform": "Linux",
                 "cpu_count": 8,
@@ -161,7 +173,9 @@ class TestHardwareOptimizer:
 
     def test_create_custom_profile_medium_performance(self):
         """Test creation of custom medium-performance profile."""
-        with patch("local_agents.hardware.HardwareOptimizer._detect_hardware") as mock_detect:
+        with patch(
+            "local_agents.hardware.HardwareOptimizer._detect_hardware"
+        ) as mock_detect:
             mock_detect.return_value = {
                 "platform": "Linux",
                 "cpu_count": 4,
@@ -178,7 +192,9 @@ class TestHardwareOptimizer:
 
     def test_create_custom_profile_basic_performance(self):
         """Test creation of custom basic-performance profile."""
-        with patch("local_agents.hardware.HardwareOptimizer._detect_hardware") as mock_detect:
+        with patch(
+            "local_agents.hardware.HardwareOptimizer._detect_hardware"
+        ) as mock_detect:
             mock_detect.return_value = {
                 "platform": "Linux",
                 "cpu_count": 2,
@@ -233,7 +249,10 @@ class TestHardwareOptimizer:
         # Mock config manager with failure
         mock_config_manager = Mock()
         mock_config_manager.load_config.return_value = Mock()
-        mock_config_manager.update_config_dict.return_value = (False, ["Error message"])
+        mock_config_manager.update_config_dict.return_value = (
+            False,
+            ["Error message"],
+        )
 
         profile = optimizer.detect_best_profile()
         result = optimizer.apply_optimization(mock_config_manager, profile)

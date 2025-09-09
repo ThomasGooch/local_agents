@@ -61,8 +61,16 @@ class PerformanceBenchmark:
     def __init__(self):
         self.benchmark_tasks = {
             "quick": [
-                ("plan", "Create a simple Hello World application", "llama3.1:8b"),
-                ("code", "Write a Python function to add two numbers", "codellama:7b"),
+                (
+                    "plan",
+                    "Create a simple Hello World application",
+                    "llama3.1:8b",
+                ),
+                (
+                    "code",
+                    "Write a Python function to add two numbers",
+                    "codellama:7b",
+                ),
                 (
                     "test",
                     "Create a unit test for a basic function",
@@ -96,7 +104,11 @@ class PerformanceBenchmark:
                     "Create integration tests for a web service",
                     "deepseek-coder:6.7b",
                 ),
-                ("review", "Review a complex multi-file codebase", "llama3.1:8b"),
+                (
+                    "review",
+                    "Review a complex multi-file codebase",
+                    "llama3.1:8b",
+                ),
                 (
                     "review",
                     "Perform security review of authentication code",
@@ -139,7 +151,11 @@ class PerformanceBenchmark:
                     "Security audit of distributed system",
                     "llama3.1:70b-instruct-q4_0",
                 ),
-                ("review", "Performance analysis of data pipeline", "llama3.1:8b"),
+                (
+                    "review",
+                    "Performance analysis of data pipeline",
+                    "llama3.1:8b",
+                ),
             ],
         }
 
@@ -160,7 +176,9 @@ class PerformanceBenchmark:
         """Run a complete benchmark suite."""
         if suite_type not in self.benchmark_tasks:
             available = list(self.benchmark_tasks.keys())
-            raise ValueError(f"Unknown suite type: {suite_type}. Available: {available}")
+            raise ValueError(
+                f"Unknown suite type: {suite_type}. Available: {available}"
+            )
 
         suite_title = f"Running {suite_type.title()} Benchmark Suite"
         console.print(f"[bold blue]{suite_title}[/bold blue]")
@@ -197,7 +215,9 @@ class PerformanceBenchmark:
                             progress.advance(main_task)
                     else:
                         # Concurrent execution
-                        batch_results = self._benchmark_concurrent_agents(tasks, concurrent_level)
+                        batch_results = self._benchmark_concurrent_agents(
+                            tasks, concurrent_level
+                        )
                         all_results.extend(batch_results)
                         progress.advance(main_task, len(tasks))
 
@@ -243,9 +263,13 @@ class PerformanceBenchmark:
                 model_name=model,
                 execution_time=execution_time,
                 memory_usage_mb=memory_usage,
-                success=(result.success if hasattr(result, "success") else True),
+                success=(
+                    result.success if hasattr(result, "success") else True
+                ),
                 error=result.error if hasattr(result, "error") else None,
-                tokens_generated=(len(result.output) if hasattr(result, "output") else 0),
+                tokens_generated=(
+                    len(result.output) if hasattr(result, "output") else 0
+                ),
                 concurrent_level=concurrent_level,
             )
 
@@ -268,7 +292,10 @@ class PerformanceBenchmark:
         results = []
 
         # Group tasks into batches for concurrent execution
-        batches = [tasks[i : i + concurrent_level] for i in range(0, len(tasks), concurrent_level)]
+        batches = [
+            tasks[i : i + concurrent_level]
+            for i in range(0, len(tasks), concurrent_level)
+        ]
         for batch in batches:
             start_time = time.time()
             start_memory = self._get_memory_usage()
@@ -329,7 +356,9 @@ class PerformanceBenchmark:
         process = psutil.Process()
         return process.memory_info().rss / 1024 / 1024
 
-    def _generate_benchmark_summary(self, results: List[BenchmarkResult]) -> Dict[str, Any]:
+    def _generate_benchmark_summary(
+        self, results: List[BenchmarkResult]
+    ) -> Dict[str, Any]:
         """Generate summary statistics from benchmark results."""
         if not results:
             return {"message": "No benchmark results"}
@@ -351,12 +380,18 @@ class PerformanceBenchmark:
 
             summary.update(
                 {
-                    "avg_execution_time": (sum(execution_times) / len(execution_times)),
+                    "avg_execution_time": (
+                        sum(execution_times) / len(execution_times)
+                    ),
                     "max_execution_time": max(execution_times),
                     "min_execution_time": min(execution_times),
-                    "avg_memory_usage": (sum(memory_usages) / len(memory_usages)),
+                    "avg_memory_usage": (
+                        sum(memory_usages) / len(memory_usages)
+                    ),
                     "max_memory_usage": max(memory_usages),
-                    "total_tokens_generated": sum(r.tokens_generated for r in successful_results),
+                    "total_tokens_generated": sum(
+                        r.tokens_generated for r in successful_results
+                    ),
                 }
             )
 
@@ -365,7 +400,9 @@ class PerformanceBenchmark:
             memory_target = self.performance_targets["memory_usage"]
             target_validation = {
                 "response_time_target": response_target,
-                "response_time_met": all(t <= response_target for t in execution_times),
+                "response_time_met": all(
+                    t <= response_target for t in execution_times
+                ),
                 "memory_target_mb": memory_target,
                 "memory_target_met": max(memory_usages) <= memory_target,
             }
@@ -415,7 +452,9 @@ class PerformanceBenchmark:
         title = f"Benchmark Results: {suite.suite_name.title()}"
         console.print(f"\n[bold blue]{title}[/bold blue]")
         console.print(f"Hardware: {suite.hardware_profile}")
-        timestamp_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(suite.timestamp))
+        timestamp_str = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(suite.timestamp)
+        )
         console.print(f"Timestamp: {timestamp_str}")
         summary = suite.summary
 
@@ -427,13 +466,23 @@ class PerformanceBenchmark:
         overall_table.add_row("Total Tests", str(summary["total_tests"]))
         overall_table.add_row("Successful", str(summary["successful_tests"]))
         overall_table.add_row("Failed", str(summary["failed_tests"]))
-        overall_table.add_row("Success Rate", f"{summary['success_rate']:.1f}%")
+        overall_table.add_row(
+            "Success Rate", f"{summary['success_rate']:.1f}%"
+        )
 
         if "avg_execution_time" in summary:
-            overall_table.add_row("Avg Execution Time", f"{summary['avg_execution_time']:.2f}s")
-            overall_table.add_row("Max Execution Time", f"{summary['max_execution_time']:.2f}s")
-            overall_table.add_row("Avg Memory Usage", f"{summary['avg_memory_usage']:.1f}MB")
-            overall_table.add_row("Max Memory Usage", f"{summary['max_memory_usage']:.1f}MB")
+            overall_table.add_row(
+                "Avg Execution Time", f"{summary['avg_execution_time']:.2f}s"
+            )
+            overall_table.add_row(
+                "Max Execution Time", f"{summary['max_execution_time']:.2f}s"
+            )
+            overall_table.add_row(
+                "Avg Memory Usage", f"{summary['avg_memory_usage']:.1f}MB"
+            )
+            overall_table.add_row(
+                "Max Memory Usage", f"{summary['max_memory_usage']:.1f}MB"
+            )
         console.print(overall_table)
 
         # Performance targets validation
@@ -443,13 +492,23 @@ class PerformanceBenchmark:
 
             response_status = "✅" if targets["response_time_met"] else "❌"
             response_target = targets["response_time_target"]
-            target_text += f"{response_status} Response Time: < {response_target}s\n"
+            target_text += (
+                f"{response_status} Response Time: < {response_target}s\n"
+            )
 
             memory_status = "✅" if targets["memory_target_met"] else "❌"
             memory_target = targets["memory_target_mb"]
-            target_text += f"{memory_status} Memory Usage: < {memory_target}MB\n"
+            target_text += (
+                f"{memory_status} Memory Usage: < {memory_target}MB\n"
+            )
 
-            console.print(Panel(target_text, title="Performance Targets", border_style="blue"))
+            console.print(
+                Panel(
+                    target_text,
+                    title="Performance Targets",
+                    border_style="blue",
+                )
+            )
         # Agent statistics table
         if "agent_statistics" in summary:
             agent_table = Table(title="Agent Performance")
@@ -470,14 +529,18 @@ class PerformanceBenchmark:
 
             console.print(agent_table)
 
-    def export_benchmark_results(self, suite: BenchmarkSuite, filepath: Path) -> None:
+    def export_benchmark_results(
+        self, suite: BenchmarkSuite, filepath: Path
+    ) -> None:
         """Export benchmark results to JSON file."""
         with open(filepath, "w") as f:
             json.dump(suite.to_dict(), f, indent=2)
         msg = f"Benchmark results exported to {filepath}"
         console.print(f"[green]{msg}[/green]")
 
-    def validate_performance_targets(self, suite: BenchmarkSuite) -> Dict[str, bool]:
+    def validate_performance_targets(
+        self, suite: BenchmarkSuite
+    ) -> Dict[str, bool]:
         """Validate benchmark results against performance targets."""
         summary = suite.summary
 
@@ -489,7 +552,9 @@ class PerformanceBenchmark:
         return {
             "response_time_target_met": targets["response_time_met"],
             "memory_target_met": targets["memory_target_met"],
-            "overall_success": (targets["response_time_met"] and targets["memory_target_met"]),
+            "overall_success": (
+                targets["response_time_met"] and targets["memory_target_met"]
+            ),
         }
 
     def run_macbook_pro_optimization_test(self) -> BenchmarkSuite:
@@ -502,7 +567,9 @@ class PerformanceBenchmark:
         hardware_optimizer.apply_optimization(config_manager, profile)
 
         # Run comprehensive benchmark
-        suite = self.run_benchmark_suite("comprehensive", [1, 2, 3], repeat_count=2)
+        suite = self.run_benchmark_suite(
+            "comprehensive", [1, 2, 3], repeat_count=2
+        )
 
         # Validate against MacBook Pro specific targets
         macbook_targets = {

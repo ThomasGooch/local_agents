@@ -403,7 +403,10 @@ def comprehensive_mock_agents():
     mock_planner.agent_type = "plan"
     mock_planner.execute.return_value = TaskResult(
         success=True,
-        output=("# Implementation Plan\n\n## Phase 1: Core Setup\n" "- Set up project structure"),
+        output=(
+            "# Implementation Plan\n\n## Phase 1: Core Setup\n"
+            "- Set up project structure"
+        ),
         agent_type="plan",
         task="Create implementation plan",
         context={},
