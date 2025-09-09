@@ -62,9 +62,7 @@ def test_calculator_divide_by_zero():
 
     def test_execute_failure(self, tester_agent):
         """Test execution failure handling."""
-        tester_agent.ollama_client.generate.side_effect = Exception(
-            "Test generation error"
-        )
+        tester_agent.ollama_client.generate.side_effect = Exception("Test generation error")
 
         task = "Generate tests"
         result = tester_agent.execute(task)
@@ -153,9 +151,7 @@ def test_calculator_divide_by_zero():
         result = tester_agent.generate_integration_tests(system_description, framework)
 
         assert result.success is True
-        assert (
-            "Generate integration tests for: User authentication system" in result.task
-        )
+        assert "Generate integration tests for: User authentication system" in result.task
 
     def test_generate_api_tests(self, tester_agent):
         """Test generating API tests."""

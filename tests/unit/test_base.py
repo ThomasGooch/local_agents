@@ -65,9 +65,7 @@ class TestBaseAgent:
         assert agent.ollama_client == mock_ollama_client
 
     @patch("local_agents.base.get_config")
-    def test_agent_initialization_with_config(
-        self, mock_get_config, mock_ollama_client
-    ):
+    def test_agent_initialization_with_config(self, mock_get_config, mock_ollama_client):
         """Test agent initialization using configuration."""
         mock_config = Mock()
         mock_config.temperature = 0.8
@@ -78,9 +76,7 @@ class TestBaseAgent:
             def execute(self, task, context=None):
                 pass
 
-        with patch(
-            "local_agents.base.get_model_for_agent", return_value="config:model"
-        ):
+        with patch("local_agents.base.get_model_for_agent", return_value="config:model"):
             agent = TestAgent(
                 agent_type="test",
                 role="Test Agent",
@@ -272,9 +268,7 @@ class TestTaskResult:
     @patch("local_agents.base.console.print")
     def test_display_success(self, mock_print):
         """Test displaying successful result."""
-        result = TaskResult(
-            success=True, output="Test output", agent_type="test", task="Test task"
-        )
+        result = TaskResult(success=True, output="Test output", agent_type="test", task="Test task")
 
         result.display()
         mock_print.assert_called_once()
@@ -406,9 +400,7 @@ class TestHandleAgentExecutionDecorator:
                 return self._create_success_result(response, task, context)
 
         # Mock Ollama client to raise connection error
-        mock_ollama_client.generate.side_effect = ConnectionError(
-            "Cannot connect to Ollama"
-        )
+        mock_ollama_client.generate.side_effect = ConnectionError("Cannot connect to Ollama")
 
         agent = TestAgent(
             agent_type="test",
@@ -472,9 +464,7 @@ class TestBaseAgentAdvanced:
             ollama_client=mock_ollama_client,
         )
 
-        result = agent._create_success_result(
-            "success output", "test task", {"key": "value"}
-        )
+        result = agent._create_success_result("success output", "test task", {"key": "value"})
 
         assert isinstance(result, TaskResult)
         assert result.success is True

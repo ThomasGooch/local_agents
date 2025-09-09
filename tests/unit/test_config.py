@@ -102,9 +102,7 @@ class TestConfig:
         ]
 
         for host in invalid_hosts:
-            with pytest.raises(
-                ValueError, match="ollama_host must be a valid HTTP/HTTPS URL"
-            ):
+            with pytest.raises(ValueError, match="ollama_host must be a valid HTTP/HTTPS URL"):
                 Config(ollama_host=host)
 
     def test_model_name_validation(self):
@@ -132,9 +130,7 @@ class TestConfig:
         ]
 
         for model in invalid_models:
-            with pytest.raises(
-                ValueError, match="Model name must follow format 'name:tag'"
-            ):
+            with pytest.raises(ValueError, match="Model name must follow format 'name:tag'"):
                 Config(default_model=model)
 
 

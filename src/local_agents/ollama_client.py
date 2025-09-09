@@ -33,9 +33,7 @@ class OllamaClient:
             if self.host not in OllamaClient._client_pool:
                 OllamaClient._client_pool[self.host] = httpx.Client(
                     timeout=300.0,
-                    limits=httpx.Limits(
-                        max_connections=10, max_keepalive_connections=5
-                    ),
+                    limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
                 )
             self.client = OllamaClient._client_pool[self.host]
 
@@ -123,9 +121,7 @@ class OllamaClient:
         """Generate text using Ollama model with caching and optimization."""
         # Check cache first for non-streaming requests
         if not stream and self.enable_cache:
-            cache_key = self._get_cache_key(
-                model, prompt, temperature, max_tokens, system
-            )
+            cache_key = self._get_cache_key(model, prompt, temperature, max_tokens, system)
             cached_response = self._get_cached_response(cache_key)
             if cached_response is not None:
                 return cached_response
@@ -155,9 +151,7 @@ class OllamaClient:
 
                 # Cache the response
                 if self.enable_cache:
-                    cache_key = self._get_cache_key(
-                        model, prompt, temperature, max_tokens, system
-                    )
+                    cache_key = self._get_cache_key(model, prompt, temperature, max_tokens, system)
                     self._cache_response(cache_key, result)
 
                 return result
@@ -167,9 +161,7 @@ class OllamaClient:
                 "Make sure Ollama is running and accessible."
             )
         except httpx.TimeoutException:
-            raise TimeoutError(
-                "Ollama request timed out. The model might be too large or busy."
-            )
+            raise TimeoutError("Ollama request timed out. The model might be too large or busy.")
         except Exception as e:
             raise RuntimeError(f"Ollama request failed: {e}")
 
@@ -178,9 +170,7 @@ class OllamaClient:
         full_response = ""
 
         try:
-            with self.client.stream(
-                "POST", f"{self.host}/api/generate", json=payload
-            ) as response:
+            with self.client.stream("POST", f"{self.host}/api/generate", json=payload) as response:
                 response.raise_for_status()
 
                 for line in response.iter_lines():
@@ -236,9 +226,7 @@ class OllamaClient:
                 "Make sure Ollama is running and accessible."
             )
         except httpx.TimeoutException:
-            raise TimeoutError(
-                "Ollama request timed out. The model might be too large or busy."
-            )
+            raise TimeoutError("Ollama request timed out. The model might be too large or busy.")
         except Exception as e:
             raise RuntimeError(f"Ollama request failed: {e}")
 
@@ -247,9 +235,7 @@ class OllamaClient:
         full_response = ""
 
         try:
-            with self.client.stream(
-                "POST", f"{self.host}/api/chat", json=payload
-            ) as response:
+            with self.client.stream("POST", f"{self.host}/api/chat", json=payload) as response:
                 response.raise_for_status()
 
                 for line in response.iter_lines():

@@ -202,9 +202,7 @@ The code is well-structured with good error handling practices.
 
     def test_review_for_maintainability(self, reviewer_agent):
         """Test maintainability-focused code review."""
-        code = (
-            "def complex_function(a,b,c,d,e,f,g,h): return a+b+c+d+e+f+g+h if a else b"
-        )
+        code = "def complex_function(a,b,c,d,e,f,g,h): return a+b+c+d+e+f+g+h if a else b"
 
         result = reviewer_agent.review_for_maintainability(code)
 
@@ -213,9 +211,7 @@ The code is well-structured with good error handling practices.
 
     def test_comprehensive_review(self, reviewer_agent):
         """Test comprehensive code review."""
-        code = (
-            "def authenticate(user, pwd): return user == 'admin' and pwd == 'password'"
-        )
+        code = "def authenticate(user, pwd): return user == 'admin' and pwd == 'password'"
         target_file = "auth.py"
 
         result = reviewer_agent.comprehensive_review(code, target_file)
@@ -240,9 +236,7 @@ The code is well-structured with good error handling practices.
         test_file.write_text("def test(): pass")
 
         # Mock static analysis results
-        mock_static_analysis.return_value = (
-            "test_code.py:1:1: C0111 Missing function docstring"
-        )
+        mock_static_analysis.return_value = "test_code.py:1:1: C0111 Missing function docstring"
 
         task = "Review with static analysis"
         context = {
@@ -357,9 +351,7 @@ The code is well-structured with good error handling practices.
         assert "metrics" in prompt.lower()
 
     @patch("local_agents.agents.reviewer.ReviewAgent._run_static_analysis")
-    def test_fallback_analysis_when_tools_unavailable(
-        self, mock_static_analysis, reviewer_agent
-    ):
+    def test_fallback_analysis_when_tools_unavailable(self, mock_static_analysis, reviewer_agent):
         """Test fallback analysis when static analysis tools are unavailable."""
         # Mock all tools as unavailable
         mock_static_analysis.side_effect = [

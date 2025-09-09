@@ -74,10 +74,7 @@ class WorkflowResult:
             f"\n**Task**: {self.task}",
             f"**Completion**: {successful_steps}/{total_steps} steps successful",
             f"\n**Execution Time**: {self.execution_time_formatted}",
-            (
-                "\nThis workflow execution summary provides an overview of the "
-                "completed tasks."
-            ),
+            ("\nThis workflow execution summary provides an overview of the " "completed tasks."),
         ]
 
         if successful_steps == total_steps:
@@ -123,9 +120,7 @@ class WorkflowResult:
 
         for i, result in enumerate(self.results, 1):
             status = "✅ Success" if result.success else "❌ Failed"
-            details = (
-                result.error if not result.success and result.error else "Completed"
-            )
+            details = result.error if not result.success and result.error else "Completed"
             table.add_row(
                 str(i),
                 result.agent_type.title(),
@@ -273,9 +268,7 @@ class Workflow:
             )
 
             for i, step in enumerate(workflow_steps, 1):
-                console.print(
-                    f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]"
-                )
+                console.print(f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]")
 
                 # Check dependencies
                 if not self._check_dependencies(step, results):
@@ -300,9 +293,7 @@ class Workflow:
 
                     # Decide whether to continue or abort
                     if not self._should_continue_after_failure(step, result):
-                        console.print(
-                            "[red]Workflow aborted due to critical failure[/red]"
-                        )
+                        console.print("[red]Workflow aborted due to critical failure[/red]")
                         break
 
                 progress.advance(workflow_task)
@@ -394,9 +385,7 @@ class Workflow:
         # Also check user-configured workflows
         config_workflows = config_manager.get_workflow_steps(workflow_name)
         if config_workflows:
-            return [
-                WorkflowStep(step, f"Execute {step} agent") for step in config_workflows
-            ]
+            return [WorkflowStep(step, f"Execute {step} agent") for step in config_workflows]
 
         return workflows.get(workflow_name, [])
 
@@ -632,10 +621,7 @@ class Workflow:
         if isinstance(step, str):
             agent_type = step
             # Check if workflow has step_dependencies attribute (set by tests)
-            if (
-                hasattr(self, "step_dependencies")
-                and agent_type in self.step_dependencies
-            ):
+            if hasattr(self, "step_dependencies") and agent_type in self.step_dependencies:
                 required_deps = self.step_dependencies[agent_type]
                 # Check against completed_steps dictionary
                 return all(
@@ -648,14 +634,10 @@ class Workflow:
         if not step.depends_on:
             return True
 
-        completed_types = {
-            result.agent_type for result in completed_results if result.success
-        }
+        completed_types = {result.agent_type for result in completed_results if result.success}
         return all(dep in completed_types for dep in step.depends_on)
 
-    def _update_context_from_result(
-        self, step: WorkflowStep, result: TaskResult
-    ) -> None:
+    def _update_context_from_result(self, step: WorkflowStep, result: TaskResult) -> None:
         """Update the workflow context with results from a step."""
         if result.success:
             # Store the output with a key based on the agent type
@@ -668,9 +650,7 @@ class Workflow:
                     if not key.startswith("_"):  # Skip private context keys
                         self.current_context[key] = value
 
-    def _should_continue_after_failure(
-        self, step: WorkflowStep, result: TaskResult
-    ) -> bool:
+    def _should_continue_after_failure(self, step: WorkflowStep, result: TaskResult) -> bool:
         """Determine whether to continue the workflow after a step failure."""
         # For now, continue unless it's a planning step failure
         # This could be made more sophisticated based on step criticality
@@ -750,9 +730,7 @@ class Workflow:
         results = []
 
         for i, step in enumerate(workflow_steps, 1):
-            console.print(
-                f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]"
-            )
+            console.print(f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]")
 
             result = self._execute_step(step, task, stream)
             results.append(result)

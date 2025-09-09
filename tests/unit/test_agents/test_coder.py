@@ -17,9 +17,7 @@ class TestCodingAgent:
         """Create a mock Ollama client."""
         client = Mock(spec=OllamaClient)
         client.is_model_available.return_value = True
-        client.generate.return_value = (
-            "```python\ndef hello():\n    return 'Hello, World!'\n```"
-        )
+        client.generate.return_value = "```python\ndef hello():\n    return 'Hello, World!'\n```"
         return client
 
     @pytest.fixture

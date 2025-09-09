@@ -95,17 +95,13 @@ class ReviewAgent(BaseAgent):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("code_content"):
-            prompt_parts.append(
-                f"\n## Code to Review\n```\n{context['code_content']}\n```"
-            )
+            prompt_parts.append(f"\n## Code to Review\n```\n{context['code_content']}\n```")
 
         if context.get("target_directory"):
             prompt_parts.append(f"\n## Target Directory\n{context['target_directory']}")
 
         if context.get("focus_area"):
-            prompt_parts.append(
-                f"\n## Review Focus\nFocus Area: {context['focus_area']}"
-            )
+            prompt_parts.append(f"\n## Review Focus\nFocus Area: {context['focus_area']}")
 
         if context.get("language"):
             prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
@@ -125,18 +121,14 @@ class ReviewAgent(BaseAgent):
             prompt_parts.append(f"\n## Static Analysis Results\n{analysis_text}")
 
         if context.get("previous_reviews"):
-            reviews_text = "\n".join(
-                f"- {review}" for review in context["previous_reviews"]
-            )
+            reviews_text = "\n".join(f"- {review}" for review in context["previous_reviews"])
             prompt_parts.append(f"\n## Previous Reviews\n{reviews_text}")
 
         if context.get("changes_made"):
             prompt_parts.append(f"\n## Changes Made\n{context['changes_made']}")
 
         if context.get("complexity_metrics"):
-            prompt_parts.append(
-                f"\n## Complexity Metrics\n{context['complexity_metrics']}"
-            )
+            prompt_parts.append(f"\n## Complexity Metrics\n{context['complexity_metrics']}")
 
         if context.get("extract_metrics"):
             prompt_parts.append(
@@ -300,9 +292,7 @@ issues by their potential impact.
         context["code_content"] = code
         if target_file:
             context["target_file"] = target_file
-        task = (
-            "Perform a comprehensive code review covering all aspects of code quality"
-        )
+        task = "Perform a comprehensive code review covering all aspects of code quality"
         return self.execute(task, context)
 
     def _add_automated_analysis(self, context: Dict[str, Any]) -> None:
@@ -322,9 +312,7 @@ issues by their potential impact.
             # Create a temporary file for analysis
             import tempfile
 
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".py", delete=False
-            ) as tmp:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp:
                 tmp.write(context["code_content"])
                 tmp_path = tmp.name
             context["static_analysis"] = self._run_static_analysis(tmp_path)
@@ -342,9 +330,7 @@ issues by their potential impact.
                 return "Tool not available"
 
             try:
-                result = subprocess.run(
-                    [tool, target], capture_output=True, text=True, timeout=30
-                )
+                result = subprocess.run([tool, target], capture_output=True, text=True, timeout=30)
                 return result.stdout if result.stdout else "Tool not available"
             except subprocess.TimeoutExpired:
                 return "Analysis timeout - tool execution took too long"
@@ -375,10 +361,7 @@ issues by their potential impact.
             return self._format_analysis_findings(findings)
 
         except Exception as e:
-            return (
-                f"Static analysis failed: {e}. Basic analysis will be performed "
-                "instead."
-            )
+            return f"Static analysis failed: {e}. Basic analysis will be performed " "instead."
 
     def _run_python_analysis_structured(self, target: str) -> List[AnalysisFinding]:
         """Run Python-specific static analysis with structured output."""
@@ -418,9 +401,7 @@ issues by their potential impact.
                                 file=item.get("filename", ""),
                                 line=item.get("line_number", 0),
                                 column=item.get("column_number", 0),
-                                severity=self._map_flake8_severity(
-                                    item.get("code", "")
-                                ),
+                                severity=self._map_flake8_severity(item.get("code", "")),
                                 message=item.get("text", ""),
                                 rule=item.get("code", ""),
                             )
@@ -478,9 +459,7 @@ issues by their potential impact.
                                 file=item.get("path", ""),
                                 line=item.get("line", 0),
                                 column=item.get("column", 0),
-                                severity=self._map_pylint_severity(
-                                    item.get("type", "")
-                                ),
+                                severity=self._map_pylint_severity(item.get("type", "")),
                                 message=item.get("message", ""),
                                 rule=item.get("message-id", ""),
                             )
@@ -578,9 +557,7 @@ issues by their potential impact.
                                 file=item.get("filename", ""),
                                 line=item.get("line_number", 0),
                                 column=0,
-                                severity=self._map_bandit_severity(
-                                    item.get("issue_severity", "")
-                                ),
+                                severity=self._map_bandit_severity(item.get("issue_severity", "")),
                                 message=item.get("issue_text", ""),
                                 rule=item.get("test_id", ""),
                             )
@@ -644,9 +621,7 @@ issues by their potential impact.
                                     file=file_result.get("filePath", ""),
                                     line=message.get("line", 0),
                                     column=message.get("column", 0),
-                                    severity=self._map_eslint_severity(
-                                        message.get("severity", 1)
-                                    ),
+                                    severity=self._map_eslint_severity(message.get("severity", 1)),
                                     message=message.get("message", ""),
                                     rule=message.get("ruleId", ""),
                                 )
@@ -738,14 +713,10 @@ issues by their potential impact.
         """Check if directory contains JavaScript/TypeScript files."""
         extensions = [".js", ".ts", ".jsx", ".tsx"]
         return any(
-            file.suffix in extensions
-            for file in directory.rglob("*")
-            if file.suffix in extensions
+            file.suffix in extensions for file in directory.rglob("*") if file.suffix in extensions
         )
 
-    def review_security(
-        self, target: str, context: Optional[Dict[str, Any]] = None
-    ) -> TaskResult:
+    def review_security(self, target: str, context: Optional[Dict[str, Any]] = None) -> TaskResult:
         """Focus review on security aspects."""
         context = context or {}
         context["focus_area"] = "security"
@@ -804,9 +775,7 @@ issues by their potential impact.
     # Severity mapping methods
     def _map_flake8_severity(self, code: str) -> Severity:
         """Map flake8 codes to severity levels."""
-        if code.startswith("E9") or code.startswith(
-            "F"
-        ):  # Syntax errors, undefined names
+        if code.startswith("E9") or code.startswith("F"):  # Syntax errors, undefined names
             return Severity.CRITICAL
         elif code.startswith("E") and code[1] in [
             "1",
@@ -897,9 +866,7 @@ issues by their potential impact.
                             file=file_path,
                             line=line_num,
                             column=0,
-                            severity=Severity.HIGH
-                            if "error" in message_part
-                            else Severity.MEDIUM,
+                            severity=Severity.HIGH if "error" in message_part else Severity.MEDIUM,
                             message=message_part.strip(),
                             rule="type-check",
                         )

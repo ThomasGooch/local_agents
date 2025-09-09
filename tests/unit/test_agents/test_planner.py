@@ -98,10 +98,7 @@ class TestPlanningAgent:
         result = planner_agent.plan_feature(feature_description)
 
         assert result.success is True
-        assert (
-            "Plan implementation of new feature: User dashboard with analytics"
-            in result.task
-        )
+        assert "Plan implementation of new feature: User dashboard with analytics" in result.task
         planner_agent.ollama_client.generate.assert_called_once()
 
     def test_plan_bugfix(self, planner_agent):
@@ -121,9 +118,7 @@ class TestPlanningAgent:
         result = planner_agent.plan_refactor(refactor_description)
 
         assert result.success is True
-        assert (
-            "Plan refactoring: Extract common utilities to shared module" in result.task
-        )
+        assert "Plan refactoring: Extract common utilities to shared module" in result.task
         planner_agent.ollama_client.generate.assert_called_once()
 
     def test_execute_with_stream(self, planner_agent):

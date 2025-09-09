@@ -52,9 +52,7 @@ class FileManager:
 
         return created_files
 
-    def _extract_from_language_blocks(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _extract_from_language_blocks(self, response: str, context: Dict[str, any]) -> List[str]:
         """Extract files from language-specific code blocks."""
         created_files = []
 
@@ -99,9 +97,7 @@ class FileManager:
 
         return created_files
 
-    def _create_default_files(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _create_default_files(self, response: str, context: Dict[str, any]) -> List[str]:
         """Create default files based on agent type and task context."""
         created_files = []
         agent_type = context.get("agent_type", "unknown")
@@ -183,9 +179,7 @@ class FileManager:
 
         return created_files
 
-    def _detect_language(
-        self, task: str, response: str, context: Dict[str, any]
-    ) -> str:
+    def _detect_language(self, task: str, response: str, context: Dict[str, any]) -> str:
         """Detect programming language from task and context."""
         task_lower = task.lower()
 
@@ -235,9 +229,7 @@ class FileManager:
         }
         return extensions.get(language, ".txt")
 
-    def _generate_filename(
-        self, content: str, extension: str, context: Dict[str, any]
-    ) -> str:
+    def _generate_filename(self, content: str, extension: str, context: Dict[str, any]) -> str:
         """Generate meaningful filename from content."""
         # Look for class names, function names, etc.
         class_match = re.search(r"class\s+(\w+)", content)
@@ -286,9 +278,7 @@ class FileManager:
 
         return f"code_{index + 1}{extension}"
 
-    def _generate_test_filename(
-        self, code: str, context: Dict[str, any], index: int
-    ) -> str:
+    def _generate_test_filename(self, code: str, context: Dict[str, any], index: int) -> str:
         """Generate filename for test files."""
         language = self._detect_language(context.get("task", ""), code, context)
 
@@ -352,9 +342,7 @@ class FileManager:
 
         return True
 
-    def _write_file(
-        self, file_path: str, content: str, context: Dict[str, any]
-    ) -> Optional[str]:
+    def _write_file(self, file_path: str, content: str, context: Dict[str, any]) -> Optional[str]:
         """Write content to file safely."""
         try:
             # Ensure we're writing within the working directory
@@ -390,9 +378,7 @@ class FileManager:
             ]
 
             for file_path, content in project_files:
-                created_file = self._write_file(
-                    file_path, content, {"agent_type": "structure"}
-                )
+                created_file = self._write_file(file_path, content, {"agent_type": "structure"})
                 if created_file:
                     created_files.append(created_file)
 

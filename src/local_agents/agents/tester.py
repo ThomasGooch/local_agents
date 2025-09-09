@@ -85,14 +85,10 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(f"\n## Framework\nFramework: {context['framework']}")
 
         if context.get("target_description"):
-            prompt_parts.append(
-                f"\n## Target Description\n{context['target_description']}"
-            )
+            prompt_parts.append(f"\n## Target Description\n{context['target_description']}")
 
         # Handle both 'specifications' and 'test_specifications' keys
-        specifications = context.get("specifications") or context.get(
-            "test_specifications"
-        )
+        specifications = context.get("specifications") or context.get("test_specifications")
         if specifications:
             if isinstance(specifications, list):
                 spec_text = "\n- " + "\n- ".join(specifications)
@@ -100,9 +96,7 @@ class TestingAgent(BaseAgent):
                 spec_text = specifications
             prompt_parts.append(f"\n## Test Specifications\n{spec_text}")
         if context.get("implementation_plan"):
-            prompt_parts.append(
-                f"\n## Implementation Plan\n{context['implementation_plan']}"
-            )
+            prompt_parts.append(f"\n## Implementation Plan\n{context['implementation_plan']}")
 
         if context.get("requirements"):
             prompt_parts.append(f"\n## Requirements\n{context['requirements']}")
@@ -130,9 +124,7 @@ class TestingAgent(BaseAgent):
                 ]
                 requirements_text = ", ".join(formatted_requirements)
             else:
-                requirements_text = str(context["coverage_requirements"]).replace(
-                    "_", " "
-                )
+                requirements_text = str(context["coverage_requirements"]).replace("_", " ")
             prompt_parts.append(f"\n## Coverage Requirements\n{requirements_text}")
         if context.get("security_concerns"):
             prompt_parts.append(
@@ -265,9 +257,7 @@ the code under test.
                 test_dirs.append(test_dir)
 
         if test_dirs:
-            prompt_parts.append(
-                f"\n## Existing Test Directories\n{', '.join(test_dirs)}"
-            )
+            prompt_parts.append(f"\n## Existing Test Directories\n{', '.join(test_dirs)}")
 
     def _run_tests(self, context: Dict[str, Any]) -> Optional[str]:
         """Run tests and return output."""
@@ -314,9 +304,7 @@ the code under test.
         target_dir = Path(context.get("target_directory", "."))
 
         # Python test commands
-        if (target_dir / "pytest.ini").exists() or (
-            target_dir / "pyproject.toml"
-        ).exists():
+        if (target_dir / "pytest.ini").exists() or (target_dir / "pyproject.toml").exists():
             commands.append("python -m pytest -v")
 
         # Node.js test commands
@@ -439,9 +427,7 @@ the code under test.
                     capture_output=True,
                     text=True,
                     timeout=300,
-                    cwd=target_path
-                    if Path(target_path).is_dir()
-                    else Path(target_path).parent,
+                    cwd=target_path if Path(target_path).is_dir() else Path(target_path).parent,
                 )
 
                 if result.returncode == 0 and result.stdout:
