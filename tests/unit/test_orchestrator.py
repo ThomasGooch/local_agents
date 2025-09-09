@@ -5,10 +5,7 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from local_agents.agents.coder import CodingAgent
-from local_agents.agents.planner import PlanningAgent
-from local_agents.agents.reviewer import ReviewAgent
-from local_agents.agents.tester import TestingAgent
+# Avoid direct imports to prevent class pollution in other tests
 from local_agents.base import TaskResult
 from local_agents.workflows.orchestrator import Workflow, WorkflowResult, WorkflowStep
 
@@ -22,7 +19,7 @@ class TestWorkflowOrchestrator:
         agents = {}
 
         # Mock planning agent
-        mock_planner = Mock(spec=PlanningAgent)
+        mock_planner = Mock()
         mock_planner.agent_type = "plan"
         mock_planner.execute.return_value = TaskResult(
             success=True,
@@ -34,7 +31,7 @@ class TestWorkflowOrchestrator:
         agents["planner"] = mock_planner
 
         # Mock coding agent
-        mock_coder = Mock(spec=CodingAgent)
+        mock_coder = Mock()
         mock_coder.agent_type = "code"
         mock_coder.execute.return_value = TaskResult(
             success=True,
@@ -46,7 +43,7 @@ class TestWorkflowOrchestrator:
         agents["coder"] = mock_coder
 
         # Mock testing agent
-        mock_tester = Mock(spec=TestingAgent)
+        mock_tester = Mock()
         mock_tester.agent_type = "test"
         mock_tester.execute.return_value = TaskResult(
             success=True,
@@ -58,7 +55,7 @@ class TestWorkflowOrchestrator:
         agents["tester"] = mock_tester
 
         # Mock review agent
-        mock_reviewer = Mock(spec=ReviewAgent)
+        mock_reviewer = Mock()
         mock_reviewer.agent_type = "review"
         mock_reviewer.execute.return_value = TaskResult(
             success=True,
@@ -76,18 +73,18 @@ class TestWorkflowOrchestrator:
         """Create workflow with mocked agents."""
         workflow = Workflow()
 
-        # Replace agent creation with mocked instances
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
+        # Replace agent creation with mocked instances using string-based patching
+        with patch(
+            "local_agents.agents.planner.PlanningAgent", return_value=mock_agents["planner"]
         ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
+            with patch(
+                "local_agents.agents.coder.CodingAgent", return_value=mock_agents["coder"]
             ):
-                with patch.object(
-                    TestingAgent, "__new__", return_value=mock_agents["tester"]
+                with patch(
+                    "local_agents.agents.tester.TestingAgent", return_value=mock_agents["tester"]
                 ):
-                    with patch.object(
-                        ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
+                    with patch(
+                        "local_agents.agents.reviewer.ReviewAgent", return_value=mock_agents["reviewer"]
                     ):
                         yield workflow
 

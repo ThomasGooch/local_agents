@@ -134,7 +134,7 @@ def test_calculator_divide_by_zero():
         code_to_test = "def add(a, b): return a + b"
         framework = "pytest"
 
-        result = tester_agent.generate_unit_tests(code_to_test, framework)
+        result = tester_agent.generate_unit_tests(code_to_test, framework=framework)
 
         assert result.success is True
         assert "Generate unit tests for provided code" in result.task

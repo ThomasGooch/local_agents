@@ -115,6 +115,17 @@ class TestingAgent(BaseAgent):
                 f"\n## API Specification\n{context['api_spec']}"
             )
 
+
+        if context.get("coverage_requirements"):
+            if isinstance(context['coverage_requirements'], list):
+                # Convert underscores to spaces for better readability
+                formatted_requirements = [req.replace('_', ' ') for req in context['coverage_requirements']]
+                requirements_text = ', '.join(formatted_requirements)
+            else:
+                requirements_text = str(context['coverage_requirements']).replace('_', ' ')
+            prompt_parts.append(
+                f"\n## Coverage Requirements\n{requirements_text}"
+            )
         if context.get("security_concerns"):
             prompt_parts.append(
                 f"\n## Security Concerns\n{', '.join(context['security_concerns']) if isinstance(context['security_concerns'], list) else context['security_concerns']}"
@@ -138,6 +149,32 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(
                 f"\n## Error Details\n{context['error_detail']}"
             )
+
+        if context.get("external_dependencies"):
+            prompt_parts.append(
+                f"\n## External Dependencies\n{', '.join(context['external_dependencies']) if isinstance(context['external_dependencies'], list) else context['external_dependencies']}"
+            )
+
+        if context.get("mock_strategy"):
+            prompt_parts.append(
+                f"\n## Mock Strategy\n{context['mock_strategy']}"
+            )
+
+        if context.get("test_command"):
+            prompt_parts.append(
+                f"\n## Test Command\n{context['test_command']}"
+            )
+
+        if context.get("expected_results"):
+            prompt_parts.append(
+                f"\n## Expected Results\n{context['expected_results']}"
+            )
+
+        if context.get("failure_details"):
+            prompt_parts.append(
+                f"\n## Failure Details\n{context['failure_details']}"
+            )
+
         if context.get("dependencies"):
             prompt_parts.append(
                 f"\n## Dependencies\n{context['dependencies']}"
