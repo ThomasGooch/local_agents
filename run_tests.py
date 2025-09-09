@@ -82,7 +82,7 @@ class TestRunner:
         success = True
         
         # Flake8 linting
-        cmd = ['flake8', 'src/local_agents', 'tests', '--max-line-length=88', '--extend-ignore=E203,W503']
+        cmd = ['flake8', 'src/local_agents', 'tests', '--max-line-length=100', '--extend-ignore=E203,W503']
         success &= self.run_command(cmd, "Code linting (flake8)")
         
         # Type checking

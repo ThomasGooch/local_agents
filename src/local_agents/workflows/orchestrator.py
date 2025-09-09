@@ -7,13 +7,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import (
-    Progress,
-    TextColumn,
-    BarColumn,
-    MofNCompleteColumn,
-    TimeElapsedColumn,
-)
+from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeElapsedColumn
 from rich.table import Table
 
 from ..agents.coder import CodingAgent
