@@ -320,3 +320,23 @@ local/
 *.prof
 *.profile
 .debug/
+
+# Local Agents specific temporary files
+code.py
+code.js
+code.java
+code.go
+code.rs
+code.txt
+code_review.md
+test_calculator_*.py
+*_generated_*
+*_temp_*
+
+# Example output files that shouldn't be committed
+example_*.py
+example_*.js
+example_*.cs
+sample_*.py
+sample_*.js
+sample_*.cs

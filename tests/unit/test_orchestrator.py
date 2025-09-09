@@ -8,6 +8,10 @@ import pytest
 # Avoid direct imports to prevent class pollution in other tests
 from local_agents.base import TaskResult
 from local_agents.workflows.orchestrator import Workflow, WorkflowResult, WorkflowStep
+from local_agents.agents.planner import PlanningAgent
+from local_agents.agents.coder import CodingAgent  
+from local_agents.agents.tester import TestingAgent
+from local_agents.agents.reviewer import ReviewAgent
 
 
 class TestWorkflowOrchestrator:
