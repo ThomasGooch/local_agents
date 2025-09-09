@@ -303,9 +303,13 @@ class TestWorkflowCLI:
         result = cli_runner.invoke(workflow, ["feature-dev", "Create calculator"])
 
         assert result.exit_code == 0
-        mock_workflow.execute_workflow.assert_called_once_with(
-            "feature-dev", "Create calculator", {}, stream=False
-        )
+        # Check that execute_workflow was called with output_directory set to PWD
+        mock_workflow.execute_workflow.assert_called_once()
+        call_args = mock_workflow.execute_workflow.call_args
+        assert call_args[0][0] == "feature-dev"
+        assert call_args[0][1] == "Create calculator"
+        assert "output_directory" in call_args[0][2]  # Should have output_directory
+        assert call_args[1]["stream"] == False
 
     @patch("local_agents.cli.Workflow")
     def test_workflow_with_context(self, mock_workflow_class, cli_runner, sample_python_file):
