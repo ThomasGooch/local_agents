@@ -163,7 +163,7 @@ def mock_ollama_client_with_responses(mock_ollama_response):
     return client
 
 
-class TestAgentChaining:
+class TestingAgentChaining:
     """Test chaining agents together with realistic scenarios."""
 
     @patch("local_agents.base.OllamaClient")
@@ -308,7 +308,7 @@ class TestAgentChaining:
         assert "review" in review_result.output.lower()
 
 
-class TestAgentErrorHandling:
+class TestingAgentErrorHandling:
     """Test error handling in agent integration scenarios."""
 
     @patch("local_agents.base.OllamaClient")
@@ -341,7 +341,7 @@ class TestAgentErrorHandling:
             PlanningAgent(model="nonexistent:model")
 
 
-class TestAgentContextHandling:
+class TestingAgentContextHandling:
     """Test how agents handle different context scenarios."""
 
     @patch("local_agents.base.OllamaClient")
@@ -406,7 +406,7 @@ class TestAgentContextHandling:
         assert result.context["style"] == "functional"
 
 
-class TestAgentStreamingSupport:
+class TestingAgentStreamingSupport:
     """Test streaming functionality across agents."""
 
     @patch("local_agents.base.OllamaClient")

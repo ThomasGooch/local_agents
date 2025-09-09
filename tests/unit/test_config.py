@@ -134,7 +134,7 @@ class TestConfig:
                 Config(default_model=model)
 
 
-class TestAgentSettings:
+class TestingAgentSettings:
     """Test AgentSettings model."""
 
     def test_agent_settings_defaults(self):

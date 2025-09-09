@@ -49,9 +49,13 @@ jobs:
         poetry run black --check src/ tests/
         poetry run isort --check-only src/ tests/
         
-    - name: Run unit tests
+    - name: Run core unit tests
       run: |
-        poetry run pytest tests/unit -v --tb=short --timeout=30 --maxfail=5 --cov=src/local_agents --cov-report=xml
+        poetry run pytest tests/unit --ignore=tests/unit/test_agents -v --tb=short --timeout=30 --cov=src/local_agents --cov-report=xml
+        
+    - name: Run agent tests
+      run: |
+        poetry run pytest tests/unit/test_agents -v --tb=short --timeout=30
         
     - name: Run integration tests  
       run: |
