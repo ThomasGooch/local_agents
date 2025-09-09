@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import Progress
+from rich.progress import Progress, TextColumn, BarColumn, MofNCompleteColumn, TimeElapsedColumn
 from rich.table import Table
 
 from ..agents.coder import CodingAgent
@@ -262,7 +262,12 @@ class Workflow:
 
         results = []
 
-        with Progress() as progress:
+        with Progress(
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeElapsedColumn(),
+        ) as progress:
             workflow_task = progress.add_task(
                 f"[cyan]{workflow_name.title()} Workflow", total=len(workflow_steps)
             )
