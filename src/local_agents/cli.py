@@ -100,10 +100,7 @@ def handle_common_errors(e: Exception) -> None:
             Panel(
                 f"[red]Unexpected Error[/red]\n\n"
                 f"{e}\n\n"
-                + (
-                    "If this problem persists, please check your configuration "
-                    "and try again."
-                ),
+                + ("If this problem persists, please check your configuration " "and try again."),
                 title="Error",
                 border_style="red",
             )
@@ -151,9 +148,7 @@ def main(ctx: click.Context, version: bool) -> None:
     type=click.Path(exists=True),
     help="Context file or directory",
 )
-@click.option(
-    "--stream/--no-stream", default=True, help="Stream output in real-time"
-)
+@click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def plan(
     task: str,
     model: Optional[str],
@@ -183,14 +178,10 @@ def plan(
             context_path = Path(context)
             if context_path.is_file():
                 context_data["file_content"] = context_path.read_text()
-                console.print(
-                    f"[dim]Loaded context from file: {context_path}[/dim]"
-                )
+                console.print(f"[dim]Loaded context from file: {context_path}[/dim]")
             elif context_path.is_dir():
                 context_data["directory"] = str(context_path)
-                console.print(
-                    f"[dim]Using directory context: {context_path}[/dim]"
-                )
+                console.print(f"[dim]Using directory context: {context_path}[/dim]")
 
         if not stream:
             with console.status("[cyan]Planning in progress..."):
@@ -212,9 +203,7 @@ def plan(
 
 @main.command()
 @click.argument("task", required=True)
-@click.option(
-    "--file", "-f", type=click.Path(), help="File to modify or create"
-)
+@click.option("--file", "-f", type=click.Path(), help="File to modify or create")
 @click.option("--spec", "-s", help="Detailed specification or requirements")
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save code to file")
@@ -224,9 +213,7 @@ def plan(
     type=click.Path(exists=True),
     help="Context file or directory",
 )
-@click.option(
-    "--stream/--no-stream", default=True, help="Stream output in real-time"
-)
+@click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def code(
     task: str,
     file: Optional[str],
@@ -260,14 +247,10 @@ def code(
             context_path = Path(context)
             if context_path.is_file():
                 context_data["file_content"] = context_path.read_text()
-                console.print(
-                    f"[dim]Loaded context from file: {context_path}[/dim]"
-                )
+                console.print(f"[dim]Loaded context from file: {context_path}[/dim]")
             elif context_path.is_dir():
                 context_data["directory"] = str(context_path)
-                console.print(
-                    f"[dim]Using directory context: {context_path}[/dim]"
-                )
+                console.print(f"[dim]Using directory context: {context_path}[/dim]")
 
         if file:
             context_data["target_file"] = file
@@ -307,9 +290,7 @@ def code(
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save tests to file")
 @click.option("--run", is_flag=True, help="Run tests after generation")
-@click.option(
-    "--stream/--no-stream", default=True, help="Stream output in real-time"
-)
+@click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def test(
     target: str,
     framework: Optional[str],
@@ -366,13 +347,9 @@ def test(
 
         if not stream:
             with console.status("[cyan]Generating tests..."):
-                result = agent.execute(
-                    f"Generate tests for {target}", context_data, stream=False
-                )
+                result = agent.execute(f"Generate tests for {target}", context_data, stream=False)
         else:
-            result = agent.execute(
-                f"Generate tests for {target}", context_data, stream=True
-            )
+            result = agent.execute(f"Generate tests for {target}", context_data, stream=True)
 
         result.display()
 
@@ -388,14 +365,10 @@ def test(
 
 @main.command()
 @click.argument("target", required=True)
-@click.option(
-    "--focus", help="Focus area (security, performance, style, etc.)"
-)
+@click.option("--focus", help="Focus area (security, performance, style, etc.)")
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save review to file")
-@click.option(
-    "--stream/--no-stream", default=True, help="Stream output in real-time"
-)
+@click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def review(
     target: str,
     focus: Optional[str],
@@ -450,13 +423,9 @@ def review(
 
         if not stream:
             with console.status("[cyan]Analyzing code..."):
-                result = agent.execute(
-                    f"Review {target}", context_data, stream=False
-                )
+                result = agent.execute(f"Review {target}", context_data, stream=False)
         else:
-            result = agent.execute(
-                f"Review {target}", context_data, stream=True
-            )
+            result = agent.execute(f"Review {target}", context_data, stream=True)
 
         result.display()
 
@@ -511,9 +480,7 @@ def workflow(
         context_data["output_directory"] = output_dir
         Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-        result = wf.execute_workflow(
-            workflow_name, task, context_data, stream=stream
-        )
+        result = wf.execute_workflow(workflow_name, task, context_data, stream=stream)
 
         # Use the WorkflowResult's built-in display method
         result.display()
@@ -526,16 +493,12 @@ def workflow(
             # Save workflow summary
             summary_path = output_path / f"{workflow_name}_summary.md"
             summary_path.write_text(result.summary)
-            console.print(
-                f"[dim]Workflow summary saved to {summary_path}[/dim]"
-            )
+            console.print(f"[dim]Workflow summary saved to {summary_path}[/dim]")
 
             # Save individual step outputs
             for i, step_result in enumerate(result.results, 1):
                 if step_result.success and step_result.output:
-                    step_path = (
-                        output_path / f"step_{i}_{step_result.agent_type}.txt"
-                    )
+                    step_path = output_path / f"step_{i}_{step_result.agent_type}.txt"
                     step_path.write_text(step_result.output)
 
     except Exception as e:
@@ -569,17 +532,13 @@ def show():
             config_obj.default_model,
             "Default model for all agents",
         )
-        table.add_row(
-            "Ollama Host", config_obj.ollama_host, "Ollama service URL"
-        )
+        table.add_row("Ollama Host", config_obj.ollama_host, "Ollama service URL")
         table.add_row(
             "Temperature",
             str(config_obj.temperature),
             "Model creativity (0.0-2.0)",
         )
-        table.add_row(
-            "Max Tokens", str(config_obj.max_tokens), "Maximum response length"
-        )
+        table.add_row("Max Tokens", str(config_obj.max_tokens), "Maximum response length")
         table.add_row(
             "Context Length",
             str(config_obj.context_length),
@@ -652,9 +611,7 @@ def reset(force: bool):
     """Reset configuration to defaults."""
     try:
         if not force:
-            if not click.confirm(
-                "This will reset all configuration to defaults. Continue?"
-            ):
+            if not click.confirm("This will reset all configuration to defaults. Continue?"):
                 console.print("[dim]Configuration reset cancelled[/dim]")
                 return
 
@@ -671,9 +628,7 @@ def backup():
     """Create a backup of current configuration."""
     try:
         backup_path = config_manager.create_backup()
-        console.print(
-            f"[green]✓ Configuration backup created: {backup_path}[/green]"
-        )
+        console.print(f"[green]✓ Configuration backup created: {backup_path}[/green]")
 
     except Exception as e:
         handle_common_errors(e)
@@ -691,9 +646,7 @@ def restore(backup_file: str):
             return
 
         config_manager.restore_from_backup(backup_file)
-        console.print(
-            f"[green]✓ Configuration restored from {backup_file}[/green]"
-        )
+        console.print(f"[green]✓ Configuration restored from {backup_file}[/green]")
 
     except Exception as e:
         handle_common_errors(e)
@@ -717,9 +670,7 @@ def validate():
                 f"({len(models)} models available)[/green]"
             )
         except Exception as ollama_error:
-            console.print(
-                f"[yellow]⚠ Ollama connection failed: {ollama_error}[/yellow]"
-            )
+            console.print(f"[yellow]⚠ Ollama connection failed: {ollama_error}[/yellow]")
 
     except Exception as e:
         handle_common_errors(e)
@@ -772,9 +723,7 @@ def pull(model_name: str):
         with console.status(f"[cyan]Pulling {model_name}..."):
             client.pull_model(model_name)
 
-        console.print(
-            f"[green]✓ Model {model_name} downloaded successfully[/green]"
-        )
+        console.print(f"[green]✓ Model {model_name} downloaded successfully[/green]")
 
     except Exception as e:
         handle_common_errors(e)
@@ -789,13 +738,9 @@ def remove(model_name: str):
 
         client = OllamaClient()
 
-        if click.confirm(
-            f"Are you sure you want to remove model '{model_name}'?"
-        ):
+        if click.confirm(f"Are you sure you want to remove model '{model_name}'?"):
             client.remove_model(model_name)
-            console.print(
-                f"[green]✓ Model {model_name} removed successfully[/green]"
-            )
+            console.print(f"[green]✓ Model {model_name} removed successfully[/green]")
         else:
             console.print("[dim]Model removal cancelled[/dim]")
 
@@ -874,9 +819,7 @@ def export(filepath: Optional[str]):
         from pathlib import Path
 
         if not filepath:
-            filepath = (
-                Path.cwd() / f"performance_metrics_{int(time.time())}.json"
-            )
+            filepath = Path.cwd() / f"performance_metrics_{int(time.time())}.json"
         else:
             filepath = Path(filepath)
 
@@ -927,13 +870,9 @@ def optimize():
         console.print(settings_table)
 
         if click.confirm("Apply these optimizations?"):
-            success = hardware_optimizer.apply_optimization(
-                config_manager, profile
-            )
+            success = hardware_optimizer.apply_optimization(config_manager, profile)
             if success:
-                console.print(
-                    "[green]✓ Hardware optimization applied successfully[/green]"
-                )
+                console.print("[green]✓ Hardware optimization applied successfully[/green]")
             else:
                 console.print("[red]✗ Failed to apply optimization[/red]")
         else:
@@ -971,17 +910,13 @@ def benchmark():
     help="Concurrent levels to test (can specify multiple)",
 )
 @click.option("--repeat", "-r", default=1, help="Number of repetitions")
-@click.option(
-    "--export", "-e", type=click.Path(), help="Export results to file"
-)
+@click.option("--export", "-e", type=click.Path(), help="Export results to file")
 def run(suite: str, concurrent: tuple, repeat: int, export: Optional[str]):
     """Run performance benchmark suite."""
     try:
         concurrent_levels = list(concurrent) if concurrent else [1, 2]
 
-        console.print(
-            f"[bold blue]Running {suite} benchmark suite[/bold blue]"
-        )
+        console.print(f"[bold blue]Running {suite} benchmark suite[/bold blue]")
         console.print(f"Concurrent levels: {concurrent_levels}")
         console.print(f"Repetitions: {repeat}")
 

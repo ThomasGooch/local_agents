@@ -43,9 +43,7 @@ class HardwareOptimizer:
             "cpu_count": psutil.cpu_count(logical=False),
             "cpu_count_logical": psutil.cpu_count(logical=True),
             "memory_gb": round(psutil.virtual_memory().total / (1024**3), 1),
-            "cpu_freq_mhz": psutil.cpu_freq().current
-            if psutil.cpu_freq()
-            else 0,
+            "cpu_freq_mhz": psutil.cpu_freq().current if psutil.cpu_freq() else 0,
         }
 
         # Detect macOS specific information
@@ -59,9 +57,7 @@ class HardwareOptimizer:
                     timeout=10,
                 )
                 if result.returncode == 0:
-                    hardware_info["mac_model"] = self._parse_mac_model(
-                        result.stdout
-                    )
+                    hardware_info["mac_model"] = self._parse_mac_model(result.stdout)
             except (subprocess.TimeoutExpired, FileNotFoundError):
                 hardware_info["mac_model"] = "Unknown Mac"
 
@@ -214,18 +210,11 @@ class HardwareOptimizer:
             and cpu_cores == 6  # Allow some variance
         ):
             mac_model = self.detected_hardware.get("mac_model", "").lower()
-            if "macbook pro" in mac_model and (
-                "i7" in mac_model or "intel" in mac_model
-            ):
+            if "macbook pro" in mac_model and ("i7" in mac_model or "intel" in mac_model):
                 return self.profiles["macbook_pro_intel_i7_16gb"]
 
         # MacBook Air M1 8GB detection
-        if (
-            platform_name == "Darwin"
-            and memory_gb >= 7.5
-            and memory_gb <= 8.5
-            and cpu_cores == 8
-        ):
+        if platform_name == "Darwin" and memory_gb >= 7.5 and memory_gb <= 8.5 and cpu_cores == 8:
             mac_model = self.detected_hardware.get("mac_model", "").lower()
             if "macbook air" in mac_model and "m1" in mac_model:
                 return self.profiles["macbook_air_m1_8gb"]
@@ -260,8 +249,7 @@ class HardwareOptimizer:
             cache_size = 50
 
         profile_name = (
-            f"Custom {tier.title()} Performance "
-            f"({memory_gb}GB RAM, {cpu_cores} cores)"
+            f"Custom {tier.title()} Performance " f"({memory_gb}GB RAM, {cpu_cores} cores)"
         )
         return HardwareProfile(
             name=profile_name,
@@ -271,9 +259,7 @@ class HardwareOptimizer:
                 "balanced": {
                     "planning": "llama3.1:8b",
                     "coding": "codellama:7b" if tier != "basic" else "phi:3.5",
-                    "testing": "deepseek-coder:6.7b"
-                    if tier != "basic"
-                    else "phi:3.5",
+                    "testing": "deepseek-coder:6.7b" if tier != "basic" else "phi:3.5",
                     "reviewing": "llama3.1:8b",
                 }
             },
@@ -297,9 +283,7 @@ class HardwareOptimizer:
             ],
         )
 
-    def get_optimization_config(
-        self, profile: Optional[HardwareProfile] = None
-    ) -> Dict[str, Any]:
+    def get_optimization_config(self, profile: Optional[HardwareProfile] = None) -> Dict[str, Any]:
         """Get optimization configuration for the specified or detected profile."""
         if profile is None:
             profile = self.detect_best_profile()
@@ -312,9 +296,7 @@ class HardwareOptimizer:
             "detected_hardware": self.detected_hardware,
         }
 
-    def apply_optimization(
-        self, config_manager, profile: Optional[HardwareProfile] = None
-    ) -> bool:
+    def apply_optimization(self, config_manager, profile: Optional[HardwareProfile] = None) -> bool:
         """Apply hardware optimization to configuration."""
         if profile is None:
             profile = self.detect_best_profile()
@@ -366,9 +348,7 @@ class HardwareOptimizer:
             success, errors = config_manager.update_config_dict(updates)
 
             if success:
-                console.print(
-                    f"[green]✓ Applied {profile.name} optimization[/green]"
-                )
+                console.print(f"[green]✓ Applied {profile.name} optimization[/green]")
                 return True
             else:
                 console.print("[red]✗ Failed to apply optimization:[/red]")
@@ -396,9 +376,7 @@ class HardwareOptimizer:
         hw_table.add_row("Memory (GB)", f"{hw['memory_gb']:.1f}")
 
         if hw["cpu_freq_mhz"]:
-            hw_table.add_row(
-                "CPU Frequency (MHz)", f"{hw['cpu_freq_mhz']:.0f}"
-            )
+            hw_table.add_row("CPU Frequency (MHz)", f"{hw['cpu_freq_mhz']:.0f}")
 
         if "mac_model" in hw:
             hw_table.add_row("Mac Model", hw["mac_model"])
@@ -407,17 +385,11 @@ class HardwareOptimizer:
 
         # Detected profile
         profile = self.detect_best_profile()
-        console.print(
-            f"\n[bold blue]Recommended Profile:[/bold blue] {profile.name}"
-        )
+        console.print(f"\n[bold blue]Recommended Profile:[/bold blue] {profile.name}")
 
         # Optimization notes
-        notes_text = "\n".join(
-            f"• {note}" for note in profile.optimization_notes
-        )
-        console.print(
-            Panel(notes_text, title="Optimization Notes", border_style="blue")
-        )
+        notes_text = "\n".join(f"• {note}" for note in profile.optimization_notes)
+        console.print(Panel(notes_text, title="Optimization Notes", border_style="blue"))
 
     def display_all_profiles(self) -> None:
         """Display all available hardware profiles."""
@@ -430,17 +402,13 @@ class HardwareOptimizer:
             settings_table.add_column("Value", style="green")
 
             for key, value in profile.performance_settings.items():
-                settings_table.add_row(
-                    key.replace("_", " ").title(), str(value)
-                )
+                settings_table.add_row(key.replace("_", " ").title(), str(value))
 
             console.print(settings_table)
 
             # Models table
             for model_type, models in profile.recommended_models.items():
-                models_table = Table(
-                    title=f"{model_type.replace('_', ' ').title()} Models"
-                )
+                models_table = Table(title=f"{model_type.replace('_', ' ').title()} Models")
                 models_table.add_column("Agent", style="magenta")
                 models_table.add_column("Model", style="cyan")
 

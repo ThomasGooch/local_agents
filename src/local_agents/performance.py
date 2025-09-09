@@ -46,9 +46,7 @@ class PerformanceMonitor:
             "cpu_count": psutil.cpu_count(logical=False),
             "cpu_count_logical": psutil.cpu_count(logical=True),
             "memory_gb": round(psutil.virtual_memory().total / (1024**3), 1),
-            "cpu_freq_mhz": psutil.cpu_freq().current
-            if psutil.cpu_freq()
-            else 0,
+            "cpu_freq_mhz": psutil.cpu_freq().current if psutil.cpu_freq() else 0,
             "platform": platform.system(),
         }
 
@@ -110,10 +108,7 @@ class PerformanceMonitor:
                 "temperature": 0.7,
                 "cache_enabled": True,
                 "optimization_notes": [
-                    (
-                        f"Good hardware for Local Agents "
-                        f"({memory_gb}GB RAM, {cpu_cores} cores)"
-                    ),
+                    (f"Good hardware for Local Agents " f"({memory_gb}GB RAM, {cpu_cores} cores)"),
                     "Recommended to use medium-sized models",
                     "Limited concurrent execution for stability",
                 ],
@@ -204,14 +199,11 @@ class PerformanceMonitor:
         for agent, stats in agent_stats.items():
             stats["avg_time"] = stats["total_time"] / stats["count"]
             stats["avg_memory"] = stats["total_memory"] / stats["count"]
-            stats["cache_hit_rate"] = (
-                stats["cache_hits"] / stats["count"]
-            ) * 100
+            stats["cache_hit_rate"] = (stats["cache_hits"] / stats["count"]) * 100
 
         return {
             "total_executions": len(self.metrics),
-            "average_execution_time": sum(execution_times)
-            / len(execution_times),
+            "average_execution_time": sum(execution_times) / len(execution_times),
             "average_memory_usage": sum(memory_usage) / len(memory_usage),
             "cache_hit_rate": (cache_hits / len(self.metrics)) * 100,
             "agent_statistics": agent_stats,
@@ -243,15 +235,9 @@ class PerformanceMonitor:
         perf_table.add_column("Value", style="green")
 
         perf_table.add_row("Total Executions", str(report["total_executions"]))
-        perf_table.add_row(
-            "Avg Execution Time", f"{report['average_execution_time']:.2f}s"
-        )
-        perf_table.add_row(
-            "Avg Memory Usage", f"{report['average_memory_usage']:.1f}MB"
-        )
-        perf_table.add_row(
-            "Cache Hit Rate", f"{report['cache_hit_rate']:.1f}%"
-        )
+        perf_table.add_row("Avg Execution Time", f"{report['average_execution_time']:.2f}s")
+        perf_table.add_row("Avg Memory Usage", f"{report['average_memory_usage']:.1f}MB")
+        perf_table.add_row("Cache Hit Rate", f"{report['cache_hit_rate']:.1f}%")
 
         # Agent statistics table
         agent_table = Table(title="Agent Performance")
@@ -284,9 +270,7 @@ class PerformanceMonitor:
         for note in recommendations["optimization_notes"]:
             rec_text += f"• {note}\n"
 
-        console.print(
-            Panel(rec_text, title="Recommendations", border_style="blue")
-        )
+        console.print(Panel(rec_text, title="Recommendations", border_style="blue"))
 
     def clear_metrics(self) -> None:
         """Clear all recorded performance metrics."""
@@ -341,9 +325,7 @@ class PerformanceContext:
     def __enter__(self) -> "PerformanceContext":
         if performance_monitor.monitoring_active:
             self.start_time = time.time()
-            self.start_memory = (
-                self.process.memory_info().rss / 1024 / 1024
-            )  # MB
+            self.start_memory = self.process.memory_info().rss / 1024 / 1024  # MB
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:

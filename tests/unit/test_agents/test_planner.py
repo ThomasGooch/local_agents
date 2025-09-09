@@ -23,17 +23,12 @@ class TestPlanningAgent:
     @pytest.fixture
     def planner_agent(self, mock_ollama_client):
         """Create a PlanningAgent instance for testing."""
-        return PlanningAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        return PlanningAgent(model="test:model", ollama_client=mock_ollama_client)
 
     def test_agent_initialization(self, planner_agent):
         """Test planning agent initialization."""
         assert planner_agent.agent_type == "plan"
-        assert (
-            planner_agent.role
-            == "Senior Software Architect and Project Planner"
-        )
+        assert planner_agent.role == "Senior Software Architect and Project Planner"
         assert "implementation plans" in planner_agent.goal
         assert planner_agent.model == "test:model"
 
@@ -54,9 +49,7 @@ class TestPlanningAgent:
 
     def test_execute_failure(self, planner_agent):
         """Test execution failure handling."""
-        planner_agent.ollama_client.generate.side_effect = Exception(
-            "Connection error"
-        )
+        planner_agent.ollama_client.generate.side_effect = Exception("Connection error")
 
         task = "Create a plan"
         result = planner_agent.execute(task)
@@ -105,10 +98,7 @@ class TestPlanningAgent:
         result = planner_agent.plan_feature(feature_description)
 
         assert result.success is True
-        assert (
-            "Plan implementation of new feature: User dashboard with analytics"
-            in result.task
-        )
+        assert "Plan implementation of new feature: User dashboard with analytics" in result.task
         planner_agent.ollama_client.generate.assert_called_once()
 
     def test_plan_bugfix(self, planner_agent):
@@ -128,10 +118,7 @@ class TestPlanningAgent:
         result = planner_agent.plan_refactor(refactor_description)
 
         assert result.success is True
-        assert (
-            "Plan refactoring: Extract common utilities to shared module"
-            in result.task
-        )
+        assert "Plan refactoring: Extract common utilities to shared module" in result.task
         planner_agent.ollama_client.generate.assert_called_once()
 
     def test_execute_with_stream(self, planner_agent):

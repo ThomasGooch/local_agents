@@ -74,16 +74,11 @@ class WorkflowResult:
             f"\n**Task**: {self.task}",
             f"**Completion**: {successful_steps}/{total_steps} steps successful",
             f"\n**Execution Time**: {self.execution_time_formatted}",
-            (
-                "\nThis workflow execution summary provides an overview of the "
-                "completed tasks."
-            ),
+            ("\nThis workflow execution summary provides an overview of the " "completed tasks."),
         ]
 
         if successful_steps == total_steps:
-            summary_parts.append(
-                "\n✅ **Status**: Workflow completed successfully"
-            )
+            summary_parts.append("\n✅ **Status**: Workflow completed successfully")
         else:
             summary_parts.append(
                 f"\n⚠️ **Status**: Workflow completed with "
@@ -93,9 +88,7 @@ class WorkflowResult:
         summary_parts.append("\n## Step Results:")
         for i, result in enumerate(self.results, 1):
             status = "✅" if result.success else "❌"
-            summary_parts.append(
-                f"{i}. {status} {result.agent_type.title()} Agent"
-            )
+            summary_parts.append(f"{i}. {status} {result.agent_type.title()} Agent")
             if not result.success and result.error:
                 summary_parts.append(f"   Error: {result.error}")
 
@@ -106,9 +99,7 @@ class WorkflowResult:
         return {
             "success": self.success,
             "results": [r.to_dict() for r in self.results],
-            "steps": [
-                r.to_dict() for r in self.results
-            ],  # Compatibility alias
+            "steps": [r.to_dict() for r in self.results],  # Compatibility alias
             "workflow_name": self.workflow_name,
             "task": self.task,
             "total_steps": self.total_steps,
@@ -129,11 +120,7 @@ class WorkflowResult:
 
         for i, result in enumerate(self.results, 1):
             status = "✅ Success" if result.success else "❌ Failed"
-            details = (
-                result.error
-                if not result.success and result.error
-                else "Completed"
-            )
+            details = result.error if not result.success and result.error else "Completed"
             table.add_row(
                 str(i),
                 result.agent_type.title(),
@@ -290,15 +277,11 @@ class Workflow:
             )
 
             for i, step in enumerate(workflow_steps, 1):
-                console.print(
-                    f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]"
-                )
+                console.print(f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]")
 
                 # Check dependencies
                 if not self._check_dependencies(step, results):
-                    console.print(
-                        "[red]Skipping step due to failed dependencies[/red]"
-                    )
+                    console.print("[red]Skipping step due to failed dependencies[/red]")
                     continue
 
                 # Execute step
@@ -313,19 +296,13 @@ class Workflow:
                     self.completed_steps[step.agent_type] = True
 
                 if result.success:
-                    console.print(
-                        f"[green]✓ Step {i} completed successfully[/green]"
-                    )
+                    console.print(f"[green]✓ Step {i} completed successfully[/green]")
                 else:
-                    console.print(
-                        f"[red]✗ Step {i} failed: {result.error}[/red]"
-                    )
+                    console.print(f"[red]✗ Step {i} failed: {result.error}[/red]")
 
                     # Decide whether to continue or abort
                     if not self._should_continue_after_failure(step, result):
-                        console.print(
-                            "[red]Workflow aborted due to critical failure[/red]"
-                        )
+                        console.print("[red]Workflow aborted due to critical failure[/red]")
                         break
 
                 progress.advance(workflow_task)
@@ -351,9 +328,7 @@ class Workflow:
             final_context=self.current_context.copy(),
         )
 
-    def _get_workflow_definition(
-        self, workflow_name: str
-    ) -> List[WorkflowStep]:
+    def _get_workflow_definition(self, workflow_name: str) -> List[WorkflowStep]:
         """Get the definition for a predefined workflow."""
         workflows = {
             "feature-dev": [
@@ -392,9 +367,7 @@ class Workflow:
                     context_mapping={"code_output": "fixed_code"},
                 ),
             ],
-            "code-review": [
-                WorkflowStep("review", "Comprehensive code review")
-            ],
+            "code-review": [WorkflowStep("review", "Comprehensive code review")],
             "refactor": [
                 WorkflowStep("plan", "Create refactoring plan"),
                 WorkflowStep(
@@ -421,10 +394,7 @@ class Workflow:
         # Also check user-configured workflows
         config_workflows = config_manager.get_workflow_steps(workflow_name)
         if config_workflows:
-            return [
-                WorkflowStep(step, f"Execute {step} agent")
-                for step in config_workflows
-            ]
+            return [WorkflowStep(step, f"Execute {step} agent") for step in config_workflows]
 
         return workflows.get(workflow_name, [])
 
@@ -446,9 +416,7 @@ class Workflow:
             * 100,
         }
 
-    def optimize_for_hardware(
-        self, ram_gb: int = 16, cpu_cores: int = 6
-    ) -> None:
+    def optimize_for_hardware(self, ram_gb: int = 16, cpu_cores: int = 6) -> None:
         """Optimize workflow settings for specific hardware configuration."""
         if ram_gb >= 16:
             # High memory - can run more concurrent agents
@@ -508,9 +476,7 @@ class Workflow:
             # Check dependencies for legacy API
             if not self._check_dependencies(agent_type, []):
                 # Return failed step for dependency failure
-                temp_step = WorkflowStep(
-                    agent_type, f"Execute {agent_type} agent"
-                )
+                temp_step = WorkflowStep(agent_type, f"Execute {agent_type} agent")
                 task_result = TaskResult(
                     success=False,
                     output="",
@@ -559,19 +525,13 @@ class Workflow:
                 merged_context = self.current_context.copy()
 
                 # Execute the agent
-                result = agent.execute(
-                    task_description, merged_context, stream=stream
-                )
+                result = agent.execute(task_description, merged_context, stream=stream)
                 result.execution_time = time.time() - step_start_time
 
                 # Update context with results
                 if result.success:
-                    self.current_context[
-                        f"{agent_type}_output"
-                    ] = result.output
-                    self.current_context[
-                        f"{agent_type}_result"
-                    ] = result.to_dict()
+                    self.current_context[f"{agent_type}_output"] = result.output
+                    self.current_context[f"{agent_type}_result"] = result.to_dict()
                     # Track completed steps
                     self.completed_steps[agent_type] = True
 
@@ -629,9 +589,7 @@ class Workflow:
             task_description = self._customize_task_for_step(step, main_task)
 
             # Execute the agent
-            result = agent.execute(
-                task_description, step_context, stream=stream
-            )
+            result = agent.execute(task_description, step_context, stream=stream)
 
             # Update result with execution time
             result.execution_time = time.time() - step_start_time
@@ -651,9 +609,7 @@ class Workflow:
                 execution_time=time.time() - step_start_time,
             )
 
-    def _customize_task_for_step(
-        self, step: WorkflowStep, main_task: str
-    ) -> str:
+    def _customize_task_for_step(self, step: WorkflowStep, main_task: str) -> str:
         """Customize the task description for a specific step."""
         task_templates = {
             "plan": f"Create a detailed plan for: {main_task}",
@@ -662,9 +618,7 @@ class Workflow:
             "review": f"Review the implementation of: {main_task}",
         }
 
-        return task_templates.get(
-            step.agent_type, f"{step.description}: {main_task}"
-        )
+        return task_templates.get(step.agent_type, f"{step.description}: {main_task}")
 
     def _check_dependencies(
         self,
@@ -676,10 +630,7 @@ class Workflow:
         if isinstance(step, str):
             agent_type = step
             # Check if workflow has step_dependencies attribute (set by tests)
-            if (
-                hasattr(self, "step_dependencies")
-                and agent_type in self.step_dependencies
-            ):
+            if hasattr(self, "step_dependencies") and agent_type in self.step_dependencies:
                 required_deps = self.step_dependencies[agent_type]
                 # Check against completed_steps dictionary
                 return all(
@@ -692,21 +643,15 @@ class Workflow:
         if not step.depends_on:
             return True
 
-        completed_types = {
-            result.agent_type for result in completed_results if result.success
-        }
+        completed_types = {result.agent_type for result in completed_results if result.success}
         return all(dep in completed_types for dep in step.depends_on)
 
-    def _update_context_from_result(
-        self, step: WorkflowStep, result: TaskResult
-    ) -> None:
+    def _update_context_from_result(self, step: WorkflowStep, result: TaskResult) -> None:
         """Update the workflow context with results from a step."""
         if result.success:
             # Store the output with a key based on the agent type
             self.current_context[f"{step.agent_type}_output"] = result.output
-            self.current_context[
-                f"{step.agent_type}_result"
-            ] = result.to_dict()
+            self.current_context[f"{step.agent_type}_result"] = result.to_dict()
 
             # Also update any context from the result itself
             if result.context:
@@ -714,9 +659,7 @@ class Workflow:
                     if not key.startswith("_"):  # Skip private context keys
                         self.current_context[key] = value
 
-    def _should_continue_after_failure(
-        self, step: WorkflowStep, result: TaskResult
-    ) -> bool:
+    def _should_continue_after_failure(self, step: WorkflowStep, result: TaskResult) -> bool:
         """Determine whether to continue the workflow after a step failure."""
         # For now, continue unless it's a planning step failure
         # This could be made more sophisticated based on step criticality
@@ -736,9 +679,7 @@ class Workflow:
         ]
 
         if successful_steps == total_steps:
-            summary_parts.append(
-                "\n✅ **Status**: Workflow completed successfully"
-            )
+            summary_parts.append("\n✅ **Status**: Workflow completed successfully")
         else:
             summary_parts.append(
                 f"\n⚠️ **Status**: Workflow completed with "
@@ -748,9 +689,7 @@ class Workflow:
         summary_parts.append("\n## Step Results:")
         for i, result in enumerate(results, 1):
             status = "✅" if result.success else "❌"
-            summary_parts.append(
-                f"{i}. {status} {result.agent_type.title()} Agent"
-            )
+            summary_parts.append(f"{i}. {status} {result.agent_type.title()} Agent")
             if not result.success and result.error:
                 summary_parts.append(f"   Error: {result.error}")
 
@@ -800,9 +739,7 @@ class Workflow:
         results = []
 
         for i, step in enumerate(workflow_steps, 1):
-            console.print(
-                f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]"
-            )
+            console.print(f"\n[bold]Step {i}/{len(workflow_steps)}: {step.description}[/bold]")
 
             result = self._execute_step(step, task, stream)
             results.append(result)
@@ -810,9 +747,7 @@ class Workflow:
             self._update_context_from_result(step, result)
 
             if result.success:
-                console.print(
-                    f"[green]✓ Step {i} completed successfully[/green]"
-                )
+                console.print(f"[green]✓ Step {i} completed successfully[/green]")
             else:
                 console.print(f"[red]✗ Step {i} failed: {result.error}[/red]")
 

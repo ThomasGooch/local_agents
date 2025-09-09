@@ -63,10 +63,7 @@ class ReviewAgent(BaseAgent):
         if not self.file_manager:
             # Use output_directory from CLI first, fallback to directory
             working_dir = (
-                context.get("output_directory")
-                or context.get("directory", ".")
-                if context
-                else "."
+                context.get("output_directory") or context.get("directory", ".") if context else "."
             )
             self.file_manager = FileManager(working_dir)
 
@@ -82,13 +79,9 @@ class ReviewAgent(BaseAgent):
         context_with_agent["task"] = task
 
         # Skip file creation during unit tests to improve performance
-        if context.get("create_files", True) and not context.get(
-            "_test_mode", False
-        ):
-            created_files = (
-                self.file_manager.extract_and_write_files_from_response(
-                    response, context_with_agent
-                )
+        if context.get("create_files", True) and not context.get("_test_mode", False):
+            created_files = self.file_manager.extract_and_write_files_from_response(
+                response, context_with_agent
             )
             if created_files:
                 # Add file creation info to the output
@@ -108,24 +101,16 @@ class ReviewAgent(BaseAgent):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("code_content"):
-            prompt_parts.append(
-                f"\n## Code to Review\n```\n{context['code_content']}\n```"
-            )
+            prompt_parts.append(f"\n## Code to Review\n```\n{context['code_content']}\n```")
 
         if context.get("target_directory"):
-            prompt_parts.append(
-                f"\n## Target Directory\n{context['target_directory']}"
-            )
+            prompt_parts.append(f"\n## Target Directory\n{context['target_directory']}")
 
         if context.get("focus_area"):
-            prompt_parts.append(
-                f"\n## Review Focus\nFocus Area: {context['focus_area']}"
-            )
+            prompt_parts.append(f"\n## Review Focus\nFocus Area: {context['focus_area']}")
 
         if context.get("language"):
-            prompt_parts.append(
-                f"\n## Language\nLanguage: {context['language']}"
-            )
+            prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
 
         if context.get("static_analysis"):
             prompt_parts.append(
@@ -135,32 +120,21 @@ class ReviewAgent(BaseAgent):
         if context.get("static_analysis_results"):
             analysis_text = "\n".join(
                 [
-                    f"**{tool}:**\n"
-                    + "\n".join(f"  - {issue}" for issue in issues)
-                    for tool, issues in context[
-                        "static_analysis_results"
-                    ].items()
+                    f"**{tool}:**\n" + "\n".join(f"  - {issue}" for issue in issues)
+                    for tool, issues in context["static_analysis_results"].items()
                 ]
             )
-            prompt_parts.append(
-                f"\n## Static Analysis Results\n{analysis_text}"
-            )
+            prompt_parts.append(f"\n## Static Analysis Results\n{analysis_text}")
 
         if context.get("previous_reviews"):
-            reviews_text = "\n".join(
-                f"- {review}" for review in context["previous_reviews"]
-            )
+            reviews_text = "\n".join(f"- {review}" for review in context["previous_reviews"])
             prompt_parts.append(f"\n## Previous Reviews\n{reviews_text}")
 
         if context.get("changes_made"):
-            prompt_parts.append(
-                f"\n## Changes Made\n{context['changes_made']}"
-            )
+            prompt_parts.append(f"\n## Changes Made\n{context['changes_made']}")
 
         if context.get("complexity_metrics"):
-            prompt_parts.append(
-                f"\n## Complexity Metrics\n{context['complexity_metrics']}"
-            )
+            prompt_parts.append(f"\n## Complexity Metrics\n{context['complexity_metrics']}")
 
         if context.get("extract_metrics"):
             prompt_parts.append(
@@ -292,8 +266,7 @@ issues by their potential impact.
         context = context or {}
         context["focus_area"] = "security"
         context["code_content"] = code
-        task = ("Review this code for security vulnerabilities and potential "
-                "security issues")
+        task = "Review this code for security vulnerabilities and potential " "security issues"
         return self.execute(task, context)
 
     def review_for_performance(
@@ -327,8 +300,7 @@ issues by their potential impact.
         context["code_content"] = code
         if target_file:
             context["target_file"] = target_file
-        task = ("Perform a comprehensive code review covering all aspects "
-                "of code quality")
+        task = "Perform a comprehensive code review covering all aspects " "of code quality"
         return self.execute(task, context)
 
     def _add_automated_analysis(self, context: Dict[str, Any]) -> None:
@@ -339,33 +311,23 @@ issues by their potential impact.
         if target_file and Path(target_file).exists():
             # Run static analysis on file
             context["static_analysis"] = self._run_static_analysis(target_file)
-            context["complexity_metrics"] = self._analyze_complexity(
-                target_file
-            )
+            context["complexity_metrics"] = self._analyze_complexity(target_file)
         elif target_directory and Path(target_directory).exists():
             # Run analysis on directory
-            context["static_analysis"] = self._run_static_analysis(
-                target_directory
-            )
-        elif context.get("enable_static_analysis") and context.get(
-            "code_content"
-        ):
+            context["static_analysis"] = self._run_static_analysis(target_directory)
+        elif context.get("enable_static_analysis") and context.get("code_content"):
             # Run static analysis when explicitly enabled even without file path
             # Create a temporary file for analysis
             import tempfile
 
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".py", delete=False
-            ) as tmp:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp:
                 tmp.write(context["code_content"])
                 tmp_path = tmp.name
             context["static_analysis"] = self._run_static_analysis(tmp_path)
             # Clean up temp file
             Path(tmp_path).unlink(missing_ok=True)
 
-    def _run_static_analysis(
-        self, target: str, tool: Optional[str] = None
-    ) -> str:
+    def _run_static_analysis(self, target: str, tool: Optional[str] = None) -> str:
         """Run static analysis tools on target with error handling."""
         # Handle test case where specific tool is requested
         if tool is not None:
@@ -376,9 +338,7 @@ issues by their potential impact.
                 return "Tool not available"
 
             try:
-                result = subprocess.run(
-                    [tool, target], capture_output=True, text=True, timeout=30
-                )
+                result = subprocess.run([tool, target], capture_output=True, text=True, timeout=30)
                 return result.stdout if result.stdout else "Tool not available"
             except subprocess.TimeoutExpired:
                 return "Analysis timeout - tool execution took too long"
@@ -392,8 +352,7 @@ issues by their potential impact.
         try:
             # Python static analysis
             if target_path.suffix == ".py" or (
-                target_path.is_dir()
-                and self._contains_python_files(target_path)
+                target_path.is_dir() and self._contains_python_files(target_path)
             ):
                 findings.extend(self._run_python_analysis_structured(target))
 
@@ -410,14 +369,9 @@ issues by their potential impact.
             return self._format_analysis_findings(findings)
 
         except Exception as e:
-            return (
-                f"Static analysis failed: {e}. Basic analysis will be performed "
-                "instead."
-            )
+            return f"Static analysis failed: {e}. Basic analysis will be performed " "instead."
 
-    def _run_python_analysis_structured(
-        self, target: str
-    ) -> List[AnalysisFinding]:
+    def _run_python_analysis_structured(self, target: str) -> List[AnalysisFinding]:
         """Run Python-specific static analysis with structured output."""
         findings = []
 
@@ -455,9 +409,7 @@ issues by their potential impact.
                                 file=item.get("filename", ""),
                                 line=item.get("line_number", 0),
                                 column=item.get("column_number", 0),
-                                severity=self._map_flake8_severity(
-                                    item.get("code", "")
-                                ),
+                                severity=self._map_flake8_severity(item.get("code", "")),
                                 message=item.get("text", ""),
                                 rule=item.get("code", ""),
                             )
@@ -515,9 +467,7 @@ issues by their potential impact.
                                 file=item.get("path", ""),
                                 line=item.get("line", 0),
                                 column=item.get("column", 0),
-                                severity=self._map_pylint_severity(
-                                    item.get("type", "")
-                                ),
+                                severity=self._map_pylint_severity(item.get("type", "")),
                                 message=item.get("message", ""),
                                 rule=item.get("message-id", ""),
                             )
@@ -615,9 +565,7 @@ issues by their potential impact.
                                 file=item.get("filename", ""),
                                 line=item.get("line_number", 0),
                                 column=0,
-                                severity=self._map_bandit_severity(
-                                    item.get("issue_severity", "")
-                                ),
+                                severity=self._map_bandit_severity(item.get("issue_severity", "")),
                                 message=item.get("issue_text", ""),
                                 rule=item.get("test_id", ""),
                             )
@@ -651,9 +599,7 @@ issues by their potential impact.
 
         return [self._format_analysis_findings(findings)]
 
-    def _run_js_analysis_structured(
-        self, target: str
-    ) -> List[AnalysisFinding]:
+    def _run_js_analysis_structured(self, target: str) -> List[AnalysisFinding]:
         """Run JavaScript/TypeScript static analysis with structured output."""
         findings = []
 
@@ -683,9 +629,7 @@ issues by their potential impact.
                                     file=file_result.get("filePath", ""),
                                     line=message.get("line", 0),
                                     column=message.get("column", 0),
-                                    severity=self._map_eslint_severity(
-                                        message.get("severity", 1)
-                                    ),
+                                    severity=self._map_eslint_severity(message.get("severity", 1)),
                                     message=message.get("message", ""),
                                     rule=message.get("ruleId", ""),
                                 )
@@ -777,14 +721,10 @@ issues by their potential impact.
         """Check if directory contains JavaScript/TypeScript files."""
         extensions = [".js", ".ts", ".jsx", ".tsx"]
         return any(
-            file.suffix in extensions
-            for file in directory.rglob("*")
-            if file.suffix in extensions
+            file.suffix in extensions for file in directory.rglob("*") if file.suffix in extensions
         )
 
-    def review_security(
-        self, target: str, context: Optional[Dict[str, Any]] = None
-    ) -> TaskResult:
+    def review_security(self, target: str, context: Optional[Dict[str, Any]] = None) -> TaskResult:
         """Focus review on security aspects."""
         context = context or {}
         context["focus_area"] = "security"
@@ -843,9 +783,7 @@ issues by their potential impact.
     # Severity mapping methods
     def _map_flake8_severity(self, code: str) -> Severity:
         """Map flake8 codes to severity levels."""
-        if code.startswith("E9") or code.startswith(
-            "F"
-        ):  # Syntax errors, undefined names
+        if code.startswith("E9") or code.startswith("F"):  # Syntax errors, undefined names
             return Severity.CRITICAL
         elif code.startswith("E") and code[1] in [
             "1",
@@ -936,18 +874,14 @@ issues by their potential impact.
                             file=file_path,
                             line=line_num,
                             column=0,
-                            severity=Severity.HIGH
-                            if "error" in message_part
-                            else Severity.MEDIUM,
+                            severity=Severity.HIGH if "error" in message_part else Severity.MEDIUM,
                             message=message_part.strip(),
                             rule="type-check",
                         )
                     )
         return findings
 
-    def _format_analysis_findings(
-        self, findings: List[AnalysisFinding]
-    ) -> str:
+    def _format_analysis_findings(self, findings: List[AnalysisFinding]) -> str:
         """Format analysis findings by severity."""
         if not findings:
             return "No issues found"

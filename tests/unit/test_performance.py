@@ -182,15 +182,9 @@ class TestPerformanceMonitor:
 
         # Add some test metrics
         metrics = [
-            PerformanceMetrics(
-                1.0, 100.0, 20.0, 120.0, "model1", "plan", 50, True
-            ),
-            PerformanceMetrics(
-                2.0, 200.0, 40.0, 250.0, "model2", "code", 100, False
-            ),
-            PerformanceMetrics(
-                1.5, 150.0, 30.0, 180.0, "model1", "plan", 75, True
-            ),
+            PerformanceMetrics(1.0, 100.0, 20.0, 120.0, "model1", "plan", 50, True),
+            PerformanceMetrics(2.0, 200.0, 40.0, 250.0, "model2", "code", 100, False),
+            PerformanceMetrics(1.5, 150.0, 30.0, 180.0, "model1", "plan", 75, True),
         ]
 
         for metric in metrics:
@@ -222,9 +216,7 @@ class TestPerformanceMonitor:
         monitor.start_monitoring()
 
         # Add some metrics
-        metrics = PerformanceMetrics(
-            1.0, 100.0, 20.0, 120.0, "model", "plan", 50
-        )
+        metrics = PerformanceMetrics(1.0, 100.0, 20.0, 120.0, "model", "plan", 50)
         monitor.record_execution(metrics)
         assert len(monitor.metrics) == 1
 
@@ -239,9 +231,7 @@ class TestPerformanceMonitor:
         from pathlib import Path
 
         monitor.start_monitoring()
-        metrics = PerformanceMetrics(
-            1.0, 100.0, 20.0, 120.0, "model", "plan", 50
-        )
+        metrics = PerformanceMetrics(1.0, 100.0, 20.0, 120.0, "model", "plan", 50)
         monitor.record_execution(metrics)
 
         filepath = Path("/tmp/test_metrics.json")
@@ -256,16 +246,12 @@ class TestPerformanceContext:
 
     @patch("local_agents.performance.performance_monitor")
     @patch("psutil.Process")
-    def test_performance_context_manager(
-        self, mock_process_class, mock_monitor
-    ):
+    def test_performance_context_manager(self, mock_process_class, mock_monitor):
         """Test PerformanceContext as context manager."""
         # Setup mocks
         mock_process = Mock()
         mock_process_class.return_value = mock_process
-        mock_process.memory_info.return_value.rss = (
-            1024 * 1024 * 100
-        )  # 100MB in bytes
+        mock_process.memory_info.return_value.rss = 1024 * 1024 * 100  # 100MB in bytes
         mock_process.cpu_percent.return_value = 25.0
 
         mock_monitor.monitoring_active = True

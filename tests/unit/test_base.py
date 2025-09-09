@@ -65,9 +65,7 @@ class TestBaseAgent:
         assert agent.ollama_client == mock_ollama_client
 
     @patch("local_agents.base.get_config")
-    def test_agent_initialization_with_config(
-        self, mock_get_config, mock_ollama_client
-    ):
+    def test_agent_initialization_with_config(self, mock_get_config, mock_ollama_client):
         """Test agent initialization using configuration."""
         mock_config = Mock()
         mock_config.temperature = 0.8
@@ -137,9 +135,7 @@ class TestBaseAgent:
 
         assert "Test Agent" in system_prompt
         assert "Test goal" in system_prompt
-        assert (
-            "clear, actionable, and well-structured responses" in system_prompt
-        )
+        assert "clear, actionable, and well-structured responses" in system_prompt
 
     def test_call_ollama(self, test_agent):
         """Test calling Ollama with prompt."""
@@ -317,9 +313,7 @@ class TestHandleAgentExecutionDecorator:
         class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
-                return self._create_success_result(
-                    "success output", task, context
-                )
+                return self._create_success_result("success output", task, context)
 
         agent = TestingAgent(
             agent_type="test",
@@ -414,9 +408,7 @@ class TestHandleAgentExecutionDecorator:
                 return self._create_success_result(response, task, context)
 
         # Mock Ollama client to raise connection error
-        mock_ollama_client.generate.side_effect = ConnectionError(
-            "Cannot connect to Ollama"
-        )
+        mock_ollama_client.generate.side_effect = ConnectionError("Cannot connect to Ollama")
 
         agent = TestingAgent(
             agent_type="test",
@@ -470,9 +462,7 @@ class TestBaseAgentAdvanced:
 
         class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
-                return self._create_success_result(
-                    "test output", task, context
-                )
+                return self._create_success_result("test output", task, context)
 
         agent = TestingAgent(
             agent_type="test",
@@ -482,9 +472,7 @@ class TestBaseAgentAdvanced:
             ollama_client=mock_ollama_client,
         )
 
-        result = agent._create_success_result(
-            "success output", "test task", {"key": "value"}
-        )
+        result = agent._create_success_result("success output", "test task", {"key": "value"})
 
         assert isinstance(result, TaskResult)
         assert result.success is True
@@ -557,9 +545,7 @@ class TestBaseAgentAdvanced:
     def test_agent_configuration_integration(self, mock_ollama_client):
         """Test agent integrates with configuration system."""
         with patch("local_agents.base.get_config") as mock_get_config:
-            with patch(
-                "local_agents.base.get_model_for_agent"
-            ) as mock_get_model:
+            with patch("local_agents.base.get_model_for_agent") as mock_get_model:
                 mock_config = Mock()
                 mock_config.temperature = 0.9
                 mock_config.max_tokens = 1024

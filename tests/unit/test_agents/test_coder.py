@@ -17,24 +17,18 @@ class TestCodingAgent:
         """Create a mock Ollama client."""
         client = Mock(spec=OllamaClient)
         client.is_model_available.return_value = True
-        client.generate.return_value = (
-            "```python\ndef hello():\n    return 'Hello, World!'\n```"
-        )
+        client.generate.return_value = "```python\ndef hello():\n    return 'Hello, World!'\n```"
         return client
 
     @pytest.fixture
     def coder_agent(self, mock_ollama_client):
         """Create a CodingAgent instance for testing."""
-        return CodingAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        return CodingAgent(model="test:model", ollama_client=mock_ollama_client)
 
     def test_agent_initialization(self, coder_agent):
         """Test coding agent initialization."""
         assert coder_agent.agent_type == "code"
-        assert (
-            coder_agent.role == "Senior Software Engineer and Code Generator"
-        )
+        assert coder_agent.role == "Senior Software Engineer and Code Generator"
         assert "high-quality" in coder_agent.goal
         assert coder_agent.model == "test:model"
 
@@ -56,9 +50,7 @@ class TestCodingAgent:
 
     def test_execute_failure(self, coder_agent):
         """Test execution failure handling."""
-        coder_agent.ollama_client.generate.side_effect = Exception(
-            "Model error"
-        )
+        coder_agent.ollama_client.generate.side_effect = Exception("Model error")
 
         task = "Generate code"
         result = coder_agent.execute(task)
@@ -270,7 +262,5 @@ class TestCodingAgent:
         assert result.success is True
         call_args = coder_agent.ollama_client.generate.call_args
         prompt = call_args.kwargs["prompt"]
-        assert (
-            "review_feedback" in prompt.lower() or "review feedback" in prompt
-        )
+        assert "review_feedback" in prompt.lower() or "review feedback" in prompt
         assert "division by zero" in prompt

@@ -149,9 +149,7 @@ class TestPerformanceIntegration:
 
         # Test optimization config generation
         profile = hardware_optimizer.detect_best_profile()
-        optimization_config = hardware_optimizer.get_optimization_config(
-            profile
-        )
+        optimization_config = hardware_optimizer.get_optimization_config(profile)
 
         assert isinstance(optimization_config, dict)
         assert "profile_name" in optimization_config

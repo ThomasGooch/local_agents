@@ -36,10 +36,7 @@ class TestingAgent(BaseAgent):
         if not self.file_manager:
             # Use output_directory from CLI first, fallback to directory
             working_dir = (
-                context.get("output_directory")
-                or context.get("directory", ".")
-                if context
-                else "."
+                context.get("output_directory") or context.get("directory", ".") if context else "."
             )
             self.file_manager = FileManager(working_dir)
 
@@ -58,13 +55,9 @@ class TestingAgent(BaseAgent):
         context_with_agent["task"] = task
 
         # Skip file creation during unit tests to improve performance
-        if context.get("create_files", True) and not context.get(
-            "_test_mode", False
-        ):
-            created_files = (
-                self.file_manager.extract_and_write_files_from_response(
-                    response, context_with_agent
-                )
+        if context.get("create_files", True) and not context.get("_test_mode", False):
+            created_files = self.file_manager.extract_and_write_files_from_response(
+                response, context_with_agent
             )
             if created_files:
                 # Add file creation info to the output
@@ -84,39 +77,23 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("code_content") or context.get("code_to_test"):
-            code_content = (
-                context.get('code_content') or context.get('code_to_test')
-            )
-            prompt_parts.append(
-                f"\n## Code to Test\n```\n{code_content}\n```"
-            )
+            code_content = context.get("code_content") or context.get("code_to_test")
+            prompt_parts.append(f"\n## Code to Test\n```\n{code_content}\n```")
 
         if context.get("target_directory"):
-            prompt_parts.append(
-                f"\n## Target Directory\n{context['target_directory']}"
-            )
-            self._add_testing_context(
-                prompt_parts, Path(context["target_directory"])
-            )
+            prompt_parts.append(f"\n## Target Directory\n{context['target_directory']}")
+            self._add_testing_context(prompt_parts, Path(context["target_directory"]))
 
         if context.get("language"):
-            prompt_parts.append(
-                f"\n## Language\nLanguage: {context['language']}"
-            )
+            prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
         if context.get("framework"):
-            prompt_parts.append(
-                f"\n## Framework\nFramework: {context['framework']}"
-            )
+            prompt_parts.append(f"\n## Framework\nFramework: {context['framework']}")
 
         if context.get("target_description"):
-            prompt_parts.append(
-                f"\n## Target Description\n{context['target_description']}"
-            )
+            prompt_parts.append(f"\n## Target Description\n{context['target_description']}")
 
         # Handle both 'specifications' and 'test_specifications' keys
-        specifications = context.get("specifications") or context.get(
-            "test_specifications"
-        )
+        specifications = context.get("specifications") or context.get("test_specifications")
         if specifications:
             if isinstance(specifications, list):
                 spec_text = "\n- " + "\n- ".join(specifications)
@@ -124,14 +101,10 @@ class TestingAgent(BaseAgent):
                 spec_text = specifications
             prompt_parts.append(f"\n## Test Specifications\n{spec_text}")
         if context.get("implementation_plan"):
-            prompt_parts.append(
-                f"\n## Implementation Plan\n{context['implementation_plan']}"
-            )
+            prompt_parts.append(f"\n## Implementation Plan\n{context['implementation_plan']}")
 
         if context.get("requirements"):
-            prompt_parts.append(
-                f"\n## Requirements\n{context['requirements']}"
-            )
+            prompt_parts.append(f"\n## Requirements\n{context['requirements']}")
 
         if context.get("style_guide"):
             prompt_parts.append(f"\n## Style Guide\n{context['style_guide']}")
@@ -143,39 +116,28 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(f"\n## Format Type\n{context['format_type']}")
 
         if context.get("data_spec"):
-            prompt_parts.append(
-                f"\n## Data Specification\n{context['data_spec']}"
-            )
+            prompt_parts.append(f"\n## Data Specification\n{context['data_spec']}")
 
         if context.get("api_spec"):
-            prompt_parts.append(
-                f"\n## API Specification\n{context['api_spec']}"
-            )
+            prompt_parts.append(f"\n## API Specification\n{context['api_spec']}")
 
         if context.get("coverage_requirements"):
             if isinstance(context["coverage_requirements"], list):
                 # Convert underscores to spaces for better readability
                 formatted_requirements = [
-                    req.replace("_", " ")
-                    for req in context["coverage_requirements"]
+                    req.replace("_", " ") for req in context["coverage_requirements"]
                 ]
                 requirements_text = ", ".join(formatted_requirements)
             else:
-                requirements_text = str(
-                    context["coverage_requirements"]
-                ).replace("_", " ")
-            prompt_parts.append(
-                f"\n## Coverage Requirements\n{requirements_text}"
-            )
+                requirements_text = str(context["coverage_requirements"]).replace("_", " ")
+            prompt_parts.append(f"\n## Coverage Requirements\n{requirements_text}")
         if context.get("security_concerns"):
-            concerns = context['security_concerns']
+            concerns = context["security_concerns"]
             if isinstance(concerns, list):
-                concerns_text = ', '.join(concerns)
+                concerns_text = ", ".join(concerns)
             else:
                 concerns_text = concerns
-            prompt_parts.append(
-                f"\n## Security Concerns\n{concerns_text}"
-            )
+            prompt_parts.append(f"\n## Security Concerns\n{concerns_text}")
 
         if context.get("performance_requirements"):
             prompt_parts.append(
@@ -183,56 +145,38 @@ class TestingAgent(BaseAgent):
             )
 
         if context.get("test_results"):
-            prompt_parts.append(
-                f"\n## Test Results\n{context['test_results']}"
-            )
+            prompt_parts.append(f"\n## Test Results\n{context['test_results']}")
 
         if context.get("test_data"):
             prompt_parts.append(f"\n## Test Data\n{context['test_data']}")
         if context.get("error_detail"):
-            prompt_parts.append(
-                f"\n## Error Details\n{context['error_detail']}"
-            )
+            prompt_parts.append(f"\n## Error Details\n{context['error_detail']}")
 
         if context.get("external_dependencies"):
-            deps = context['external_dependencies']
+            deps = context["external_dependencies"]
             if isinstance(deps, list):
-                deps_text = ', '.join(deps)
+                deps_text = ", ".join(deps)
             else:
                 deps_text = deps
-            prompt_parts.append(
-                f"\n## External Dependencies\n{deps_text}"
-            )
+            prompt_parts.append(f"\n## External Dependencies\n{deps_text}")
 
         if context.get("mock_strategy"):
-            prompt_parts.append(
-                f"\n## Mock Strategy\n{context['mock_strategy']}"
-            )
+            prompt_parts.append(f"\n## Mock Strategy\n{context['mock_strategy']}")
 
         if context.get("test_command"):
-            prompt_parts.append(
-                f"\n## Test Command\n{context['test_command']}"
-            )
+            prompt_parts.append(f"\n## Test Command\n{context['test_command']}")
 
         if context.get("expected_results"):
-            prompt_parts.append(
-                f"\n## Expected Results\n{context['expected_results']}"
-            )
+            prompt_parts.append(f"\n## Expected Results\n{context['expected_results']}")
 
         if context.get("failure_details"):
-            prompt_parts.append(
-                f"\n## Failure Details\n{context['failure_details']}"
-            )
+            prompt_parts.append(f"\n## Failure Details\n{context['failure_details']}")
 
         if context.get("dependencies"):
-            prompt_parts.append(
-                f"\n## Dependencies\n{context['dependencies']}"
-            )
+            prompt_parts.append(f"\n## Dependencies\n{context['dependencies']}")
 
         if context.get("database_setup"):
-            prompt_parts.append(
-                f"\n## Database Setup\n{context['database_setup']}"
-            )
+            prompt_parts.append(f"\n## Database Setup\n{context['database_setup']}")
         prompt_parts.extend(
             [
                 "\n## Test Coverage Requirements",
@@ -292,9 +236,7 @@ the code under test.
 
         return "\n".join(prompt_parts)
 
-    def _add_testing_context(
-        self, prompt_parts: List[str], directory: Path
-    ) -> None:
+    def _add_testing_context(self, prompt_parts: List[str], directory: Path) -> None:
         """Add testing context information to the prompt."""
         if not directory.exists():
             return
@@ -326,9 +268,7 @@ the code under test.
                 test_dirs.append(test_dir)
 
         if test_dirs:
-            prompt_parts.append(
-                f"\n## Existing Test Directories\n{', '.join(test_dirs)}"
-            )
+            prompt_parts.append(f"\n## Existing Test Directories\n{', '.join(test_dirs)}")
 
     def _run_tests(self, context: Dict[str, Any]) -> Optional[str]:
         """Run tests and return output."""
@@ -359,9 +299,7 @@ the code under test.
                     return output
 
                 except subprocess.TimeoutExpired:
-                    return (
-                        f"Test command '{command}' timed out after 5 minutes"
-                    )
+                    return f"Test command '{command}' timed out after 5 minutes"
                 except Exception:
                     continue  # Try next command
 
@@ -377,9 +315,7 @@ the code under test.
         target_dir = Path(context.get("target_directory", "."))
 
         # Python test commands
-        if (target_dir / "pytest.ini").exists() or (
-            target_dir / "pyproject.toml"
-        ).exists():
+        if (target_dir / "pytest.ini").exists() or (target_dir / "pyproject.toml").exists():
             commands.append("python -m pytest -v")
 
         # Node.js test commands
@@ -502,9 +438,7 @@ the code under test.
                     capture_output=True,
                     text=True,
                     timeout=300,
-                    cwd=target_path
-                    if Path(target_path).is_dir()
-                    else Path(target_path).parent,
+                    cwd=target_path if Path(target_path).is_dir() else Path(target_path).parent,
                 )
 
                 if result.returncode == 0 and result.stdout:

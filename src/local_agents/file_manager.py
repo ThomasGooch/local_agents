@@ -38,17 +38,13 @@ class FileManager:
             for file_path, content in matches:
                 file_path = file_path.strip()
                 if self._is_valid_file_path(file_path):
-                    created_file = self._write_file(
-                        file_path, content.strip(), context
-                    )
+                    created_file = self._write_file(file_path, content.strip(), context)
                     if created_file:
                         created_files.append(created_file)
 
         # Pattern 2: Infer from code blocks with language hints
         if not created_files:
-            created_files.extend(
-                self._extract_from_language_blocks(response, context)
-            )
+            created_files.extend(self._extract_from_language_blocks(response, context))
 
         # Pattern 3: Create default files based on agent type and content
         if not created_files:
@@ -56,9 +52,7 @@ class FileManager:
 
         return created_files
 
-    def _extract_from_language_blocks(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _extract_from_language_blocks(self, response: str, context: Dict[str, any]) -> List[str]:
         """Extract files from language-specific code blocks."""
         created_files = []
 
@@ -89,29 +83,21 @@ class FileManager:
         }
 
         # Find code blocks with language specifiers
-        code_blocks = re.findall(
-            r"```(\w+)\s*\n(.*?)\n```", response, re.DOTALL
-        )
+        code_blocks = re.findall(r"```(\w+)\s*\n(.*?)\n```", response, re.DOTALL)
 
         for language, content in code_blocks:
             language = language.lower()
             if language in lang_extensions:
                 extension = lang_extensions[language]
                 # Generate file name based on content analysis
-                file_name = self._generate_filename(
-                    content, extension, context
-                )
-                created_file = self._write_file(
-                    file_name, content.strip(), context
-                )
+                file_name = self._generate_filename(content, extension, context)
+                created_file = self._write_file(file_name, content.strip(), context)
                 if created_file:
                     created_files.append(created_file)
 
         return created_files
 
-    def _create_default_files(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _create_default_files(self, response: str, context: Dict[str, any]) -> List[str]:
         """Create default files based on agent type and task context."""
         created_files = []
         agent_type = context.get("agent_type", "unknown")
@@ -125,9 +111,7 @@ class FileManager:
 
         return created_files
 
-    def _create_code_files(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _create_code_files(self, response: str, context: Dict[str, any]) -> List[str]:
         """Create code files from coding agent response."""
         created_files = []
         task = context.get("task", "")
@@ -139,72 +123,52 @@ class FileManager:
         # For .NET projects, create basic project structure first
         if language.lower() in ["c#", "csharp"] and "api" in task.lower():
             project_name = self._extract_project_name(task, response)
-            created_files.extend(
-                self.create_project_structure(language, project_name)
-            )
+            created_files.extend(self.create_project_structure(language, project_name))
 
         # Extract all code blocks
-        code_blocks = re.findall(
-            r"```(?:\w+)?\s*\n(.*?)\n```", response, re.DOTALL
-        )
+        code_blocks = re.findall(r"```(?:\w+)?\s*\n(.*?)\n```", response, re.DOTALL)
 
         if code_blocks:
             for i, code in enumerate(code_blocks):
                 if code.strip():
                     # Generate meaningful filename
-                    filename = self._generate_code_filename(
-                        code, extension, context, i
-                    )
-                    created_file = self._write_file(
-                        filename, code.strip(), context
-                    )
+                    filename = self._generate_code_filename(code, extension, context, i)
+                    created_file = self._write_file(filename, code.strip(), context)
                     if created_file:
                         created_files.append(created_file)
         else:
             # No code blocks found, create a single file with the response
-            filename = self._generate_default_filename(
-                "code", extension, context
-            )
+            filename = self._generate_default_filename("code", extension, context)
             created_file = self._write_file(filename, response, context)
             if created_file:
                 created_files.append(created_file)
 
         return created_files
 
-    def _create_test_files(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _create_test_files(self, response: str, context: Dict[str, any]) -> List[str]:
         """Create test files from testing agent response."""
         created_files = []
 
         # Extract code blocks that look like tests
-        code_blocks = re.findall(
-            r"```(?:\w+)?\s*\n(.*?)\n```", response, re.DOTALL
-        )
+        code_blocks = re.findall(r"```(?:\w+)?\s*\n(.*?)\n```", response, re.DOTALL)
 
         if code_blocks:
             for i, code in enumerate(code_blocks):
                 if code.strip() and ("test" in code.lower() or "Test" in code):
                     # Generate test filename
                     filename = self._generate_test_filename(code, context, i)
-                    created_file = self._write_file(
-                        filename, code.strip(), context
-                    )
+                    created_file = self._write_file(filename, code.strip(), context)
                     if created_file:
                         created_files.append(created_file)
 
         # Always create a test report/summary
-        test_report_file = self._write_file(
-            "test_report.md", response, context
-        )
+        test_report_file = self._write_file("test_report.md", response, context)
         if test_report_file:
             created_files.append(test_report_file)
 
         return created_files
 
-    def _create_review_files(
-        self, response: str, context: Dict[str, any]
-    ) -> List[str]:
+    def _create_review_files(self, response: str, context: Dict[str, any]) -> List[str]:
         """Create review documentation from review agent response."""
         created_files = []
 
@@ -215,9 +179,7 @@ class FileManager:
 
         return created_files
 
-    def _detect_language(
-        self, task: str, response: str, context: Dict[str, any]
-    ) -> str:
+    def _detect_language(self, task: str, response: str, context: Dict[str, any]) -> str:
         """Detect programming language from task and context."""
         task_lower = task.lower()
 
@@ -274,9 +236,7 @@ class FileManager:
         }
         return extensions.get(language, ".txt")
 
-    def _generate_filename(
-        self, content: str, extension: str, context: Dict[str, any]
-    ) -> str:
+    def _generate_filename(self, content: str, extension: str, context: Dict[str, any]) -> str:
         """Generate meaningful filename from content."""
         # Look for class names, function names, etc.
         class_match = re.search(r"class\s+(\w+)", content)
@@ -325,20 +285,16 @@ class FileManager:
 
         return f"code_{index + 1}{extension}"
 
-    def _generate_test_filename(
-        self, code: str, context: Dict[str, any], index: int
-    ) -> str:
+    def _generate_test_filename(self, code: str, context: Dict[str, any], index: int) -> str:
         """Generate filename for test files."""
-        language = self._detect_language(
-            context.get("task", ""), code, context
-        )
+        language = self._detect_language(context.get("task", ""), code, context)
 
         if language == "c#":
             # Look for test class names
             test_class_match = re.search(r"public\s+class\s+(\w+Tests?)", code)
             if test_class_match:
                 return f"{test_class_match.group(1)}.cs"
-            return f"WeatherApiTests.cs"
+            return "WeatherApiTests.cs"
         elif language == "python":
             return f"test_{index + 1}.py"
         elif language in ["javascript", "typescript"]:
@@ -393,9 +349,7 @@ class FileManager:
 
         return True
 
-    def _write_file(
-        self, file_path: str, content: str, context: Dict[str, any]
-    ) -> Optional[str]:
+    def _write_file(self, file_path: str, content: str, context: Dict[str, any]) -> Optional[str]:
         """Write content to file safely."""
         try:
             # Ensure we're writing within the working directory
@@ -412,14 +366,10 @@ class FileManager:
             return str(full_path)
 
         except Exception as e:
-            console.print(
-                f"[red]✗ Failed to create file {file_path}: {e}[/red]"
-            )
+            console.print(f"[red]✗ Failed to create file {file_path}: {e}[/red]")
             return None
 
-    def create_project_structure(
-        self, language: str, project_name: str
-    ) -> List[str]:
+    def create_project_structure(self, language: str, project_name: str) -> List[str]:
         """Create basic project structure for different languages."""
         created_files = []
 
@@ -438,9 +388,7 @@ class FileManager:
             ]
 
             for file_path, content in project_files:
-                created_file = self._write_file(
-                    file_path, content, {"agent_type": "structure"}
-                )
+                created_file = self._write_file(file_path, content, {"agent_type": "structure"})
                 if created_file:
                     created_files.append(created_file)
 
@@ -475,9 +423,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Weather API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Weather API",
         Version = "v1",
         Description = "A simple Weather API built with .NET 9"
     });

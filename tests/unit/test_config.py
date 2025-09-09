@@ -26,9 +26,7 @@ class TestConfig:
 
     def test_config_custom_values(self):
         """Test configuration with custom values."""
-        config = Config(
-            default_model="custom:model", temperature=0.5, max_tokens=2048
-        )
+        config = Config(default_model="custom:model", temperature=0.5, max_tokens=2048)
         assert config.default_model == "custom:model"
         assert config.temperature == 0.5
         assert config.max_tokens == 2048
@@ -43,14 +41,10 @@ class TestConfig:
 
     def test_temperature_validation_invalid_range(self):
         """Test temperature validation rejects invalid range."""
-        with pytest.raises(
-            ValueError, match="Temperature must be between 0.0 and 2.0"
-        ):
+        with pytest.raises(ValueError, match="Temperature must be between 0.0 and 2.0"):
             Config(temperature=-0.1)
 
-        with pytest.raises(
-            ValueError, match="Temperature must be between 0.0 and 2.0"
-        ):
+        with pytest.raises(ValueError, match="Temperature must be between 0.0 and 2.0"):
             Config(temperature=2.1)
 
     def test_max_tokens_validation(self):
@@ -62,14 +56,10 @@ class TestConfig:
             assert config.max_tokens == tokens
 
         # Invalid values
-        with pytest.raises(
-            ValueError, match="max_tokens must be greater than 0"
-        ):
+        with pytest.raises(ValueError, match="max_tokens must be greater than 0"):
             Config(max_tokens=0)
 
-        with pytest.raises(
-            ValueError, match="max_tokens must be greater than 0"
-        ):
+        with pytest.raises(ValueError, match="max_tokens must be greater than 0"):
             Config(max_tokens=-100)
 
     def test_context_length_validation(self):
@@ -81,14 +71,10 @@ class TestConfig:
             assert config.context_length == length
 
         # Invalid values
-        with pytest.raises(
-            ValueError, match="context_length must be greater than 0"
-        ):
+        with pytest.raises(ValueError, match="context_length must be greater than 0"):
             Config(context_length=0)
 
-        with pytest.raises(
-            ValueError, match="context_length must be greater than 0"
-        ):
+        with pytest.raises(ValueError, match="context_length must be greater than 0"):
             Config(context_length=-1000)
 
     def test_ollama_host_validation(self):
@@ -116,9 +102,7 @@ class TestConfig:
         ]
 
         for host in invalid_hosts:
-            with pytest.raises(
-                ValueError, match="ollama_host must be a valid HTTP/HTTPS URL"
-            ):
+            with pytest.raises(ValueError, match="ollama_host must be a valid HTTP/HTTPS URL"):
                 Config(ollama_host=host)
 
     def test_model_name_validation(self):
@@ -146,9 +130,7 @@ class TestConfig:
         ]
 
         for model in invalid_models:
-            with pytest.raises(
-                ValueError, match="Model name must follow format 'name:tag'"
-            ):
+            with pytest.raises(ValueError, match="Model name must follow format 'name:tag'"):
                 Config(default_model=model)
 
 
@@ -165,9 +147,7 @@ class TestingAgentSettings:
 
     def test_agent_settings_custom(self):
         """Test custom agent settings."""
-        settings = AgentSettings(
-            planning="custom:planner", coding="custom:coder"
-        )
+        settings = AgentSettings(planning="custom:planner", coding="custom:coder")
         assert settings.planning == "custom:planner"
         assert settings.coding == "custom:coder"
         assert settings.testing == "deepseek-coder:6.7b"  # Default unchanged
@@ -323,9 +303,7 @@ class TestConfigManager:
             "agents": {"planning": "test:planner"},
         }
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
             yaml.dump(config_data, f)
             config_path = f.name
 
@@ -341,9 +319,7 @@ class TestConfigManager:
 
     def test_load_config_invalid_yaml(self):
         """Test loading configuration with invalid YAML."""
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yml", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
             f.write("invalid: yaml: content: [")
             config_path = f.name
 
@@ -386,9 +362,7 @@ class TestConfigManager:
         assert manager.get_model_for_agent("code") == "codellama:7b"
         assert manager.get_model_for_agent("test") == "deepseek-coder:6.7b"
         assert manager.get_model_for_agent("review") == "llama3.1:8b"
-        assert (
-            manager.get_model_for_agent("unknown") == "llama3.1:8b"
-        )  # Default
+        assert manager.get_model_for_agent("unknown") == "llama3.1:8b"  # Default
 
     def test_get_workflow_steps(self):
         """Test getting workflow steps."""
@@ -437,9 +411,7 @@ class TestConfigManager:
 
             # Test various invalid configurations
             invalid_configs = [
-                {
-                    "default_model": "invalid_model_name"
-                },  # Invalid model format
+                {"default_model": "invalid_model_name"},  # Invalid model format
                 {"temperature": -1.0},  # Invalid temperature
                 {"max_tokens": 0},  # Invalid max_tokens
                 {"ollama_host": "invalid-url"},  # Invalid URL

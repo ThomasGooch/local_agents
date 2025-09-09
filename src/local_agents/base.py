@@ -65,16 +65,12 @@ class BaseAgent(ABC):
 
         # Ensure model is available
         if not self.ollama_client.is_model_available(self.model):
-            console.print(
-                f"[yellow]Model {self.model} not found. Attempting to pull...[/yellow]"
-            )
+            console.print(f"[yellow]Model {self.model} not found. Attempting to pull...[/yellow]")
             if not self.ollama_client.pull_model(self.model):
                 raise RuntimeError(f"Failed to pull model {self.model}")
 
     @abstractmethod
-    def execute(
-        self, task: str, context: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+    def execute(self, task: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Execute the agent's task."""
         pass
 
@@ -201,10 +197,7 @@ class TaskResult:
             )
         else:
             result_panel = Panel(
-                (
-                    f"[red]Error:[/red] {self.error}\n\n"
-                    f"[yellow]Output:[/yellow] {self.output}"
-                ),
+                (f"[red]Error:[/red] {self.error}\n\n" f"[yellow]Output:[/yellow] {self.output}"),
                 title=f"[red]{self.agent_type.title()} Agent Failed[/red]",
                 border_style="red",
             )

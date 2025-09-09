@@ -97,13 +97,9 @@ def performance_monitor():
 class TestingAgentPerformanceBenchmarks:
     """Test individual agent performance benchmarks."""
 
-    def test_planning_agent_performance_benchmark(
-        self, mock_ollama_client, performance_monitor
-    ):
+    def test_planning_agent_performance_benchmark(self, mock_ollama_client, performance_monitor):
         """Test planning agent meets < 30 second benchmark."""
-        agent = PlanningAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        agent = PlanningAgent(model="test:model", ollama_client=mock_ollama_client)
 
         performance_monitor.start_monitoring()
 
@@ -130,13 +126,9 @@ class TestingAgentPerformanceBenchmarks:
             f"Planning Performance: {metrics['execution_time']:.2f}s, Peak Memory: {metrics['peak_memory_mb']:.1f}MB"
         )
 
-    def test_coding_agent_performance_benchmark(
-        self, mock_ollama_client, performance_monitor
-    ):
+    def test_coding_agent_performance_benchmark(self, mock_ollama_client, performance_monitor):
         """Test coding agent meets < 45 second benchmark."""
-        agent = CodingAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        agent = CodingAgent(model="test:model", ollama_client=mock_ollama_client)
 
         performance_monitor.start_monitoring()
 
@@ -170,13 +162,9 @@ class TestingAgentPerformanceBenchmarks:
             f"Coding Performance: {metrics['execution_time']:.2f}s, Peak Memory: {metrics['peak_memory_mb']:.1f}MB"
         )
 
-    def test_testing_agent_performance_benchmark(
-        self, mock_ollama_client, performance_monitor
-    ):
+    def test_testing_agent_performance_benchmark(self, mock_ollama_client, performance_monitor):
         """Test testing agent meets < 30 second benchmark."""
-        agent = TestingAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        agent = TestingAgent(model="test:model", ollama_client=mock_ollama_client)
 
         performance_monitor.start_monitoring()
 
@@ -232,9 +220,7 @@ class UserAuthenticator:
             stderr="",
         )
 
-        agent = ReviewAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        agent = ReviewAgent(model="test:model", ollama_client=mock_ollama_client)
 
         performance_monitor.start_monitoring()
 
@@ -400,9 +386,7 @@ class TestWorkflowPerformanceBenchmarks:
             f"Feature Development Workflow: {metrics['execution_time']:.2f}s, Peak Memory: {metrics['peak_memory_mb']:.1f}MB"
         )
 
-    def test_bug_fix_workflow_benchmark(
-        self, mock_agents_for_workflow, performance_monitor
-    ):
+    def test_bug_fix_workflow_benchmark(self, mock_agents_for_workflow, performance_monitor):
         """Test bug fix workflow performance."""
         workflow = Workflow()
 
@@ -448,9 +432,7 @@ class TestWorkflowPerformanceBenchmarks:
             f"Bug Fix Workflow: {metrics['execution_time']:.2f}s, Peak Memory: {metrics['peak_memory_mb']:.1f}MB"
         )
 
-    def test_code_review_workflow_benchmark(
-        self, mock_agents_for_workflow, performance_monitor
-    ):
+    def test_code_review_workflow_benchmark(self, mock_agents_for_workflow, performance_monitor):
         """Test code review workflow performance."""
         workflow = Workflow()
 
@@ -490,9 +472,7 @@ class TestWorkflowPerformanceBenchmarks:
 class TestMemoryUsageBenchmarks:
     """Test memory usage benchmarks."""
 
-    def test_workflow_memory_usage_benchmark(
-        self, mock_agents_for_workflow, performance_monitor
-    ):
+    def test_workflow_memory_usage_benchmark(self, mock_agents_for_workflow, performance_monitor):
         """Test that workflow execution stays under 4GB memory benchmark."""
         workflow = Workflow()
 
@@ -528,9 +508,7 @@ class TestMemoryUsageBenchmarks:
                     ):
                         results = []
                         for workflow_name, task in workflows_to_test:
-                            result = workflow.execute_workflow(
-                                workflow_name, task
-                            )
+                            result = workflow.execute_workflow(workflow_name, task)
                             results.append(result)
 
                             # Force garbage collection between workflows
@@ -553,18 +531,14 @@ class TestMemoryUsageBenchmarks:
             f"Memory Usage Test: Peak {metrics['peak_memory_mb']:.1f}MB, Total time: {metrics['execution_time']:.2f}s"
         )
 
-    def test_concurrent_agent_memory_usage(
-        self, mock_ollama_client, performance_monitor
-    ):
+    def test_concurrent_agent_memory_usage(self, mock_ollama_client, performance_monitor):
         """Test memory usage with concurrent agent operations."""
         import concurrent.futures
 
         performance_monitor.start_monitoring()
 
         def run_agent_task(agent_class, task, context):
-            agent = agent_class(
-                model="test:model", ollama_client=mock_ollama_client
-            )
+            agent = agent_class(model="test:model", ollama_client=mock_ollama_client)
             return agent.execute(task, context)
 
         # Create multiple concurrent tasks
@@ -579,13 +553,8 @@ class TestMemoryUsageBenchmarks:
 
         # Execute tasks concurrently
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-            futures = [
-                executor.submit(run_agent_task, *task) for task in tasks
-            ]
-            results = [
-                future.result()
-                for future in concurrent.futures.as_completed(futures)
-            ]
+            futures = [executor.submit(run_agent_task, *task) for task in tasks]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
 
         metrics = performance_monitor.stop_monitoring()
 
@@ -606,13 +575,9 @@ class TestMemoryUsageBenchmarks:
 class TestScalabilityBenchmarks:
     """Test system scalability under various loads."""
 
-    def test_large_context_processing_performance(
-        self, mock_ollama_client, performance_monitor
-    ):
+    def test_large_context_processing_performance(self, mock_ollama_client, performance_monitor):
         """Test performance with large context inputs."""
-        agent = PlanningAgent(
-            model="test:model", ollama_client=mock_ollama_client
-        )
+        agent = PlanningAgent(model="test:model", ollama_client=mock_ollama_client)
 
         # Create large context (simulating large codebase analysis)
         large_context = {
@@ -680,9 +645,7 @@ class TestScalabilityBenchmarks:
                         return_value=mock_agents_for_workflow["reviewer"],
                     ):
                         for workflow_name, task in workflows:
-                            result = workflow.execute_workflow(
-                                workflow_name, task
-                            )
+                            result = workflow.execute_workflow(workflow_name, task)
                             results.append(result)
 
         metrics = performance_monitor.stop_monitoring()
@@ -696,18 +659,14 @@ class TestScalabilityBenchmarks:
         for result in results:
             assert result.success is True
 
-        print(
-            f"Multiple Workflows: {len(workflows)} workflows in {metrics['execution_time']:.2f}s"
-        )
+        print(f"Multiple Workflows: {len(workflows)} workflows in {metrics['execution_time']:.2f}s")
 
 
 @pytest.mark.performance
 class TestPerformanceRegression:
     """Test for performance regressions."""
 
-    def test_baseline_performance_metrics(
-        self, mock_ollama_client, performance_monitor
-    ):
+    def test_baseline_performance_metrics(self, mock_ollama_client, performance_monitor):
         """Establish baseline performance metrics for regression testing."""
         baseline_metrics = {}
 
@@ -720,9 +679,7 @@ class TestPerformanceRegression:
         ]
 
         for agent_class, task in agents:
-            agent = agent_class(
-                model="test:model", ollama_client=mock_ollama_client
-            )
+            agent = agent_class(model="test:model", ollama_client=mock_ollama_client)
 
             performance_monitor.start_monitoring()
             result = agent.execute(task)
@@ -739,9 +696,7 @@ class TestPerformanceRegression:
         # Log baseline metrics for future regression testing
         print("Baseline Performance Metrics:")
         for agent, metrics in baseline_metrics.items():
-            print(
-                f"  {agent}: {metrics['execution_time']:.2f}s, {metrics['memory_mb']:.1f}MB"
-            )
+            print(f"  {agent}: {metrics['execution_time']:.2f}s, {metrics['memory_mb']:.1f}MB")
 
         # Store baseline for comparison (in real implementation, save to file)
         return baseline_metrics

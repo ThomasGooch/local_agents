@@ -113,10 +113,7 @@ class TestWorkflowOrchestrator:
         # Feature development workflow
         feature_dev = workflow.workflow_definitions["feature-dev"]
         assert feature_dev["steps"] == ["plan", "code", "test", "review"]
-        assert (
-            feature_dev["description"]
-            == "Complete feature development workflow"
-        )
+        assert feature_dev["description"] == "Complete feature development workflow"
 
         # Bug fix workflow
         bug_fix = workflow.workflow_definitions["bug-fix"]
@@ -132,27 +129,19 @@ class TestWorkflowOrchestrator:
 
     def test_agent_factory_creation(self, workflow, mock_agents):
         """Test agent factory creates correct agent types."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             agent = workflow._create_agent("plan")
             assert agent.agent_type == "plan"
 
-        with patch.object(
-            CodingAgent, "__new__", return_value=mock_agents["coder"]
-        ):
+        with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
             agent = workflow._create_agent("code")
             assert agent.agent_type == "code"
 
-        with patch.object(
-            TestingAgent, "__new__", return_value=mock_agents["tester"]
-        ):
+        with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
             agent = workflow._create_agent("test")
             assert agent.agent_type == "test"
 
-        with patch.object(
-            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
-        ):
+        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
             agent = workflow._create_agent("review")
             assert agent.agent_type == "review"
 
@@ -163,9 +152,7 @@ class TestWorkflowOrchestrator:
 
     def test_execute_single_step(self, workflow, mock_agents):
         """Test executing a single workflow step."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             step_result = workflow._execute_step(
                 "plan", "Create implementation plan", {"language": "python"}
             )
@@ -179,12 +166,8 @@ class TestWorkflowOrchestrator:
 
     def test_execute_step_with_streaming(self, workflow, mock_agents):
         """Test executing step with streaming enabled."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            step_result = workflow._execute_step(
-                "plan", "Create plan", {}, stream=True
-            )
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            step_result = workflow._execute_step("plan", "Create plan", {}, stream=True)
 
         assert step_result.success is True
         # Verify streaming parameter was passed
@@ -193,16 +176,10 @@ class TestWorkflowOrchestrator:
 
     def test_context_passing_between_steps(self, workflow, mock_agents):
         """Test context is properly passed between workflow steps."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 # Execute planning step
-                workflow._execute_step(
-                    "plan", "Create plan", {"language": "python"}
-                )
+                workflow._execute_step("plan", "Create plan", {"language": "python"})
 
                 # Verify context was updated
                 assert "plan_output" in workflow.current_context
@@ -229,9 +206,7 @@ class TestWorkflowOrchestrator:
         with patch.object(workflow, "_check_dependencies") as mock_check:
             mock_check.return_value = True
 
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 workflow._execute_step("code", "Generate code", {})
 
             mock_check.assert_called_once_with("code", [])
@@ -242,9 +217,7 @@ class TestWorkflowOrchestrator:
         workflow.completed_steps = {"plan": False}  # Plan failed
         workflow.step_dependencies = {"code": ["plan"]}
 
-        with patch.object(
-            CodingAgent, "__new__", return_value=mock_agents["coder"]
-        ):
+        with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
             step_result = workflow._execute_step("code", "Generate code", {})
 
         # Step should be skipped due to dependency failure
@@ -262,9 +235,7 @@ class TestWorkflowOrchestrator:
             error="Planning failed",
         )
 
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             step_result = workflow._execute_step("plan", "Create plan", {})
 
         assert step_result.success is False
@@ -273,15 +244,9 @@ class TestWorkflowOrchestrator:
 
     def test_full_workflow_execution_success(self, workflow, mock_agents):
         """Test successful execution of complete workflow."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
-                with patch.object(
-                    TestingAgent, "__new__", return_value=mock_agents["tester"]
-                ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
+                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
                     with patch.object(
                         ReviewAgent,
                         "__new__",
@@ -321,23 +286,15 @@ class TestWorkflowOrchestrator:
             error="Code generation failed",
         )
 
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
-                with patch.object(
-                    TestingAgent, "__new__", return_value=mock_agents["tester"]
-                ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
+                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
                     with patch.object(
                         ReviewAgent,
                         "__new__",
                         return_value=mock_agents["reviewer"],
                     ):
-                        result = workflow.execute_workflow(
-                            "feature-dev", "Create a function"
-                        )
+                        result = workflow.execute_workflow("feature-dev", "Create a function")
 
         assert result.success is False
         assert len(result.steps) == 4  # All steps should be attempted
@@ -346,9 +303,7 @@ class TestWorkflowOrchestrator:
         plan_step, code_step, test_step, review_step = result.steps
         assert plan_step.success is True
         assert code_step.success is False
-        assert (
-            test_step.success is True
-        )  # Should continue after non-critical failure
+        assert test_step.success is True  # Should continue after non-critical failure
         assert review_step.success is True
 
         assert result.successful_steps == 3
@@ -356,15 +311,9 @@ class TestWorkflowOrchestrator:
 
     def test_workflow_summary_generation(self, workflow, mock_agents):
         """Test workflow summary generation."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
-            ):
-                result = workflow.execute_workflow(
-                    "code-review", "Review authentication module"
-                )
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                result = workflow.execute_workflow("code-review", "Review authentication module")
 
         assert "summary" in result.summary
         assert "Code-Review Workflow Summary" in result.summary
@@ -374,12 +323,8 @@ class TestWorkflowOrchestrator:
 
     def test_custom_workflow_creation(self, workflow, mock_agents):
         """Test creation and execution of custom workflows."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                TestingAgent, "__new__", return_value=mock_agents["tester"]
-            ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
                 result = workflow.create_custom_workflow(
                     steps=["plan", "test"],
                     task="Test-driven development workflow",
@@ -407,16 +352,10 @@ class TestWorkflowOrchestrator:
 
     def test_workflow_state_management(self, workflow, mock_agents):
         """Test workflow state management during execution."""
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 # Execute partial workflow
-                workflow._execute_step(
-                    "plan", "Create plan", {"language": "python"}
-                )
+                workflow._execute_step("plan", "Create plan", {"language": "python"})
 
                 # Check workflow state
                 assert "plan" in workflow.completed_steps
@@ -432,9 +371,7 @@ class TestWorkflowOrchestrator:
                 assert "code_output" in workflow.current_context
 
     @patch("local_agents.base.OllamaClient")
-    def test_workflow_execution_time_tracking(
-        self, mock_ollama_class, workflow, mock_agents
-    ):
+    def test_workflow_execution_time_tracking(self, mock_ollama_class, workflow, mock_agents):
         """Test that execution times are properly tracked."""
         # Set up mock OllamaClient
         mock_client = Mock()
@@ -448,8 +385,7 @@ class TestWorkflowOrchestrator:
         assert result.total_execution_time > 0
         assert result.execution_time_formatted is not None
         assert (
-            "seconds" in result.execution_time_formatted
-            or "ms" in result.execution_time_formatted
+            "seconds" in result.execution_time_formatted or "ms" in result.execution_time_formatted
         )
 
         # Check individual step timing
@@ -480,23 +416,15 @@ class TestWorkflowOrchestrator:
             error="Non-critical failure",
         )
 
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
-                with patch.object(
-                    TestingAgent, "__new__", return_value=mock_agents["tester"]
-                ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
+                with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
                     result = workflow.execute_workflow(
                         "feature-dev", "Create feature despite coding failure"
                     )
 
         # Workflow should complete despite coding failure
-        assert (
-            len(result.steps) >= 3
-        )  # Plan, code (failed), test should all run
+        assert len(result.steps) >= 3  # Plan, code (failed), test should all run
         assert result.steps[0].success is True  # Plan
         assert result.steps[1].success is False  # Code (failed)
         assert result.steps[2].success is True  # Test (continues)
@@ -515,12 +443,8 @@ class TestWorkflowOrchestrator:
             error="Critical planning failure",
         )
 
-        with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents["planner"]
-        ):
-            with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents["coder"]
-            ):
+        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
+            with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 result = workflow.execute_workflow(
                     "feature-dev", "Create feature with critical failure"
                 )
@@ -540,13 +464,9 @@ class TestWorkflowOrchestrator:
 
     def test_workflow_context_isolation(self, workflow, mock_agents):
         """Test that workflow contexts are properly isolated between executions."""
-        with patch.object(
-            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
-        ):
+        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
             # Execute first workflow
-            result1 = workflow.execute_workflow(
-                "code-review", "First review", {"file": "test1.py"}
-            )
+            result1 = workflow.execute_workflow("code-review", "First review", {"file": "test1.py"})
 
             # Execute second workflow
             result2 = workflow.execute_workflow(
@@ -559,12 +479,8 @@ class TestWorkflowOrchestrator:
 
     def test_workflow_result_serialization(self, workflow, mock_agents):
         """Test that workflow results can be serialized to dict."""
-        with patch.object(
-            ReviewAgent, "__new__", return_value=mock_agents["reviewer"]
-        ):
-            result = workflow.execute_workflow(
-                "code-review", "Test serialization"
-            )
+        with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+            result = workflow.execute_workflow("code-review", "Test serialization")
 
         result_dict = result.to_dict()
 
