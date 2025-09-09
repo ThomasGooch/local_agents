@@ -31,7 +31,11 @@ class CodingAgent(BaseAgent):
         """Execute coding task."""
         # Initialize file manager if not already done
         if not self.file_manager:
-            working_dir = context.get("directory", ".") if context else "."
+            # Use output_directory from CLI first, then fallback to directory or current dir
+            working_dir = (
+                context.get("output_directory") or 
+                context.get("directory", ".") if context else "."
+            )
             self.file_manager = FileManager(working_dir)
 
         prompt = self._build_coding_prompt(task, context)
@@ -113,10 +117,12 @@ class CodingAgent(BaseAgent):
         if context.get("file_content"):
             prompt_parts.append(f"\n## Context File Content\n```\n{context['file_content']}\n```")
 
-        if context.get("directory"):
-            prompt_parts.append(f"\n## Working Directory\n{context['directory']}")
+        # Use output_directory or directory for context
+        work_dir = context.get("output_directory") or context.get("directory")
+        if work_dir:
+            prompt_parts.append(f"\n## Working Directory\n{work_dir}")
             # Try to infer project structure and language
-            self._add_project_context(prompt_parts, Path(context["directory"]))
+            self._add_project_context(prompt_parts, Path(work_dir))
 
         prompt_parts.extend(
             [

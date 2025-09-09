@@ -31,7 +31,11 @@ class TestingAgent(BaseAgent):
         """Execute testing task."""
         # Initialize file manager if not already done
         if not self.file_manager:
-            working_dir = context.get("directory", ".") if context else "."
+            # Use output_directory from CLI first, then fallback to directory or current dir
+            working_dir = (
+                context.get("output_directory") or 
+                context.get("directory", ".") if context else "."
+            )
             self.file_manager = FileManager(working_dir)
 
         prompt = self._build_testing_prompt(task, context)
