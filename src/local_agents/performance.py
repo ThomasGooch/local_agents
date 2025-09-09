@@ -108,10 +108,7 @@ class PerformanceMonitor:
                 "temperature": 0.7,
                 "cache_enabled": True,
                 "optimization_notes": [
-                    (
-                        f"Good hardware for Local Agents "
-                        f"({memory_gb}GB RAM, {cpu_cores} cores)"
-                    ),
+                    (f"Good hardware for Local Agents " f"({memory_gb}GB RAM, {cpu_cores} cores)"),
                     "Recommended to use medium-sized models",
                     "Limited concurrent execution for stability",
                 ],
@@ -238,12 +235,8 @@ class PerformanceMonitor:
         perf_table.add_column("Value", style="green")
 
         perf_table.add_row("Total Executions", str(report["total_executions"]))
-        perf_table.add_row(
-            "Avg Execution Time", f"{report['average_execution_time']:.2f}s"
-        )
-        perf_table.add_row(
-            "Avg Memory Usage", f"{report['average_memory_usage']:.1f}MB"
-        )
+        perf_table.add_row("Avg Execution Time", f"{report['average_execution_time']:.2f}s")
+        perf_table.add_row("Avg Memory Usage", f"{report['average_memory_usage']:.1f}MB")
         perf_table.add_row("Cache Hit Rate", f"{report['cache_hit_rate']:.1f}%")
 
         # Agent statistics table

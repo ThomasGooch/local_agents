@@ -188,9 +188,7 @@ class Config(BaseModel):
             raise ValueError("ollama_host must be a valid HTTP/HTTPS URL")
 
         # Basic URL validation
-        url_pattern = (
-            r"^https?://[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?(\:[0-9]+)?(/.*)?$"
-        )
+        url_pattern = r"^https?://[a-zA-Z0-9]([a-zA-Z0-9\-\.]*[a-zA-Z0-9])?(\:[0-9]+)?(/.*)?$"
         if not re.match(url_pattern, v):
             raise ValueError("ollama_host must be a valid HTTP/HTTPS URL")
 
@@ -201,9 +199,7 @@ class Config(BaseModel):
             try:
                 port_num = int(port)
                 if not 1 <= port_num <= 65535:
-                    raise ValueError(
-                        f"Port must be between 1 and 65535, got: {port_num}"
-                    )
+                    raise ValueError(f"Port must be between 1 and 65535, got: {port_num}")
             except ValueError as e:
                 if "Port must be" in str(e):
                     raise
@@ -244,9 +240,7 @@ class ConfigManager:
     """Manages configuration loading and saving."""
 
     def __init__(self, config_path: Optional[str] = None):
-        self.config_path = Path(
-            config_path or "~/.local_agents_config.yml"
-        ).expanduser()
+        self.config_path = Path(config_path or "~/.local_agents_config.yml").expanduser()
         self._config: Optional[Config] = None
 
     def load_config(self) -> Config:
@@ -284,21 +278,15 @@ class ConfigManager:
         """Save current configuration to file."""
         if config is not None:
             # Validate before saving by checking individual field constraints
-            if hasattr(config, "temperature") and not (
-                0.0 <= config.temperature <= 2.0
-            ):
+            if hasattr(config, "temperature") and not (0.0 <= config.temperature <= 2.0):
                 raise ValueError(
                     f"Invalid configuration: temperature must be between 0.0 and "
                     f"2.0, got {config.temperature}"
                 )
             if hasattr(config, "max_tokens") and config.max_tokens <= 0:
-                raise ValueError(
-                    "Invalid configuration: max_tokens must be greater than 0"
-                )
+                raise ValueError("Invalid configuration: max_tokens must be greater than 0")
             if hasattr(config, "context_length") and config.context_length <= 0:
-                raise ValueError(
-                    "Invalid configuration: context_length must be greater than 0"
-                )
+                raise ValueError("Invalid configuration: context_length must be greater than 0")
             self._config = config
         elif self._config is None:
             self._config = Config()
@@ -383,9 +371,7 @@ class ConfigManager:
         except (yaml.YAMLError, ValidationError) as e:
             raise ValueError(f"Invalid backup file: {e}")
 
-    def validate_config_dict(
-        self, config_data: Dict[str, Any]
-    ) -> tuple[bool, list[str]]:
+    def validate_config_dict(self, config_data: Dict[str, Any]) -> tuple[bool, list[str]]:
         """Validate configuration dictionary without creating Config instance.
 
         Returns:

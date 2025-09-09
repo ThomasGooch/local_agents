@@ -78,9 +78,7 @@ class TestCLIBasicCommands:
         assert "Welcome" in result.output or "Available Commands" in result.output
 
     @patch("local_agents.cli.PlanningAgent")
-    def test_plan_command_success(
-        self, mock_agent_class, cli_runner, mock_successful_agent
-    ):
+    def test_plan_command_success(self, mock_agent_class, cli_runner, mock_successful_agent):
         """Test successful plan command execution."""
         mock_agent_class.return_value = mock_successful_agent
 
@@ -92,9 +90,7 @@ class TestCLIBasicCommands:
         mock_successful_agent.display_info.assert_called_once()
 
     @patch("local_agents.cli.CodingAgent")
-    def test_code_command_success(
-        self, mock_agent_class, cli_runner, mock_successful_agent
-    ):
+    def test_code_command_success(self, mock_agent_class, cli_runner, mock_successful_agent):
         """Test successful code command execution."""
         mock_agent_class.return_value = mock_successful_agent
 
@@ -105,9 +101,7 @@ class TestCLIBasicCommands:
         mock_successful_agent.execute.assert_called_once()
 
     @patch("local_agents.cli.TestingAgent")
-    def test_test_command_success(
-        self, mock_agent_class, cli_runner, mock_successful_agent
-    ):
+    def test_test_command_success(self, mock_agent_class, cli_runner, mock_successful_agent):
         """Test successful test command execution."""
         mock_agent_class.return_value = mock_successful_agent
 
@@ -146,9 +140,7 @@ class TestCLICommandOptions:
         mock_agent_class.return_value = mock_successful_agent
         output_file = temp_directory / "plan.md"
 
-        result = cli_runner.invoke(
-            plan, ["Create a web app", "--output", str(output_file)]
-        )
+        result = cli_runner.invoke(plan, ["Create a web app", "--output", str(output_file)])
 
         assert result.exit_code == 0
         assert output_file.exists()
@@ -172,15 +164,11 @@ class TestCLICommandOptions:
         assert "file_content" in context
 
     @patch("local_agents.cli.CodingAgent")
-    def test_code_with_file_option(
-        self, mock_agent_class, cli_runner, mock_successful_agent
-    ):
+    def test_code_with_file_option(self, mock_agent_class, cli_runner, mock_successful_agent):
         """Test code command with file option."""
         mock_agent_class.return_value = mock_successful_agent
 
-        result = cli_runner.invoke(
-            code, ["Add error handling", "--file", "calculator.py"]
-        )
+        result = cli_runner.invoke(code, ["Add error handling", "--file", "calculator.py"])
 
         assert result.exit_code == 0
         # Verify file context was passed
@@ -190,9 +178,7 @@ class TestCLICommandOptions:
         assert context["target_file"] == "calculator.py"
 
     @patch("local_agents.cli.TestingAgent")
-    def test_test_with_framework_option(
-        self, mock_agent_class, cli_runner, mock_successful_agent
-    ):
+    def test_test_with_framework_option(self, mock_agent_class, cli_runner, mock_successful_agent):
         """Test test command with framework option."""
         mock_agent_class.return_value = mock_successful_agent
 
@@ -212,9 +198,7 @@ class TestCLICommandOptions:
         """Test review command with focus option."""
         mock_agent_class.return_value = mock_successful_agent
 
-        result = cli_runner.invoke(
-            review, [str(sample_python_file), "--focus", "security"]
-        )
+        result = cli_runner.invoke(review, [str(sample_python_file), "--focus", "security"])
 
         assert result.exit_code == 0
         # Verify focus area was passed in context
@@ -224,9 +208,7 @@ class TestCLICommandOptions:
         assert context["focus_area"] == "security"
 
     @patch("local_agents.cli.PlanningAgent")
-    def test_streaming_option(
-        self, mock_agent_class, cli_runner, mock_successful_agent
-    ):
+    def test_streaming_option(self, mock_agent_class, cli_runner, mock_successful_agent):
         """Test streaming option is passed to agents."""
         mock_agent_class.return_value = mock_successful_agent
 
@@ -242,9 +224,7 @@ class TestCLIErrorHandling:
     """Test CLI error handling scenarios."""
 
     @patch("local_agents.cli.PlanningAgent")
-    def test_agent_failure_handling(
-        self, mock_agent_class, cli_runner, mock_failed_agent
-    ):
+    def test_agent_failure_handling(self, mock_agent_class, cli_runner, mock_failed_agent):
         """Test CLI handles agent failures gracefully."""
         mock_agent_class.return_value = mock_failed_agent
 
@@ -268,9 +248,7 @@ class TestCLIErrorHandling:
 
         assert result.exit_code == 0
         # Should display connection error panel
-        assert (
-            "Connection Error" in result.output or "Connection Failed" in result.output
-        )
+        assert "Connection Error" in result.output or "Connection Failed" in result.output
 
     @patch("local_agents.cli.PlanningAgent")
     def test_timeout_error_handling(self, mock_agent_class, cli_runner):
@@ -330,9 +308,7 @@ class TestWorkflowCLI:
         )
 
     @patch("local_agents.cli.Workflow")
-    def test_workflow_with_context(
-        self, mock_workflow_class, cli_runner, sample_python_file
-    ):
+    def test_workflow_with_context(self, mock_workflow_class, cli_runner, sample_python_file):
         """Test workflow command with context file."""
         mock_workflow = Mock()
         mock_workflow.execute_workflow.return_value = {
@@ -354,9 +330,7 @@ class TestWorkflowCLI:
         assert "file_content" in context
 
     @patch("local_agents.cli.Workflow")
-    def test_workflow_with_output_dir(
-        self, mock_workflow_class, cli_runner, temp_directory
-    ):
+    def test_workflow_with_output_dir(self, mock_workflow_class, cli_runner, temp_directory):
         """Test workflow command with output directory."""
         mock_workflow = Mock()
         mock_workflow.execute_workflow.return_value = {
@@ -380,9 +354,7 @@ class TestWorkflowCLI:
     def test_workflow_error_handling(self, mock_workflow_class, cli_runner):
         """Test workflow error handling."""
         mock_workflow = Mock()
-        mock_workflow.execute_workflow.side_effect = ValueError(
-            "Unknown workflow: invalid"
-        )
+        mock_workflow.execute_workflow.side_effect = ValueError("Unknown workflow: invalid")
         mock_workflow_class.return_value = mock_workflow
 
         result = cli_runner.invoke(workflow, ["invalid", "Test task"])

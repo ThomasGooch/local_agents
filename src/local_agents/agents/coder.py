@@ -72,19 +72,13 @@ class CodingAgent(BaseAgent):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("existing_code"):
-            prompt_parts.append(
-                f"\n## Existing Code\n```\n{context['existing_code']}\n```"
-            )
+            prompt_parts.append(f"\n## Existing Code\n```\n{context['existing_code']}\n```")
 
         if context.get("specification"):
-            prompt_parts.append(
-                f"\n## Detailed Specification\n{context['specification']}"
-            )
+            prompt_parts.append(f"\n## Detailed Specification\n{context['specification']}")
 
         if context.get("implementation_plan"):
-            prompt_parts.append(
-                f"\n## Implementation Plan\n{context['implementation_plan']}"
-            )
+            prompt_parts.append(f"\n## Implementation Plan\n{context['implementation_plan']}")
 
         if context.get("requirements"):
             prompt_parts.append(f"\n## Requirements\n{context['requirements']}")
@@ -111,17 +105,13 @@ class CodingAgent(BaseAgent):
             prompt_parts.append(f"\n## Error Message\n{context['error_message']}")
 
         if context.get("code_to_refactor"):
-            prompt_parts.append(
-                f"\n## Code to Refactor\n```\n{context['code_to_refactor']}\n```"
-            )
+            prompt_parts.append(f"\n## Code to Refactor\n```\n{context['code_to_refactor']}\n```")
 
         if context.get("target_structure"):
             prompt_parts.append(f"\n## Target Structure\n{context['target_structure']}")
 
         if context.get("file_content"):
-            prompt_parts.append(
-                f"\n## Context File Content\n```\n{context['file_content']}\n```"
-            )
+            prompt_parts.append(f"\n## Context File Content\n```\n{context['file_content']}\n```")
 
         if context.get("directory"):
             prompt_parts.append(f"\n## Working Directory\n{context['directory']}")
@@ -197,9 +187,7 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
                 project_files.append(file_pattern)
 
         if project_files:
-            prompt_parts.append(
-                f"\n## Detected Project Files\n{', '.join(project_files)}"
-            )
+            prompt_parts.append(f"\n## Detected Project Files\n{', '.join(project_files)}")
 
         # Look for common directory structures
         common_dirs = ["src", "lib", "app", "components", "utils", "tests", "test"]
@@ -210,9 +198,7 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
                 f"\n## Project Structure\nDetected directories: {', '.join(found_dirs)}"
             )
 
-    def _post_process_code_response(
-        self, response: str, context: Dict[str, Any]
-    ) -> str:
+    def _post_process_code_response(self, response: str, context: Dict[str, Any]) -> str:
         """Post-process the code response to extract and format code blocks."""
         # If the response contains code blocks, extract the main one
         code_blocks = re.findall(r"```(\w*)\n(.*?)\n```", response, re.DOTALL)

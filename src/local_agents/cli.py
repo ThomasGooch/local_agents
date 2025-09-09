@@ -100,10 +100,7 @@ def handle_common_errors(e: Exception) -> None:
             Panel(
                 f"[red]Unexpected Error[/red]\n\n"
                 f"{e}\n\n"
-                + (
-                    "If this problem persists, please check your configuration "
-                    "and try again."
-                ),
+                + ("If this problem persists, please check your configuration " "and try again."),
                 title="Error",
                 border_style="red",
             )
@@ -145,9 +142,7 @@ def main(ctx: click.Context, version: bool) -> None:
 @click.argument("task", required=True)
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save plan to file")
-@click.option(
-    "--context", "-c", type=click.Path(exists=True), help="Context file or directory"
-)
+@click.option("--context", "-c", type=click.Path(exists=True), help="Context file or directory")
 @click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def plan(
     task: str,
@@ -207,9 +202,7 @@ def plan(
 @click.option("--spec", "-s", help="Detailed specification or requirements")
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save code to file")
-@click.option(
-    "--context", "-c", type=click.Path(exists=True), help="Context file or directory"
-)
+@click.option("--context", "-c", type=click.Path(exists=True), help="Context file or directory")
 @click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def code(
     task: str,
@@ -280,9 +273,7 @@ def code(
 
 @main.command()
 @click.argument("target", required=True)
-@click.option(
-    "--framework", help="Testing framework to use (pytest, unittest, jest, etc.)"
-)
+@click.option("--framework", help="Testing framework to use (pytest, unittest, jest, etc.)")
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save tests to file")
 @click.option("--run", is_flag=True, help="Run tests after generation")
@@ -343,13 +334,9 @@ def test(
 
         if not stream:
             with console.status("[cyan]Generating tests..."):
-                result = agent.execute(
-                    f"Generate tests for {target}", context_data, stream=False
-                )
+                result = agent.execute(f"Generate tests for {target}", context_data, stream=False)
         else:
-            result = agent.execute(
-                f"Generate tests for {target}", context_data, stream=True
-            )
+            result = agent.execute(f"Generate tests for {target}", context_data, stream=True)
 
         result.display()
 
@@ -442,12 +429,8 @@ def review(
 @main.command()
 @click.argument("workflow_name", required=True)
 @click.argument("task", required=True)
-@click.option(
-    "--context", "-c", type=click.Path(exists=True), help="Context file or directory"
-)
-@click.option(
-    "--output-dir", "-o", type=click.Path(), help="Output directory for results"
-)
+@click.option("--context", "-c", type=click.Path(exists=True), help="Context file or directory")
+@click.option("--output-dir", "-o", type=click.Path(), help="Output directory for results")
 @click.option("--stream", is_flag=True, help="Stream output in real-time")
 def workflow(
     workflow_name: str,
@@ -519,33 +502,17 @@ def show():
             str(config_manager.config_path),
             "Configuration file location",
         )
-        table.add_row(
-            "Default Model", config_obj.default_model, "Default model for all agents"
-        )
+        table.add_row("Default Model", config_obj.default_model, "Default model for all agents")
         table.add_row("Ollama Host", config_obj.ollama_host, "Ollama service URL")
-        table.add_row(
-            "Temperature", str(config_obj.temperature), "Model creativity (0.0-2.0)"
-        )
-        table.add_row(
-            "Max Tokens", str(config_obj.max_tokens), "Maximum response length"
-        )
-        table.add_row(
-            "Context Length", str(config_obj.context_length), "Maximum context size"
-        )
+        table.add_row("Temperature", str(config_obj.temperature), "Model creativity (0.0-2.0)")
+        table.add_row("Max Tokens", str(config_obj.max_tokens), "Maximum response length")
+        table.add_row("Context Length", str(config_obj.context_length), "Maximum context size")
         table.add_row("", "", "")  # Separator
         table.add_row("[bold]Agent Models[/bold]", "", "")
-        table.add_row(
-            "Planning Model", config_obj.agents.planning, "Model for planning tasks"
-        )
-        table.add_row(
-            "Coding Model", config_obj.agents.coding, "Model for code generation"
-        )
-        table.add_row(
-            "Testing Model", config_obj.agents.testing, "Model for test creation"
-        )
-        table.add_row(
-            "Review Model", config_obj.agents.reviewing, "Model for code review"
-        )
+        table.add_row("Planning Model", config_obj.agents.planning, "Model for planning tasks")
+        table.add_row("Coding Model", config_obj.agents.coding, "Model for code generation")
+        table.add_row("Testing Model", config_obj.agents.testing, "Model for test creation")
+        table.add_row("Review Model", config_obj.agents.reviewing, "Model for code review")
 
         console.print(table)
 
@@ -591,9 +558,7 @@ def reset(force: bool):
     """Reset configuration to defaults."""
     try:
         if not force:
-            if not click.confirm(
-                "This will reset all configuration to defaults. Continue?"
-            ):
+            if not click.confirm("This will reset all configuration to defaults. Continue?"):
                 console.print("[dim]Configuration reset cancelled[/dim]")
                 return
 
@@ -652,9 +617,7 @@ def validate():
                 f"({len(models)} models available)[/green]"
             )
         except Exception as ollama_error:
-            console.print(
-                f"[yellow]⚠ Ollama connection failed: {ollama_error}[/yellow]"
-            )
+            console.print(f"[yellow]⚠ Ollama connection failed: {ollama_error}[/yellow]")
 
     except Exception as e:
         handle_common_errors(e)
@@ -856,9 +819,7 @@ def optimize():
         if click.confirm("Apply these optimizations?"):
             success = hardware_optimizer.apply_optimization(config_manager, profile)
             if success:
-                console.print(
-                    "[green]✓ Hardware optimization applied successfully[/green]"
-                )
+                console.print("[green]✓ Hardware optimization applied successfully[/green]")
             else:
                 console.print("[red]✗ Failed to apply optimization[/red]")
         else:

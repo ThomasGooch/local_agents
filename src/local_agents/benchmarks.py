@@ -160,9 +160,7 @@ class PerformanceBenchmark:
         """Run a complete benchmark suite."""
         if suite_type not in self.benchmark_tasks:
             available = list(self.benchmark_tasks.keys())
-            raise ValueError(
-                f"Unknown suite type: {suite_type}. Available: {available}"
-            )
+            raise ValueError(f"Unknown suite type: {suite_type}. Available: {available}")
 
         suite_title = f"Running {suite_type.title()} Benchmark Suite"
         console.print(f"[bold blue]{suite_title}[/bold blue]")
@@ -199,9 +197,7 @@ class PerformanceBenchmark:
                             progress.advance(main_task)
                     else:
                         # Concurrent execution
-                        batch_results = self._benchmark_concurrent_agents(
-                            tasks, concurrent_level
-                        )
+                        batch_results = self._benchmark_concurrent_agents(tasks, concurrent_level)
                         all_results.extend(batch_results)
                         progress.advance(main_task, len(tasks))
 
@@ -249,9 +245,7 @@ class PerformanceBenchmark:
                 memory_usage_mb=memory_usage,
                 success=(result.success if hasattr(result, "success") else True),
                 error=result.error if hasattr(result, "error") else None,
-                tokens_generated=(
-                    len(result.output) if hasattr(result, "output") else 0
-                ),
+                tokens_generated=(len(result.output) if hasattr(result, "output") else 0),
                 concurrent_level=concurrent_level,
             )
 
@@ -274,10 +268,7 @@ class PerformanceBenchmark:
         results = []
 
         # Group tasks into batches for concurrent execution
-        batches = [
-            tasks[i : i + concurrent_level]
-            for i in range(0, len(tasks), concurrent_level)
-        ]
+        batches = [tasks[i : i + concurrent_level] for i in range(0, len(tasks), concurrent_level)]
         for batch in batches:
             start_time = time.time()
             start_memory = self._get_memory_usage()
@@ -338,9 +329,7 @@ class PerformanceBenchmark:
         process = psutil.Process()
         return process.memory_info().rss / 1024 / 1024
 
-    def _generate_benchmark_summary(
-        self, results: List[BenchmarkResult]
-    ) -> Dict[str, Any]:
+    def _generate_benchmark_summary(self, results: List[BenchmarkResult]) -> Dict[str, Any]:
         """Generate summary statistics from benchmark results."""
         if not results:
             return {"message": "No benchmark results"}
@@ -367,9 +356,7 @@ class PerformanceBenchmark:
                     "min_execution_time": min(execution_times),
                     "avg_memory_usage": (sum(memory_usages) / len(memory_usages)),
                     "max_memory_usage": max(memory_usages),
-                    "total_tokens_generated": sum(
-                        r.tokens_generated for r in successful_results
-                    ),
+                    "total_tokens_generated": sum(r.tokens_generated for r in successful_results),
                 }
             )
 
@@ -428,9 +415,7 @@ class PerformanceBenchmark:
         title = f"Benchmark Results: {suite.suite_name.title()}"
         console.print(f"\n[bold blue]{title}[/bold blue]")
         console.print(f"Hardware: {suite.hardware_profile}")
-        timestamp_str = time.strftime(
-            "%Y-%m-%d %H:%M:%S", time.localtime(suite.timestamp)
-        )
+        timestamp_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(suite.timestamp))
         console.print(f"Timestamp: {timestamp_str}")
         summary = suite.summary
 
@@ -445,18 +430,10 @@ class PerformanceBenchmark:
         overall_table.add_row("Success Rate", f"{summary['success_rate']:.1f}%")
 
         if "avg_execution_time" in summary:
-            overall_table.add_row(
-                "Avg Execution Time", f"{summary['avg_execution_time']:.2f}s"
-            )
-            overall_table.add_row(
-                "Max Execution Time", f"{summary['max_execution_time']:.2f}s"
-            )
-            overall_table.add_row(
-                "Avg Memory Usage", f"{summary['avg_memory_usage']:.1f}MB"
-            )
-            overall_table.add_row(
-                "Max Memory Usage", f"{summary['max_memory_usage']:.1f}MB"
-            )
+            overall_table.add_row("Avg Execution Time", f"{summary['avg_execution_time']:.2f}s")
+            overall_table.add_row("Max Execution Time", f"{summary['max_execution_time']:.2f}s")
+            overall_table.add_row("Avg Memory Usage", f"{summary['avg_memory_usage']:.1f}MB")
+            overall_table.add_row("Max Memory Usage", f"{summary['max_memory_usage']:.1f}MB")
         console.print(overall_table)
 
         # Performance targets validation
@@ -472,9 +449,7 @@ class PerformanceBenchmark:
             memory_target = targets["memory_target_mb"]
             target_text += f"{memory_status} Memory Usage: < {memory_target}MB\n"
 
-            console.print(
-                Panel(target_text, title="Performance Targets", border_style="blue")
-            )
+            console.print(Panel(target_text, title="Performance Targets", border_style="blue"))
         # Agent statistics table
         if "agent_statistics" in summary:
             agent_table = Table(title="Agent Performance")
@@ -514,9 +489,7 @@ class PerformanceBenchmark:
         return {
             "response_time_target_met": targets["response_time_met"],
             "memory_target_met": targets["memory_target_met"],
-            "overall_success": (
-                targets["response_time_met"] and targets["memory_target_met"]
-            ),
+            "overall_success": (targets["response_time_met"] and targets["memory_target_met"]),
         }
 
     def run_macbook_pro_optimization_test(self) -> BenchmarkSuite:

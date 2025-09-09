@@ -37,17 +37,13 @@ class PlanningAgent(BaseAgent):
         ]
 
         if context.get("file_content"):
-            prompt_parts.append(
-                f"\n## Context File Content\n```\n{context['file_content']}\n```"
-            )
+            prompt_parts.append(f"\n## Context File Content\n```\n{context['file_content']}\n```")
 
         if context.get("directory"):
             prompt_parts.append(f"\n## Working Directory\n{context['directory']}")
 
         if context.get("specification"):
-            prompt_parts.append(
-                f"\n## Additional Specifications\n{context['specification']}"
-            )
+            prompt_parts.append(f"\n## Additional Specifications\n{context['specification']}")
 
         prompt_parts.extend(
             [
@@ -106,9 +102,7 @@ followed.
         """Create a plan specifically for a new feature."""
         context = context or {}
         context["plan_type"] = "feature"
-        return self.execute(
-            f"Plan implementation of new feature: {feature_description}", context
-        )
+        return self.execute(f"Plan implementation of new feature: {feature_description}", context)
 
     def plan_bugfix(
         self, bug_description: str, context: Optional[Dict[str, Any]] = None

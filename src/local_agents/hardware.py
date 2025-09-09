@@ -210,18 +210,11 @@ class HardwareOptimizer:
             and cpu_cores == 6  # Allow some variance
         ):
             mac_model = self.detected_hardware.get("mac_model", "").lower()
-            if "macbook pro" in mac_model and (
-                "i7" in mac_model or "intel" in mac_model
-            ):
+            if "macbook pro" in mac_model and ("i7" in mac_model or "intel" in mac_model):
                 return self.profiles["macbook_pro_intel_i7_16gb"]
 
         # MacBook Air M1 8GB detection
-        if (
-            platform_name == "Darwin"
-            and memory_gb >= 7.5
-            and memory_gb <= 8.5
-            and cpu_cores == 8
-        ):
+        if platform_name == "Darwin" and memory_gb >= 7.5 and memory_gb <= 8.5 and cpu_cores == 8:
             mac_model = self.detected_hardware.get("mac_model", "").lower()
             if "macbook air" in mac_model and "m1" in mac_model:
                 return self.profiles["macbook_air_m1_8gb"]
@@ -256,8 +249,7 @@ class HardwareOptimizer:
             cache_size = 50
 
         profile_name = (
-            f"Custom {tier.title()} Performance "
-            f"({memory_gb}GB RAM, {cpu_cores} cores)"
+            f"Custom {tier.title()} Performance " f"({memory_gb}GB RAM, {cpu_cores} cores)"
         )
         return HardwareProfile(
             name=profile_name,
@@ -291,9 +283,7 @@ class HardwareOptimizer:
             ],
         )
 
-    def get_optimization_config(
-        self, profile: Optional[HardwareProfile] = None
-    ) -> Dict[str, Any]:
+    def get_optimization_config(self, profile: Optional[HardwareProfile] = None) -> Dict[str, Any]:
         """Get optimization configuration for the specified or detected profile."""
         if profile is None:
             profile = self.detect_best_profile()
@@ -306,9 +296,7 @@ class HardwareOptimizer:
             "detected_hardware": self.detected_hardware,
         }
 
-    def apply_optimization(
-        self, config_manager, profile: Optional[HardwareProfile] = None
-    ) -> bool:
+    def apply_optimization(self, config_manager, profile: Optional[HardwareProfile] = None) -> bool:
         """Apply hardware optimization to configuration."""
         if profile is None:
             profile = self.detect_best_profile()
@@ -400,9 +388,7 @@ class HardwareOptimizer:
 
         # Optimization notes
         notes_text = "\n".join(f"• {note}" for note in profile.optimization_notes)
-        console.print(
-            Panel(notes_text, title="Optimization Notes", border_style="blue")
-        )
+        console.print(Panel(notes_text, title="Optimization Notes", border_style="blue"))
 
     def display_all_profiles(self) -> None:
         """Display all available hardware profiles."""
@@ -421,9 +407,7 @@ class HardwareOptimizer:
 
             # Models table
             for model_type, models in profile.recommended_models.items():
-                models_table = Table(
-                    title=f"{model_type.replace('_', ' ').title()} Models"
-                )
+                models_table = Table(title=f"{model_type.replace('_', ' ').title()} Models")
                 models_table.add_column("Agent", style="magenta")
                 models_table.add_column("Model", style="cyan")
 
