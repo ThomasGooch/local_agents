@@ -380,7 +380,9 @@ class TestWorkflowOrchestrator:
             assert step.execution_time >= 0
 
     @patch("local_agents.base.OllamaClient")
-    def test_workflow_continuation_after_non_critical_failures(self, mock_ollama_class, workflow, mock_agents):
+    def test_workflow_continuation_after_non_critical_failures(
+        self, mock_ollama_class, workflow, mock_agents
+    ):
         """Test workflow continues after non-critical step failures."""
         # Set up mock OllamaClient
         mock_client = Mock()
