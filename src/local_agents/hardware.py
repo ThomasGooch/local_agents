@@ -330,7 +330,8 @@ class HardwareOptimizer:
             models = profile.recommended_models.get(
                 "balanced",
                 profile.recommended_models.get(
-                    "speed_optimized", next(iter(profile.recommended_models.values()))
+                    "speed_optimized",
+                    next(iter(profile.recommended_models.values())),
                 ),
             )
 

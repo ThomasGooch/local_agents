@@ -375,7 +375,11 @@ class TestConfigManager:
             "test",
             "review",
         ]
-        assert manager.get_workflow_steps("bug-fix") == ["plan", "code", "test"]
+        assert manager.get_workflow_steps("bug-fix") == [
+            "plan",
+            "code",
+            "test",
+        ]
         assert manager.get_workflow_steps("code-review") == ["review"]
         assert manager.get_workflow_steps("refactor") == [
             "plan",

@@ -73,7 +73,11 @@ def workflow_with_mocks(mock_agents):
     with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
         with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
             with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                with patch.object(
+                    ReviewAgent,
+                    "__new__",
+                    return_value=mock_agents["reviewer"],
+                ):
                     yield workflow, mock_agents
 
 
@@ -87,7 +91,11 @@ class TestWorkflowExecution:
         with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             workflow_name="feature-dev",
                             task="Create a hello world function",
@@ -175,7 +183,11 @@ class TestWorkflowExecution:
         with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             workflow_name="feature-dev",
                             task="Create a hello world function",
@@ -207,7 +219,11 @@ class TestWorkflowExecution:
         with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             workflow_name="feature-dev",
                             task="Create a hello world function",
@@ -321,7 +337,8 @@ class TestWorkflowDependencies:
         with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 result = workflow.execute_workflow(
-                    workflow_name="feature-dev", task="Test successful dependencies"
+                    workflow_name="feature-dev",
+                    task="Test successful dependencies",
                 )
 
         # Both steps should execute successfully

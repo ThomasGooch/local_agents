@@ -26,15 +26,17 @@ class CodingAgent(BaseAgent):
 
     @handle_agent_execution
     def execute(
-        self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
     ) -> TaskResult:
         """Execute coding task."""
         # Initialize file manager if not already done
         if not self.file_manager:
-            # Use output_directory from CLI first, then fallback to directory or current dir
+            # Use output_directory from CLI first, fallback to directory
             working_dir = (
-                context.get("output_directory") or 
-                context.get("directory", ".") if context else "."
+                context.get("output_directory") or context.get("directory", ".") if context else "."
             )
             self.file_manager = FileManager(working_dir)
 
@@ -166,7 +168,7 @@ Please generate high-quality code that:
    - Include configuration files (appsettings.json, .csproj files, etc.)
    - Ensure files follow naming conventions for the target language/framework
 
-Please provide the complete code implementation with proper file paths and 
+Please provide the complete code implementation with proper file paths and
 structure. Format each file clearly with "File: [filepath]" followed by the code block.
 """,
             ]
@@ -196,7 +198,15 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
             prompt_parts.append(f"\n## Detected Project Files\n{', '.join(project_files)}")
 
         # Look for common directory structures
-        common_dirs = ["src", "lib", "app", "components", "utils", "tests", "test"]
+        common_dirs = [
+            "src",
+            "lib",
+            "app",
+            "components",
+            "utils",
+            "tests",
+            "test",
+        ]
         found_dirs = [d for d in common_dirs if (directory / d).exists()]
 
         if found_dirs:

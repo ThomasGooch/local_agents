@@ -80,11 +80,16 @@ class TestWorkflowOrchestrator:
 
         # Replace agent creation with mocked instances using string-based patching
         with patch(
-            "local_agents.agents.planner.PlanningAgent", return_value=mock_agents["planner"]
+            "local_agents.agents.planner.PlanningAgent",
+            return_value=mock_agents["planner"],
         ):
-            with patch("local_agents.agents.coder.CodingAgent", return_value=mock_agents["coder"]):
+            with patch(
+                "local_agents.agents.coder.CodingAgent",
+                return_value=mock_agents["coder"],
+            ):
                 with patch(
-                    "local_agents.agents.tester.TestingAgent", return_value=mock_agents["tester"]
+                    "local_agents.agents.tester.TestingAgent",
+                    return_value=mock_agents["tester"],
                 ):
                     with patch(
                         "local_agents.agents.reviewer.ReviewAgent",
@@ -242,7 +247,11 @@ class TestWorkflowOrchestrator:
         with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow(
                             "feature-dev",
                             "Create a hello world function",
@@ -280,7 +289,11 @@ class TestWorkflowOrchestrator:
         with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
             with patch.object(CodingAgent, "__new__", return_value=mock_agents["coder"]):
                 with patch.object(TestingAgent, "__new__", return_value=mock_agents["tester"]):
-                    with patch.object(ReviewAgent, "__new__", return_value=mock_agents["reviewer"]):
+                    with patch.object(
+                        ReviewAgent,
+                        "__new__",
+                        return_value=mock_agents["reviewer"],
+                    ):
                         result = workflow.execute_workflow("feature-dev", "Create a function")
 
         assert result.success is False

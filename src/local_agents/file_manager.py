@@ -191,7 +191,14 @@ class FileManager:
         language_keywords = {
             "c#": [".net", "csharp", "c#", ".net9", "dotnet"],
             "python": ["python", "py", "django", "flask", "fastapi"],
-            "javascript": ["javascript", "js", "node", "react", "vue", "angular"],
+            "javascript": [
+                "javascript",
+                "js",
+                "node",
+                "react",
+                "vue",
+                "angular",
+            ],
             "typescript": ["typescript", "ts"],
             "java": ["java", "spring", "maven", "gradle"],
             "go": ["go", "golang"],
@@ -287,7 +294,7 @@ class FileManager:
             test_class_match = re.search(r"public\s+class\s+(\w+Tests?)", code)
             if test_class_match:
                 return f"{test_class_match.group(1)}.cs"
-            return f"WeatherApiTests.cs"
+            return "WeatherApiTests.cs"
         elif language == "python":
             return f"test_{index + 1}.py"
         elif language in ["javascript", "typescript"]:
@@ -369,7 +376,10 @@ class FileManager:
         if language.lower() in ["c#", "csharp"]:
             # .NET project structure
             project_files = [
-                (f"{project_name}.csproj", self._get_csproj_template(project_name)),
+                (
+                    f"{project_name}.csproj",
+                    self._get_csproj_template(project_name),
+                ),
                 ("Program.cs", self._get_program_cs_template()),
                 ("appsettings.json", self._get_appsettings_template()),
                 ("Controllers/.gitkeep", ""),
@@ -413,9 +423,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Weather API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Weather API",
         Version = "v1",
         Description = "A simple Weather API built with .NET 9"
     });

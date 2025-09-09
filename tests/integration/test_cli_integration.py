@@ -113,7 +113,11 @@ class TestCLIBasicCommands:
 
     @patch("local_agents.cli.ReviewAgent")
     def test_review_command_success(
-        self, mock_agent_class, cli_runner, mock_successful_agent, temp_directory
+        self,
+        mock_agent_class,
+        cli_runner,
+        mock_successful_agent,
+        temp_directory,
     ):
         """Test successful review command execution."""
         mock_agent_class.return_value = mock_successful_agent
@@ -134,7 +138,11 @@ class TestCLICommandOptions:
 
     @patch("local_agents.cli.PlanningAgent")
     def test_plan_with_output_file(
-        self, mock_agent_class, cli_runner, mock_successful_agent, temp_directory
+        self,
+        mock_agent_class,
+        cli_runner,
+        mock_successful_agent,
+        temp_directory,
     ):
         """Test plan command with output file option."""
         mock_agent_class.return_value = mock_successful_agent
@@ -148,7 +156,11 @@ class TestCLICommandOptions:
 
     @patch("local_agents.cli.PlanningAgent")
     def test_plan_with_context_file(
-        self, mock_agent_class, cli_runner, mock_successful_agent, sample_python_file
+        self,
+        mock_agent_class,
+        cli_runner,
+        mock_successful_agent,
+        sample_python_file,
     ):
         """Test plan command with context file."""
         mock_agent_class.return_value = mock_successful_agent
@@ -193,7 +205,11 @@ class TestCLICommandOptions:
 
     @patch("local_agents.cli.ReviewAgent")
     def test_review_with_focus_option(
-        self, mock_agent_class, cli_runner, mock_successful_agent, sample_python_file
+        self,
+        mock_agent_class,
+        cli_runner,
+        mock_successful_agent,
+        sample_python_file,
     ):
         """Test review command with focus option."""
         mock_agent_class.return_value = mock_successful_agent
@@ -324,7 +340,12 @@ class TestWorkflowCLI:
 
         result = cli_runner.invoke(
             workflow,
-            ["code-review", "Review this code", "--context", str(sample_python_file)],
+            [
+                "code-review",
+                "Review this code",
+                "--context",
+                str(sample_python_file),
+            ],
         )
 
         assert result.exit_code == 0
@@ -347,7 +368,8 @@ class TestWorkflowCLI:
         output_dir = temp_directory / "workflow_output"
 
         result = cli_runner.invoke(
-            workflow, ["feature-dev", "Create feature", "--output-dir", str(output_dir)]
+            workflow,
+            ["feature-dev", "Create feature", "--output-dir", str(output_dir)],
         )
 
         assert result.exit_code == 0
@@ -429,7 +451,11 @@ class TestCLIInputOutput:
 
     @patch("local_agents.cli.PlanningAgent")
     def test_output_file_creation(
-        self, mock_agent_class, cli_runner, mock_successful_agent, temp_directory
+        self,
+        mock_agent_class,
+        cli_runner,
+        mock_successful_agent,
+        temp_directory,
     ):
         """Test that output files are created correctly."""
         mock_agent_class.return_value = mock_successful_agent
@@ -454,7 +480,12 @@ class TestCLIInputOutput:
         mock_agent_class.return_value = mock_successful_agent
 
         result = cli_runner.invoke(
-            plan, ["Analyze this project", "--context", str(sample_project_directory)]
+            plan,
+            [
+                "Analyze this project",
+                "--context",
+                str(sample_project_directory),
+            ],
         )
 
         assert result.exit_code == 0

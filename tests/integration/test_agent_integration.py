@@ -228,7 +228,8 @@ class TestingAgentChaining:
         }
 
         test_result = tester.execute(
-            "Generate comprehensive tests for the calculator function", test_context
+            "Generate comprehensive tests for the calculator function",
+            test_context,
         )
 
         assert test_result.success
@@ -279,7 +280,10 @@ class TestingAgentChaining:
         reviewer = ReviewAgent()
 
         task = "Create a robust calculator function"
-        context = {"language": "python", "requirements": "basic arithmetic operations"}
+        context = {
+            "language": "python",
+            "requirements": "basic arithmetic operations",
+        }
 
         # Step 1: Planning
         plan_result = planner.execute(task, context)
@@ -370,7 +374,10 @@ class TestingAgentContextHandling:
 
     @patch("local_agents.base.OllamaClient")
     def test_agent_handles_rich_context(
-        self, mock_ollama_class, mock_ollama_client_with_responses, sample_python_file
+        self,
+        mock_ollama_class,
+        mock_ollama_client_with_responses,
+        sample_python_file,
     ):
         """Test agent handles context with file content."""
         mock_ollama_class.return_value = mock_ollama_client_with_responses
@@ -425,7 +432,9 @@ class TestingAgentStreamingSupport:
 
         # Test with streaming enabled
         result = planner.execute(
-            "Create implementation plan", {"project": "calculator"}, stream=True
+            "Create implementation plan",
+            {"project": "calculator"},
+            stream=True,
         )
 
         assert result.success

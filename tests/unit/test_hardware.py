@@ -233,7 +233,10 @@ class TestHardwareOptimizer:
         # Mock config manager with failure
         mock_config_manager = Mock()
         mock_config_manager.load_config.return_value = Mock()
-        mock_config_manager.update_config_dict.return_value = (False, ["Error message"])
+        mock_config_manager.update_config_dict.return_value = (
+            False,
+            ["Error message"],
+        )
 
         profile = optimizer.detect_best_profile()
         result = optimizer.apply_optimization(mock_config_manager, profile)

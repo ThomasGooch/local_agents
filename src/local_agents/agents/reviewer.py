@@ -53,15 +53,17 @@ class ReviewAgent(BaseAgent):
 
     @handle_agent_execution
     def execute(
-        self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
     ) -> TaskResult:
         """Execute code review task."""
         # Initialize file manager if not already done
         if not self.file_manager:
-            # Use output_directory from CLI first, then fallback to directory or current dir
+            # Use output_directory from CLI first, fallback to directory
             working_dir = (
-                context.get("output_directory") or 
-                context.get("directory", ".") if context else "."
+                context.get("output_directory") or context.get("directory", ".") if context else "."
             )
             self.file_manager = FileManager(working_dir)
 
@@ -136,7 +138,9 @@ class ReviewAgent(BaseAgent):
 
         if context.get("extract_metrics"):
             prompt_parts.append(
-                "\n## Metrics Extraction\nPlease extract and analyze code metrics including complexity, maintainability, and quality scores."
+                "\n## Metrics Extraction\n"
+                "Please extract and analyze code metrics including complexity, "
+                "maintainability, and quality scores."
             )
 
         # Add review criteria section
@@ -262,7 +266,7 @@ issues by their potential impact.
         context = context or {}
         context["focus_area"] = "security"
         context["code_content"] = code
-        task = "Review this code for security vulnerabilities and potential security issues"
+        task = "Review this code for security vulnerabilities and potential " "security issues"
         return self.execute(task, context)
 
     def review_for_performance(
@@ -296,7 +300,7 @@ issues by their potential impact.
         context["code_content"] = code
         if target_file:
             context["target_file"] = target_file
-        task = "Perform a comprehensive code review covering all aspects of code quality"
+        task = "Perform a comprehensive code review covering all aspects " "of code quality"
         return self.execute(task, context)
 
     def _add_automated_analysis(self, context: Dict[str, Any]) -> None:

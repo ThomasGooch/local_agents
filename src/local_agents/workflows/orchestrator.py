@@ -212,7 +212,10 @@ class Workflow:
                 "steps": ["plan", "code", "test"],
                 "description": "Bug fix workflow",
             },
-            "code-review": {"steps": ["review"], "description": "Code review workflow"},
+            "code-review": {
+                "steps": ["review"],
+                "description": "Code review workflow",
+            },
             "refactor": {
                 "steps": ["plan", "code", "test", "review"],
                 "description": "Code refactoring workflow",
@@ -269,7 +272,8 @@ class Workflow:
             TimeElapsedColumn(),
         ) as progress:
             workflow_task = progress.add_task(
-                f"[cyan]{workflow_name.title()} Workflow", total=len(workflow_steps)
+                f"[cyan]{workflow_name.title()} Workflow",
+                total=len(workflow_steps),
             )
 
             for i, step in enumerate(workflow_steps, 1):

@@ -26,15 +26,17 @@ class TestingAgent(BaseAgent):
 
     @handle_agent_execution
     def execute(
-        self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
+        self,
+        task: str,
+        context: Optional[Dict[str, Any]] = None,
+        stream: bool = False,
     ) -> TaskResult:
         """Execute testing task."""
         # Initialize file manager if not already done
         if not self.file_manager:
-            # Use output_directory from CLI first, then fallback to directory or current dir
+            # Use output_directory from CLI first, fallback to directory
             working_dir = (
-                context.get("output_directory") or 
-                context.get("directory", ".") if context else "."
+                context.get("output_directory") or context.get("directory", ".") if context else "."
             )
             self.file_manager = FileManager(working_dir)
 
@@ -75,9 +77,8 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(f"\n## Target File\n{context['target_file']}")
 
         if context.get("code_content") or context.get("code_to_test"):
-            prompt_parts.append(
-                f"\n## Code to Test\n```\n{context.get('code_content') or context.get('code_to_test')}\n```"
-            )
+            code_content = context.get("code_content") or context.get("code_to_test")
+            prompt_parts.append(f"\n## Code to Test\n```\n{code_content}\n```")
 
         if context.get("target_directory"):
             prompt_parts.append(f"\n## Target Directory\n{context['target_directory']}")
@@ -131,9 +132,12 @@ class TestingAgent(BaseAgent):
                 requirements_text = str(context["coverage_requirements"]).replace("_", " ")
             prompt_parts.append(f"\n## Coverage Requirements\n{requirements_text}")
         if context.get("security_concerns"):
-            prompt_parts.append(
-                f"\n## Security Concerns\n{', '.join(context['security_concerns']) if isinstance(context['security_concerns'], list) else context['security_concerns']}"
-            )
+            concerns = context["security_concerns"]
+            if isinstance(concerns, list):
+                concerns_text = ", ".join(concerns)
+            else:
+                concerns_text = concerns
+            prompt_parts.append(f"\n## Security Concerns\n{concerns_text}")
 
         if context.get("performance_requirements"):
             prompt_parts.append(
@@ -149,9 +153,12 @@ class TestingAgent(BaseAgent):
             prompt_parts.append(f"\n## Error Details\n{context['error_detail']}")
 
         if context.get("external_dependencies"):
-            prompt_parts.append(
-                f"\n## External Dependencies\n{', '.join(context['external_dependencies']) if isinstance(context['external_dependencies'], list) else context['external_dependencies']}"
-            )
+            deps = context["external_dependencies"]
+            if isinstance(deps, list):
+                deps_text = ", ".join(deps)
+            else:
+                deps_text = deps
+            prompt_parts.append(f"\n## External Dependencies\n{deps_text}")
 
         if context.get("mock_strategy"):
             prompt_parts.append(f"\n## Mock Strategy\n{context['mock_strategy']}")

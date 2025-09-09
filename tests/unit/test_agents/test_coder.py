@@ -136,7 +136,11 @@ class TestCodingAgent:
     def test_implement_feature(self, coder_agent):
         """Test implementing a feature."""
         feature_description = "Shopping cart functionality"
-        context = {"language": "python", "framework": "flask", "database": "postgresql"}
+        context = {
+            "language": "python",
+            "framework": "flask",
+            "database": "postgresql",
+        }
 
         result = coder_agent.implement_feature(feature_description, context)
 

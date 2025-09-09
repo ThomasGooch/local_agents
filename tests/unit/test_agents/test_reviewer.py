@@ -140,7 +140,9 @@ The code is well-structured with good error handling practices.
     def test_run_static_analysis_success(self, mock_run, mock_exists, reviewer_agent):
         """Test successful static analysis execution."""
         mock_run.return_value = Mock(
-            returncode=0, stdout="test.py:1:1: E302 expected 2 blank lines", stderr=""
+            returncode=0,
+            stdout="test.py:1:1: E302 expected 2 blank lines",
+            stderr="",
         )
 
         result = reviewer_agent._run_static_analysis("test.py", "flake8")
@@ -262,7 +264,10 @@ The code is well-structured with good error handling practices.
                 "language": "java",
                 "code": "public void hello() { System.out.println('Hello'); }",
             },
-            {"language": "go", "code": "func hello() { fmt.Println('Hello') }"},
+            {
+                "language": "go",
+                "code": "func hello() { fmt.Println('Hello') }",
+            },
         ]
 
         for lang_context in languages:
@@ -361,7 +366,10 @@ The code is well-structured with good error handling practices.
         ]
 
         task = "Review with fallback analysis"
-        context = {"code_content": "def test(): pass", "enable_static_analysis": True}
+        context = {
+            "code_content": "def test(): pass",
+            "enable_static_analysis": True,
+        }
 
         result = reviewer_agent.execute(task, context)
 

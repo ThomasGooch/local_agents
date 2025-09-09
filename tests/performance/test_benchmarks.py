@@ -215,7 +215,9 @@ class UserAuthenticator:
         """Test review agent meets < 60 second benchmark (including static analysis)."""
         # Mock static analysis tools
         mock_subprocess.return_value = Mock(
-            returncode=0, stdout="test.py:1:1: E302 expected 2 blank lines", stderr=""
+            returncode=0,
+            stdout="test.py:1:1: E302 expected 2 blank lines",
+            stderr="",
         )
 
         agent = ReviewAgent(model="test:model", ollama_client=mock_ollama_client)
@@ -334,10 +336,14 @@ class TestWorkflowPerformanceBenchmarks:
         performance_monitor.start_monitoring()
 
         with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents_for_workflow["planner"]
+            PlanningAgent,
+            "__new__",
+            return_value=mock_agents_for_workflow["planner"],
         ):
             with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents_for_workflow["coder"]
+                CodingAgent,
+                "__new__",
+                return_value=mock_agents_for_workflow["coder"],
             ):
                 with patch.object(
                     TestingAgent,
@@ -387,10 +393,14 @@ class TestWorkflowPerformanceBenchmarks:
         performance_monitor.start_monitoring()
 
         with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents_for_workflow["planner"]
+            PlanningAgent,
+            "__new__",
+            return_value=mock_agents_for_workflow["planner"],
         ):
             with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents_for_workflow["coder"]
+                CodingAgent,
+                "__new__",
+                return_value=mock_agents_for_workflow["coder"],
             ):
                 with patch.object(
                     TestingAgent,
@@ -403,7 +413,10 @@ class TestWorkflowPerformanceBenchmarks:
                         {
                             "bug_report": "JWT tokens can be forged due to missing signature validation",
                             "priority": "critical",
-                            "affected_components": ["authentication", "authorization"],
+                            "affected_components": [
+                                "authentication",
+                                "authorization",
+                            ],
                         },
                     )
 
@@ -426,14 +439,20 @@ class TestWorkflowPerformanceBenchmarks:
         performance_monitor.start_monitoring()
 
         with patch.object(
-            ReviewAgent, "__new__", return_value=mock_agents_for_workflow["reviewer"]
+            ReviewAgent,
+            "__new__",
+            return_value=mock_agents_for_workflow["reviewer"],
         ):
             result = workflow.execute_workflow(
                 "code-review",
                 "Review complete authentication module for security and performance",
                 {
                     "code_files": ["auth.py", "models.py", "utils.py"],
-                    "focus_areas": ["security", "performance", "maintainability"],
+                    "focus_areas": [
+                        "security",
+                        "performance",
+                        "maintainability",
+                    ],
                 },
             )
 
@@ -468,10 +487,14 @@ class TestMemoryUsageBenchmarks:
         ]
 
         with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents_for_workflow["planner"]
+            PlanningAgent,
+            "__new__",
+            return_value=mock_agents_for_workflow["planner"],
         ):
             with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents_for_workflow["coder"]
+                CodingAgent,
+                "__new__",
+                return_value=mock_agents_for_workflow["coder"],
             ):
                 with patch.object(
                     TestingAgent,
@@ -602,10 +625,14 @@ class TestScalabilityBenchmarks:
 
         results = []
         with patch.object(
-            PlanningAgent, "__new__", return_value=mock_agents_for_workflow["planner"]
+            PlanningAgent,
+            "__new__",
+            return_value=mock_agents_for_workflow["planner"],
         ):
             with patch.object(
-                CodingAgent, "__new__", return_value=mock_agents_for_workflow["coder"]
+                CodingAgent,
+                "__new__",
+                return_value=mock_agents_for_workflow["coder"],
             ):
                 with patch.object(
                     TestingAgent,

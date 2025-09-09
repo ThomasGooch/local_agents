@@ -61,8 +61,16 @@ class PerformanceBenchmark:
     def __init__(self):
         self.benchmark_tasks = {
             "quick": [
-                ("plan", "Create a simple Hello World application", "llama3.1:8b"),
-                ("code", "Write a Python function to add two numbers", "codellama:7b"),
+                (
+                    "plan",
+                    "Create a simple Hello World application",
+                    "llama3.1:8b",
+                ),
+                (
+                    "code",
+                    "Write a Python function to add two numbers",
+                    "codellama:7b",
+                ),
                 (
                     "test",
                     "Create a unit test for a basic function",
@@ -96,7 +104,11 @@ class PerformanceBenchmark:
                     "Create integration tests for a web service",
                     "deepseek-coder:6.7b",
                 ),
-                ("review", "Review a complex multi-file codebase", "llama3.1:8b"),
+                (
+                    "review",
+                    "Review a complex multi-file codebase",
+                    "llama3.1:8b",
+                ),
                 (
                     "review",
                     "Perform security review of authentication code",
@@ -139,7 +151,11 @@ class PerformanceBenchmark:
                     "Security audit of distributed system",
                     "llama3.1:70b-instruct-q4_0",
                 ),
-                ("review", "Performance analysis of data pipeline", "llama3.1:8b"),
+                (
+                    "review",
+                    "Performance analysis of data pipeline",
+                    "llama3.1:8b",
+                ),
             ],
         }
 
@@ -267,7 +283,7 @@ class PerformanceBenchmark:
         """Benchmark concurrent agent execution."""
         results = []
 
-        # Group tasks into batches for concurrent execution
+        # Group tasks into batches for concurrent executions
         batches = [tasks[i : i + concurrent_level] for i in range(0, len(tasks), concurrent_level)]
         for batch in batches:
             start_time = time.time()
@@ -449,7 +465,13 @@ class PerformanceBenchmark:
             memory_target = targets["memory_target_mb"]
             target_text += f"{memory_status} Memory Usage: < {memory_target}MB\n"
 
-            console.print(Panel(target_text, title="Performance Targets", border_style="blue"))
+            console.print(
+                Panel(
+                    target_text,
+                    title="Performance Targets",
+                    border_style="blue",
+                )
+            )
         # Agent statistics table
         if "agent_statistics" in summary:
             agent_table = Table(title="Agent Performance")

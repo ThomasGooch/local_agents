@@ -76,7 +76,10 @@ class TestBaseAgent:
             def execute(self, task, context=None):
                 pass
 
-        with patch("local_agents.base.get_model_for_agent", return_value="config:model"):
+        with patch(
+            "local_agents.base.get_model_for_agent",
+            return_value="config:model",
+        ):
             agent = TestingAgent(
                 agent_type="test",
                 role="Test Agent",
@@ -268,7 +271,12 @@ class TestTaskResult:
     @patch("local_agents.base.console.print")
     def test_display_success(self, mock_print):
         """Test displaying successful result."""
-        result = TaskResult(success=True, output="Test output", agent_type="test", task="Test task")
+        result = TaskResult(
+            success=True,
+            output="Test output",
+            agent_type="test",
+            task="Test task",
+        )
 
         result.display()
         mock_print.assert_called_once()
