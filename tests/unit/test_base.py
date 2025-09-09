@@ -25,7 +25,7 @@ class TestBaseAgent:
     def test_agent(self, mock_ollama_client):
         """Create a test agent implementation."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 return TaskResult(
                     success=True,
@@ -35,7 +35,7 @@ class TestBaseAgent:
                     context=context,
                 )
 
-        return TestAgent(
+        return TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -46,11 +46,11 @@ class TestBaseAgent:
     def test_agent_initialization(self, mock_ollama_client):
         """Test agent initialization."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -72,12 +72,12 @@ class TestBaseAgent:
         mock_config.max_tokens = 2048
         mock_get_config.return_value = mock_config
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
         with patch("local_agents.base.get_model_for_agent", return_value="config:model"):
-            agent = TestAgent(
+            agent = TestingAgent(
                 agent_type="test",
                 role="Test Agent",
                 goal="Test goal",
@@ -93,12 +93,12 @@ class TestBaseAgent:
         mock_ollama_client.is_model_available.return_value = False
         mock_ollama_client.pull_model.return_value = False
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
         with pytest.raises(RuntimeError, match="Failed to pull model"):
-            TestAgent(
+            TestingAgent(
                 agent_type="test",
                 role="Test Agent",
                 goal="Test goal",
@@ -111,11 +111,11 @@ class TestBaseAgent:
         mock_ollama_client.is_model_available.return_value = False
         mock_ollama_client.pull_model.return_value = True
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -302,12 +302,12 @@ class TestHandleAgentExecutionDecorator:
     def test_decorator_success_case(self, mock_ollama_client):
         """Test decorator with successful execution."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 return self._create_success_result("success output", task, context)
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -325,12 +325,12 @@ class TestHandleAgentExecutionDecorator:
     def test_decorator_exception_handling(self, mock_ollama_client):
         """Test decorator handles exceptions properly."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 raise ValueError("Test exception")
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -348,14 +348,14 @@ class TestHandleAgentExecutionDecorator:
     def test_decorator_context_normalization(self, mock_ollama_client):
         """Test decorator normalizes None context to empty dict."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 # Verify context is normalized
                 assert context == {}
                 return self._create_success_result("success", task, context)
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -370,13 +370,13 @@ class TestHandleAgentExecutionDecorator:
     def test_decorator_preserves_context(self, mock_ollama_client):
         """Test decorator preserves existing context."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 assert context["key"] == "value"
                 return self._create_success_result("success", task, context)
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -393,7 +393,7 @@ class TestHandleAgentExecutionDecorator:
     def test_decorator_handles_ollama_errors(self, mock_ollama_client):
         """Test decorator handles OllamaClient-specific errors."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 response = self._call_ollama("test prompt")
@@ -402,7 +402,7 @@ class TestHandleAgentExecutionDecorator:
         # Mock Ollama client to raise connection error
         mock_ollama_client.generate.side_effect = ConnectionError("Cannot connect to Ollama")
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -418,12 +418,12 @@ class TestHandleAgentExecutionDecorator:
     def test_decorator_timeout_handling(self, mock_ollama_client):
         """Test decorator handles timeout errors."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 raise TimeoutError("Request timed out after 30 seconds")
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -452,11 +452,11 @@ class TestBaseAgentAdvanced:
     def test_create_success_result_helper(self, mock_ollama_client):
         """Test _create_success_result helper method."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 return self._create_success_result("test output", task, context)
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -477,11 +477,11 @@ class TestBaseAgentAdvanced:
     def test_create_success_result_with_none_context(self, mock_ollama_client):
         """Test _create_success_result with None context."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -499,12 +499,12 @@ class TestBaseAgentAdvanced:
         mock_client.is_model_available.return_value = False
         mock_client.pull_model.return_value = False
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
         with pytest.raises(RuntimeError, match="Failed to pull model"):
-            TestAgent(
+            TestingAgent(
                 agent_type="test",
                 role="Test Agent",
                 goal="Test goal",
@@ -518,11 +518,11 @@ class TestBaseAgentAdvanced:
         mock_ollama_client.is_model_available.side_effect = [False, True]
         mock_ollama_client.pull_model.return_value = True
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             def execute(self, task, context=None):
                 pass
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",
@@ -545,11 +545,11 @@ class TestBaseAgentAdvanced:
                 mock_get_config.return_value = mock_config
                 mock_get_model.return_value = "config:model"
 
-                class TestAgent(BaseAgent):
+                class TestingAgent(BaseAgent):
                     def execute(self, task, context=None):
                         pass
 
-                agent = TestAgent(
+                agent = TestingAgent(
                     agent_type="test",
                     role="Test Agent",
                     goal="Test goal",
@@ -564,7 +564,7 @@ class TestBaseAgentAdvanced:
     def test_error_handling_chain(self, mock_ollama_client):
         """Test complete error handling chain."""
 
-        class TestAgent(BaseAgent):
+        class TestingAgent(BaseAgent):
             @handle_agent_execution
             def execute(self, task, context=None, stream=False):
                 # Simulate different types of errors
@@ -579,7 +579,7 @@ class TestBaseAgentAdvanced:
                 else:
                     raise ValueError("Generic error")
 
-        agent = TestAgent(
+        agent = TestingAgent(
             agent_type="test",
             role="Test Agent",
             goal="Test goal",

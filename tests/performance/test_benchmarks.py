@@ -94,7 +94,7 @@ def performance_monitor():
     return PerformanceMonitor()
 
 
-class TestAgentPerformanceBenchmarks:
+class TestingAgentPerformanceBenchmarks:
     """Test individual agent performance benchmarks."""
 
     def test_planning_agent_performance_benchmark(self, mock_ollama_client, performance_monitor):
