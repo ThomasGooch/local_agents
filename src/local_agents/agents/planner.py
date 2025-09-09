@@ -39,8 +39,10 @@ class PlanningAgent(BaseAgent):
         if context.get("file_content"):
             prompt_parts.append(f"\n## Context File Content\n```\n{context['file_content']}\n```")
 
-        if context.get("directory"):
-            prompt_parts.append(f"\n## Working Directory\n{context['directory']}")
+        # Use output_directory or directory for context
+        work_dir = context.get("output_directory") or context.get("directory")
+        if work_dir:
+            prompt_parts.append(f"\n## Working Directory\n{work_dir}")
 
         if context.get("specification"):
             prompt_parts.append(f"\n## Additional Specifications\n{context['specification']}")
