@@ -1,5 +1,7 @@
 """Integration tests for Phase 2 performance features."""
 
+from unittest.mock import Mock, patch
+
 from local_agents.agents import CodingAgent, PlanningAgent, ReviewAgent, TestingAgent
 from local_agents.benchmarks import benchmark_system
 from local_agents.config import config_manager
@@ -112,8 +114,16 @@ class TestPerformanceIntegration:
         assert targets["workflow_time"] > 0
         assert targets["startup_time"] > 0
 
-    def test_agent_creation_with_performance_features(self):
+    @patch("local_agents.base.OllamaClient")
+    def test_agent_creation_with_performance_features(self, mock_ollama_class):
         """Test that agents can be created with performance enhancements active."""
+        # Set up mock OllamaClient
+        mock_client = Mock()
+        mock_client.is_model_available.return_value = True
+        mock_client.pull_model.return_value = True
+        mock_client.generate.return_value = "Mock output"
+        mock_ollama_class.return_value = mock_client
+
         # Test agent creation doesn't break with performance features
         planner = PlanningAgent()
         coder = CodingAgent()
