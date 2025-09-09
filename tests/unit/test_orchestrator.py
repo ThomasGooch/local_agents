@@ -357,11 +357,17 @@ class TestWorkflowOrchestrator:
                 assert workflow.completed_steps["code"] is True
                 assert "code_output" in workflow.current_context
 
-    @pytest.mark.skip(reason="Test hangs due to Rich console output in CI - needs investigation")
-    def test_workflow_execution_time_tracking(self, workflow, mock_agents):
+    @patch("local_agents.base.OllamaClient")
+    def test_workflow_execution_time_tracking(self, mock_ollama_class, workflow, mock_agents):
         """Test that execution times are properly tracked."""
-        with patch.object(PlanningAgent, "__new__", return_value=mock_agents["planner"]):
-            result = workflow.execute_workflow("code-review", "Review code")
+        # Set up mock OllamaClient
+        mock_client = Mock()
+        mock_client.is_model_available.return_value = True
+        mock_client.pull_model.return_value = True
+        mock_client.generate.return_value = "Mock review output"
+        mock_ollama_class.return_value = mock_client
+
+        result = workflow.execute_workflow("code-review", "Review code")
 
         assert result.total_execution_time > 0
         assert result.execution_time_formatted is not None
@@ -373,9 +379,16 @@ class TestWorkflowOrchestrator:
         for step in result.steps:
             assert step.execution_time >= 0
 
-    @pytest.mark.skip(reason="Test hangs due to Rich console output in CI - needs investigation")
-    def test_workflow_continuation_after_non_critical_failures(self, workflow, mock_agents):
+    @patch("local_agents.base.OllamaClient")
+    def test_workflow_continuation_after_non_critical_failures(self, mock_ollama_class, workflow, mock_agents):
         """Test workflow continues after non-critical step failures."""
+        # Set up mock OllamaClient
+        mock_client = Mock()
+        mock_client.is_model_available.return_value = True
+        mock_client.pull_model.return_value = True
+        mock_client.generate.return_value = "Mock output"
+        mock_ollama_class.return_value = mock_client
+
         # Configure failure behavior
         workflow.critical_steps = ["plan"]  # Only plan is critical
 

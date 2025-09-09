@@ -136,14 +136,21 @@ best practices.
     }
 
     def mock_generate(model, prompt, **kwargs):
-        # Determine response based on system prompt or model type
-        if "planner" in model.lower() or "Planning" in prompt:
-            return responses["plan"]
-        elif "coder" in model.lower() or "Code Generation" in prompt:
-            return responses["code"]
-        elif "test" in model.lower() or "Test Generation" in prompt:
+        # Determine response based on prompt content first (more reliable)
+        if "Test Generation Task" in prompt or "QA Engineer" in prompt or "test suites" in prompt:
             return responses["test"]
-        elif "review" in model.lower() or "Code Review" in prompt:
+        elif "Code Generation Task" in prompt:
+            return responses["code"]
+        elif "Code Review Task" in prompt or "Code Review" in prompt:
+            return responses["review"]
+        elif "Planning" in prompt:
+            return responses["plan"]
+        # Fallback to model name matching
+        elif "planner" in model.lower():
+            return responses["plan"]
+        elif "codellama" in model.lower():
+            return responses["code"]
+        elif "review" in model.lower():
             return responses["review"]
         else:
             return responses["plan"]  # Default
