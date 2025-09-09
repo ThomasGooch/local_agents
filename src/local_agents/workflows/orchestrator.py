@@ -2,6 +2,7 @@
 
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Type, Union
 
 from rich.console import Console
@@ -246,6 +247,9 @@ class Workflow:
 
         self.current_context = initial_context or {}
         self.current_context["main_task"] = task
+        # Pass current working directory to agents
+        if "directory" not in self.current_context:
+            self.current_context["directory"] = str(Path.cwd())
 
         workflow_steps = self._get_workflow_definition(workflow_name)
         if not workflow_steps:

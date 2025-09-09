@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ..base import BaseAgent, TaskResult, handle_agent_execution
+from ..file_manager import FileManager
 
 
 class TestingAgent(BaseAgent):
@@ -21,12 +22,18 @@ class TestingAgent(BaseAgent):
             model=model,
             **kwargs,
         )
+        self.file_manager = None
 
     @handle_agent_execution
     def execute(
         self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
     ) -> TaskResult:
         """Execute testing task."""
+        # Initialize file manager if not already done
+        if not self.file_manager:
+            working_dir = context.get("directory", ".") if context else "."
+            self.file_manager = FileManager(working_dir)
+
         prompt = self._build_testing_prompt(task, context)
         response = self._call_ollama(prompt, stream=stream)
 
@@ -35,6 +42,21 @@ class TestingAgent(BaseAgent):
             test_output = self._run_tests(context)
             if test_output:
                 response += f"\n\n## Test Execution Results\n\n{test_output}"
+
+        # Create test files if enabled (default to True for feature-dev workflows)
+        context_with_agent = context.copy() if context else {}
+        context_with_agent["agent_type"] = "test"
+        context_with_agent["task"] = task
+
+        # Skip file creation during unit tests to improve performance
+        if context.get("create_files", True) and not context.get("_test_mode", False):
+            created_files = self.file_manager.extract_and_write_files_from_response(
+                response, context_with_agent
+            )
+            if created_files:
+                # Add file creation info to the output
+                file_list = "\n".join(f"- {f}" for f in created_files)
+                response += f"\n\n## Created Test Files:\n{file_list}"
 
         return self._create_success_result(response, task, context)
 
@@ -60,9 +82,7 @@ class TestingAgent(BaseAgent):
         if context.get("language"):
             prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
         if context.get("framework"):
-            prompt_parts.append(
-                f"\n## Framework\nFramework: {context['framework']}"
-            )
+            prompt_parts.append(f"\n## Framework\nFramework: {context['framework']}")
 
         if context.get("target_description"):
             prompt_parts.append(
@@ -70,62 +90,50 @@ class TestingAgent(BaseAgent):
             )
 
         # Handle both 'specifications' and 'test_specifications' keys
-        specifications = context.get("specifications") or context.get("test_specifications")
+        specifications = context.get("specifications") or context.get(
+            "test_specifications"
+        )
         if specifications:
             if isinstance(specifications, list):
                 spec_text = "\n- " + "\n- ".join(specifications)
             else:
                 spec_text = specifications
-            prompt_parts.append(
-                f"\n## Test Specifications\n{spec_text}"
-            )
+            prompt_parts.append(f"\n## Test Specifications\n{spec_text}")
         if context.get("implementation_plan"):
             prompt_parts.append(
                 f"\n## Implementation Plan\n{context['implementation_plan']}"
             )
 
         if context.get("requirements"):
-            prompt_parts.append(
-                f"\n## Requirements\n{context['requirements']}"
-            )
+            prompt_parts.append(f"\n## Requirements\n{context['requirements']}")
 
         if context.get("style_guide"):
-            prompt_parts.append(
-                f"\n## Style Guide\n{context['style_guide']}"
-            )
+            prompt_parts.append(f"\n## Style Guide\n{context['style_guide']}")
 
         if context.get("test_type"):
-            prompt_parts.append(
-                f"\n## Test Type\n{context['test_type']}"
-            )
-
+            prompt_parts.append(f"\n## Test Type\n{context['test_type']}")
 
         if context.get("format_type"):
-            prompt_parts.append(
-                f"\n## Format Type\n{context['format_type']}"
-            )
+            prompt_parts.append(f"\n## Format Type\n{context['format_type']}")
 
         if context.get("data_spec"):
-            prompt_parts.append(
-                f"\n## Data Specification\n{context['data_spec']}"
-            )
+            prompt_parts.append(f"\n## Data Specification\n{context['data_spec']}")
 
         if context.get("api_spec"):
-            prompt_parts.append(
-                f"\n## API Specification\n{context['api_spec']}"
-            )
-
+            prompt_parts.append(f"\n## API Specification\n{context['api_spec']}")
 
         if context.get("coverage_requirements"):
-            if isinstance(context['coverage_requirements'], list):
+            if isinstance(context["coverage_requirements"], list):
                 # Convert underscores to spaces for better readability
-                formatted_requirements = [req.replace('_', ' ') for req in context['coverage_requirements']]
-                requirements_text = ', '.join(formatted_requirements)
+                formatted_requirements = [
+                    req.replace("_", " ") for req in context["coverage_requirements"]
+                ]
+                requirements_text = ", ".join(formatted_requirements)
             else:
-                requirements_text = str(context['coverage_requirements']).replace('_', ' ')
-            prompt_parts.append(
-                f"\n## Coverage Requirements\n{requirements_text}"
-            )
+                requirements_text = str(context["coverage_requirements"]).replace(
+                    "_", " "
+                )
+            prompt_parts.append(f"\n## Coverage Requirements\n{requirements_text}")
         if context.get("security_concerns"):
             prompt_parts.append(
                 f"\n## Security Concerns\n{', '.join(context['security_concerns']) if isinstance(context['security_concerns'], list) else context['security_concerns']}"
@@ -137,18 +145,12 @@ class TestingAgent(BaseAgent):
             )
 
         if context.get("test_results"):
-            prompt_parts.append(
-                f"\n## Test Results\n{context['test_results']}"
-            )
+            prompt_parts.append(f"\n## Test Results\n{context['test_results']}")
 
         if context.get("test_data"):
-            prompt_parts.append(
-                f"\n## Test Data\n{context['test_data']}"
-            )
+            prompt_parts.append(f"\n## Test Data\n{context['test_data']}")
         if context.get("error_detail"):
-            prompt_parts.append(
-                f"\n## Error Details\n{context['error_detail']}"
-            )
+            prompt_parts.append(f"\n## Error Details\n{context['error_detail']}")
 
         if context.get("external_dependencies"):
             prompt_parts.append(
@@ -156,43 +158,33 @@ class TestingAgent(BaseAgent):
             )
 
         if context.get("mock_strategy"):
-            prompt_parts.append(
-                f"\n## Mock Strategy\n{context['mock_strategy']}"
-            )
+            prompt_parts.append(f"\n## Mock Strategy\n{context['mock_strategy']}")
 
         if context.get("test_command"):
-            prompt_parts.append(
-                f"\n## Test Command\n{context['test_command']}"
-            )
+            prompt_parts.append(f"\n## Test Command\n{context['test_command']}")
 
         if context.get("expected_results"):
-            prompt_parts.append(
-                f"\n## Expected Results\n{context['expected_results']}"
-            )
+            prompt_parts.append(f"\n## Expected Results\n{context['expected_results']}")
 
         if context.get("failure_details"):
-            prompt_parts.append(
-                f"\n## Failure Details\n{context['failure_details']}"
-            )
+            prompt_parts.append(f"\n## Failure Details\n{context['failure_details']}")
 
         if context.get("dependencies"):
-            prompt_parts.append(
-                f"\n## Dependencies\n{context['dependencies']}"
-            )
+            prompt_parts.append(f"\n## Dependencies\n{context['dependencies']}")
 
         if context.get("database_setup"):
-            prompt_parts.append(
-                f"\n## Database Setup\n{context['database_setup']}"
-            )
+            prompt_parts.append(f"\n## Database Setup\n{context['database_setup']}")
         prompt_parts.extend(
             [
                 "\n## Test Coverage Requirements",
-                ("\nThis test suite should include:"
-                + "\n- Happy path scenarios"
-                + "\n- Edge cases and boundary conditions"
-                + "\n- Error conditions and exception handling"
-                + "\n- Input validation and data integrity tests"
-                + "\n- Integration and workflow tests"),
+                (
+                    "\nThis test suite should include:"
+                    + "\n- Happy path scenarios"
+                    + "\n- Edge cases and boundary conditions"
+                    + "\n- Error conditions and exception handling"
+                    + "\n- Input validation and data integrity tests"
+                    + "\n- Integration and workflow tests"
+                ),
                 "\n## Testing Instructions",
                 """
 Please generate comprehensive tests that:

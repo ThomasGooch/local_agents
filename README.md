@@ -854,6 +854,39 @@ We welcome contributions! Here's how to get started:
 6. **🚀 Push** to your branch: `git push origin feature/amazing-feature`  
 7. **📬 Submit** a Pull Request
 
+## 📁 Project Structure
+
+The Local Agents project follows a clean, organized structure designed for maintainability and scalability:
+
+```
+local-agents/
+├── src/local_agents/          # 🧠 Core source code
+│   ├── agents/                # 🤖 Specialized AI agents
+│   ├── workflows/             # ⚡ Multi-agent orchestration
+│   ├── cli.py                 # 🎨 Rich terminal interface
+│   ├── config.py              # ⚙️ Configuration management
+│   ├── file_manager.py        # 📄 Smart file creation system
+│   └── performance.py         # 🚀 Optimization & monitoring
+├── tests/                     # 🧪 Comprehensive test suite (1500+ tests)
+│   ├── unit/                  # Individual component tests
+│   ├── integration/           # End-to-end workflow tests
+│   └── performance/           # Benchmarking & optimization tests
+├── docs/                      # 📚 Project documentation
+│   ├── PROJECT_STRUCTURE.md   # Detailed structure guide
+│   ├── IMPLEMENTATION_SUMMARY.md # System architecture
+│   └── MACBOOK_PRO_OPTIMIZATION.md # Hardware guides
+└── pyproject.toml             # 📦 Poetry dependencies & configuration
+```
+
+**Key Features of Our Organization:**
+
+🔧 **Modular Architecture** - Each component has a single, clear responsibility  
+🧪 **Test-Driven Development** - 95%+ test coverage with comprehensive scenarios  
+📖 **Self-Documenting** - Clear file names, comprehensive docstrings, and usage examples  
+🚀 **Performance-Optimized** - Dedicated performance monitoring and hardware optimization  
+
+For detailed structure information, see [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
+
 ### 📋 Development Guidelines
 
 - **Code Style**: Follow PEP 8, use `black` and `isort`

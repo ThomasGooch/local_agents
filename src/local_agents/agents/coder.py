@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ..base import BaseAgent, TaskResult, handle_agent_execution
+from ..file_manager import FileManager
 
 
 class CodingAgent(BaseAgent):
@@ -21,17 +22,38 @@ class CodingAgent(BaseAgent):
             model=model,
             **kwargs,
         )
+        self.file_manager = None
 
     @handle_agent_execution
     def execute(
         self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
     ) -> TaskResult:
         """Execute coding task."""
+        # Initialize file manager if not already done
+        if not self.file_manager:
+            working_dir = context.get("directory", ".") if context else "."
+            self.file_manager = FileManager(working_dir)
+
         prompt = self._build_coding_prompt(task, context)
         response = self._call_ollama(prompt, stream=stream)
 
         # Post-process response to extract code if needed
         processed_output = self._post_process_code_response(response, context)
+
+        # Create files if enabled (default to True for feature-dev workflows)
+        context_with_agent = context.copy() if context else {}
+        context_with_agent["agent_type"] = "code"
+        context_with_agent["task"] = task
+
+        # Skip file creation during unit tests to improve performance
+        if context.get("create_files", True) and not context.get("_test_mode", False):
+            created_files = self.file_manager.extract_and_write_files_from_response(
+                processed_output, context_with_agent
+            )
+            if created_files:
+                # Add file creation info to the output
+                file_list = "\n".join(f"- {f}" for f in created_files)
+                processed_output += f"\n\n## Created Files:\n{file_list}"
 
         return self._create_success_result(processed_output, task, context)
 
@@ -65,44 +87,28 @@ class CodingAgent(BaseAgent):
             )
 
         if context.get("requirements"):
-            prompt_parts.append(
-                f"\n## Requirements\n{context['requirements']}"
-            )
+            prompt_parts.append(f"\n## Requirements\n{context['requirements']}")
 
         if context.get("style_guide"):
-            prompt_parts.append(
-                f"\n## Style Guide\n{context['style_guide']}"
-            )
+            prompt_parts.append(f"\n## Style Guide\n{context['style_guide']}")
 
         if context.get("docstring_style"):
-            prompt_parts.append(
-                f"\n## Docstring Style\n{context['docstring_style']}"
-            )
+            prompt_parts.append(f"\n## Docstring Style\n{context['docstring_style']}")
 
         if context.get("review_feedback"):
-            prompt_parts.append(
-                f"\n## Review Feedback\n{context['review_feedback']}"
-            )
+            prompt_parts.append(f"\n## Review Feedback\n{context['review_feedback']}")
 
         if context.get("framework"):
-            prompt_parts.append(
-                f"\n## Framework\n{context['framework']}"
-            )
+            prompt_parts.append(f"\n## Framework\n{context['framework']}")
 
         if context.get("database"):
-            prompt_parts.append(
-                f"\n## Database\n{context['database']}"
-            )
+            prompt_parts.append(f"\n## Database\n{context['database']}")
 
         if context.get("buggy_code"):
-            prompt_parts.append(
-                f"\n## Buggy Code\n```\n{context['buggy_code']}\n```"
-            )
+            prompt_parts.append(f"\n## Buggy Code\n```\n{context['buggy_code']}\n```")
 
         if context.get("error_message"):
-            prompt_parts.append(
-                f"\n## Error Message\n{context['error_message']}"
-            )
+            prompt_parts.append(f"\n## Error Message\n{context['error_message']}")
 
         if context.get("code_to_refactor"):
             prompt_parts.append(
@@ -110,9 +116,7 @@ class CodingAgent(BaseAgent):
             )
 
         if context.get("target_structure"):
-            prompt_parts.append(
-                f"\n## Target Structure\n{context['target_structure']}"
-            )
+            prompt_parts.append(f"\n## Target Structure\n{context['target_structure']}")
 
         if context.get("file_content"):
             prompt_parts.append(
@@ -155,13 +159,19 @@ Please generate high-quality code that:
    - Optimize for readability and maintainability
 
 5. **Output Format**
-   - Provide complete, working code
-   - Include any necessary imports or dependencies
+   - Provide complete, working code in properly formatted code blocks
+   - Include any necessary imports and dependencies
    - Add brief explanations for complex logic
-   - Specify the file path where code should be placed
+   - Use clear file path indicators like "File: Controllers/WeatherController.cs"
 
-Please provide the complete code implementation with clear explanations of any
-important design decisions.
+6. **File Organization**
+   - Create a complete project structure when building applications
+   - Organize code into appropriate directories (Controllers, Models, Services, etc.)
+   - Include configuration files (appsettings.json, .csproj files, etc.)
+   - Ensure files follow naming conventions for the target language/framework
+
+Please provide the complete code implementation with proper file paths and 
+structure. Format each file clearly with "File: [filepath]" followed by the code block.
 """,
             ]
         )

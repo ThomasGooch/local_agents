@@ -37,6 +37,12 @@ def test_config():
 
 
 @pytest.fixture
+def test_context():
+    """Create a test context that disables file creation."""
+    return {"_test_mode": True}
+
+
+@pytest.fixture
 def temp_directory():
     """Create a temporary directory for testing."""
     temp_dir = tempfile.mkdtemp()

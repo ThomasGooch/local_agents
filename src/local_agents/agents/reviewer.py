@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ..base import BaseAgent, TaskResult, handle_agent_execution
+from ..file_manager import FileManager
 
 
 class Severity(Enum):
@@ -48,17 +49,38 @@ class ReviewAgent(BaseAgent):
             model=model,
             **kwargs,
         )
+        self.file_manager = None
 
     @handle_agent_execution
     def execute(
         self, task: str, context: Optional[Dict[str, Any]] = None, stream: bool = False
     ) -> TaskResult:
         """Execute code review task."""
+        # Initialize file manager if not already done
+        if not self.file_manager:
+            working_dir = context.get("directory", ".") if context else "."
+            self.file_manager = FileManager(working_dir)
+
         # Enhance context with automated analysis
         self._add_automated_analysis(context)
 
         prompt = self._build_review_prompt(task, context)
         response = self._call_ollama(prompt, stream=stream)
+
+        # Create review document if enabled (default to True for feature-dev workflows)
+        context_with_agent = context.copy() if context else {}
+        context_with_agent["agent_type"] = "review"
+        context_with_agent["task"] = task
+
+        # Skip file creation during unit tests to improve performance
+        if context.get("create_files", True) and not context.get("_test_mode", False):
+            created_files = self.file_manager.extract_and_write_files_from_response(
+                response, context_with_agent
+            )
+            if created_files:
+                # Add file creation info to the output
+                file_list = "\n".join(f"- {f}" for f in created_files)
+                response += f"\n\n## Created Review Documents:\n{file_list}"
 
         return self._create_success_result(response, task, context)
 
@@ -81,7 +103,9 @@ class ReviewAgent(BaseAgent):
             prompt_parts.append(f"\n## Target Directory\n{context['target_directory']}")
 
         if context.get("focus_area"):
-            prompt_parts.append(f"\n## Review Focus\nFocus Area: {context['focus_area']}")
+            prompt_parts.append(
+                f"\n## Review Focus\nFocus Area: {context['focus_area']}"
+            )
 
         if context.get("language"):
             prompt_parts.append(f"\n## Language\nLanguage: {context['language']}")
@@ -92,24 +116,22 @@ class ReviewAgent(BaseAgent):
             )
 
         if context.get("static_analysis_results"):
-            analysis_text = "\n".join([
-                f"**{tool}:**\n" + "\n".join(f"  - {issue}" for issue in issues)
-                for tool, issues in context['static_analysis_results'].items()
-            ])
-            prompt_parts.append(
-                f"\n## Static Analysis Results\n{analysis_text}"
+            analysis_text = "\n".join(
+                [
+                    f"**{tool}:**\n" + "\n".join(f"  - {issue}" for issue in issues)
+                    for tool, issues in context["static_analysis_results"].items()
+                ]
             )
+            prompt_parts.append(f"\n## Static Analysis Results\n{analysis_text}")
 
         if context.get("previous_reviews"):
-            reviews_text = "\n".join(f"- {review}" for review in context['previous_reviews'])
-            prompt_parts.append(
-                f"\n## Previous Reviews\n{reviews_text}"
+            reviews_text = "\n".join(
+                f"- {review}" for review in context["previous_reviews"]
             )
+            prompt_parts.append(f"\n## Previous Reviews\n{reviews_text}")
 
         if context.get("changes_made"):
-            prompt_parts.append(
-                f"\n## Changes Made\n{context['changes_made']}"
-            )
+            prompt_parts.append(f"\n## Changes Made\n{context['changes_made']}")
 
         if context.get("complexity_metrics"):
             prompt_parts.append(
@@ -237,8 +259,9 @@ issues by their potential impact.
 
         return "\n".join(prompt_parts)
 
-
-    def review_for_security(self, code: str, context: Optional[Dict[str, Any]] = None) -> TaskResult:
+    def review_for_security(
+        self, code: str, context: Optional[Dict[str, Any]] = None
+    ) -> TaskResult:
         """Review code specifically for security issues."""
         context = context or {}
         context["focus_area"] = "security"
@@ -246,7 +269,9 @@ issues by their potential impact.
         task = "Review this code for security vulnerabilities and potential security issues"
         return self.execute(task, context)
 
-    def review_for_performance(self, code: str, context: Optional[Dict[str, Any]] = None) -> TaskResult:
+    def review_for_performance(
+        self, code: str, context: Optional[Dict[str, Any]] = None
+    ) -> TaskResult:
         """Review code specifically for performance issues."""
         context = context or {}
         context["focus_area"] = "performance"
@@ -254,7 +279,9 @@ issues by their potential impact.
         task = "Review this code for performance issues and optimization opportunities"
         return self.execute(task, context)
 
-    def review_for_maintainability(self, code: str, context: Optional[Dict[str, Any]] = None) -> TaskResult:
+    def review_for_maintainability(
+        self, code: str, context: Optional[Dict[str, Any]] = None
+    ) -> TaskResult:
         """Review code specifically for maintainability issues."""
         context = context or {}
         context["focus_area"] = "maintainability"
@@ -263,17 +290,19 @@ issues by their potential impact.
         return self.execute(task, context)
 
     def comprehensive_review(
-        self, 
-        code: str, 
-        target_file: Optional[str] = None, 
-        context: Optional[Dict[str, Any]] = None
+        self,
+        code: str,
+        target_file: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
     ) -> TaskResult:
         """Perform a comprehensive code review."""
         context = context or {}
         context["code_content"] = code
         if target_file:
             context["target_file"] = target_file
-        task = "Perform a comprehensive code review covering all aspects of code quality"
+        task = (
+            "Perform a comprehensive code review covering all aspects of code quality"
+        )
         return self.execute(task, context)
 
     def _add_automated_analysis(self, context: Dict[str, Any]) -> None:
@@ -292,7 +321,10 @@ issues by their potential impact.
             # Run static analysis when explicitly enabled even without file path
             # Create a temporary file for analysis
             import tempfile
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp:
+
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".py", delete=False
+            ) as tmp:
                 tmp.write(context["code_content"])
                 tmp_path = tmp.name
             context["static_analysis"] = self._run_static_analysis(tmp_path)
@@ -303,18 +335,15 @@ issues by their potential impact.
         """Run static analysis tools on target with error handling."""
         # Handle test case where specific tool is requested
         if tool is not None:
-            import subprocess
             import os
-            
+            import subprocess
+
             if not os.path.exists(target):
                 return "Tool not available"
-            
+
             try:
                 result = subprocess.run(
-                    [tool, target],
-                    capture_output=True,
-                    text=True,
-                    timeout=30
+                    [tool, target], capture_output=True, text=True, timeout=30
                 )
                 return result.stdout if result.stdout else "Tool not available"
             except subprocess.TimeoutExpired:
