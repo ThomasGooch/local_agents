@@ -430,7 +430,7 @@ def review(
 @click.argument("workflow_name", required=True)
 @click.argument("task", required=True)
 @click.option("--context", "-c", type=click.Path(exists=True), help="Context file or directory")
-@click.option("--output-dir", "-o", type=click.Path(), help="Output directory for results")
+@click.option("--output-dir", "-o", type=click.Path(), help="Output directory for results (defaults to current directory)")
 @click.option("--stream", is_flag=True, help="Stream output in real-time")
 def workflow(
     workflow_name: str,
@@ -451,17 +451,20 @@ def workflow(
             elif context_path.is_dir():
                 context_data["directory"] = str(context_path)
 
-        if output_dir:
-            context_data["output_directory"] = output_dir
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
+        # Use PWD as default output directory if none specified
+        if not output_dir:
+            output_dir = str(Path.cwd())
+        
+        context_data["output_directory"] = output_dir
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
 
         result = wf.execute_workflow(workflow_name, task, context_data, stream=stream)
 
         # Use the WorkflowResult's built-in display method
         result.display()
 
-        # Save results to output directory if specified
-        if output_dir and result.success:
+        # Save results to output directory (always available now)
+        if result.success:
             output_path = Path(output_dir)
             output_path.mkdir(parents=True, exist_ok=True)
 
