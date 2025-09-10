@@ -109,6 +109,49 @@ class WorkflowConfig(BaseModel):
         return v
 
 
+class PlanOutputConfig(BaseModel):
+    """Configuration for plan file output."""
+
+    enable_file_output: bool = True
+    output_directory: str = "./plans"
+    filename_format: str = "plan_{timestamp}_{task_hash}.md"
+    include_context_in_filename: bool = False
+    max_filename_length: int = 255
+    preserve_plans: bool = True
+
+    @field_validator("output_directory")
+    @classmethod
+    def validate_output_directory(cls, v: str) -> str:
+        """Validate output directory path."""
+        if not v or not v.strip():
+            raise ValueError("Output directory cannot be empty")
+        return v.strip()
+
+    @field_validator("filename_format")
+    @classmethod
+    def validate_filename_format(cls, v: str) -> str:
+        """Validate filename format contains required placeholders."""
+        if not v or not v.strip():
+            raise ValueError("Filename format cannot be empty")
+
+        required_parts = ["{timestamp}", "{task_hash}"]
+        for part in required_parts:
+            if part not in v:
+                raise ValueError(f"Filename format must contain '{part}' placeholder")
+
+        return v.strip()
+
+    @field_validator("max_filename_length")
+    @classmethod
+    def validate_max_filename_length(cls, v: int) -> int:
+        """Validate max filename length is reasonable."""
+        if v < 50:
+            raise ValueError("max_filename_length must be at least 50")
+        if v > 255:
+            raise ValueError("max_filename_length cannot exceed 255")
+        return v
+
+
 class PerformanceConfig(BaseModel):
     """Performance and optimization settings."""
 
@@ -162,6 +205,7 @@ class Config(BaseModel):
     agents: AgentSettings = AgentSettings()
     workflows: WorkflowConfig = WorkflowConfig()
     performance: PerformanceConfig = PerformanceConfig()
+    plan_output: PlanOutputConfig = PlanOutputConfig()
 
     @field_validator("default_model")
     @classmethod

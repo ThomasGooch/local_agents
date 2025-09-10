@@ -83,7 +83,11 @@ class CodingAgent(BaseAgent):
         if context.get("specification"):
             prompt_parts.append(f"\n## Detailed Specification\n{context['specification']}")
 
-        if context.get("implementation_plan"):
+        # Add plan content (from file or direct context)
+        plan_content = self._get_plan_content(context)
+        if plan_content:
+            prompt_parts.append(f"\n## Implementation Plan\n{plan_content}")
+        elif context.get("implementation_plan"):
             prompt_parts.append(f"\n## Implementation Plan\n{context['implementation_plan']}")
 
         if context.get("requirements"):
@@ -175,6 +179,34 @@ structure. Format each file clearly with "File: [filepath]" followed by the code
         )
 
         return "\n".join(prompt_parts)
+
+    def _get_plan_content(self, context: Dict[str, Any]) -> Optional[str]:
+        """Get plan content from file or context."""
+        # First check if plan content is already in context
+        if context.get("plan_content"):
+            return context["plan_content"]
+
+        # Then check if we have a plan file path
+        plan_file = context.get("plan_file")
+        if plan_file:
+            try:
+                from pathlib import Path
+
+                plan_path = Path(plan_file)
+                if plan_path.exists():
+                    content = plan_path.read_text(encoding="utf-8")
+                    # Extract just the plan content after metadata
+                    if "# Implementation Plan" in content:
+                        parts = content.split("# Implementation Plan", 1)
+                        if len(parts) > 1:
+                            return parts[1].strip()
+                    return content
+                else:
+                    print(f"Warning: Plan file not found: {plan_file}")
+            except Exception as e:
+                print(f"Warning: Failed to read plan file {plan_file}: {e}")
+
+        return None
 
     def _add_project_context(self, prompt_parts: List[str], directory: Path) -> None:
         """Add project context information to the prompt."""

@@ -156,7 +156,11 @@ def plan(
     context: Optional[str],
     stream: bool,
 ) -> None:
-    """Create an implementation plan for a task."""
+    """Create an implementation plan for a task.
+
+    The planning agent will automatically save plans to markdown files based on the
+    plan_output configuration (enable_file_output: true by default). You can also
+    use --output to save to a specific file."""
     try:
         console.print(
             Panel(
@@ -213,6 +217,12 @@ def plan(
     type=click.Path(exists=True),
     help="Context file or directory",
 )
+@click.option(
+    "--plan",
+    "-p",
+    type=click.Path(exists=True),
+    help="Implementation plan file (.md) from planning agent",
+)
 @click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def code(
     task: str,
@@ -221,9 +231,14 @@ def code(
     model: Optional[str],
     output: Optional[str],
     context: Optional[str],
+    plan: Optional[str],
     stream: bool,
 ) -> None:
-    """Generate or modify code."""
+    """Generate or modify code.
+
+    The coding agent can use implementation plans from the planning agent.
+    Use --plan to reference a plan file, or the agent will automatically
+    detect plan files passed in the context."""
     try:
         console.print(
             Panel(
@@ -233,6 +248,7 @@ def code(
                 f"Model: {model or 'default'}\n"
                 f"Specification: {spec or 'none'}\n"
                 f"Context: {context or 'none'}\n"
+                f"Plan file: {plan or 'none'}\n"
                 f"Streaming: {'enabled' if stream else 'disabled'}",
                 title="Coding Agent",
                 border_style="green",
@@ -262,6 +278,15 @@ def code(
 
         if spec:
             context_data["specification"] = spec
+
+        if plan:
+            plan_path = Path(plan)
+            if plan_path.suffix.lower() == ".md":
+                context_data["plan_file"] = str(plan_path)
+                console.print(f"[dim]Using implementation plan from: {plan_path}[/dim]")
+            else:
+                console.print("[yellow]Warning: Plan file should be a .md file[/yellow]")
+                context_data["plan_file"] = str(plan_path)
 
         if not stream:
             with console.status("[cyan]Generating code..."):
@@ -565,6 +590,23 @@ def show():
             "Review Model",
             config_obj.agents.reviewing,
             "Model for code review",
+        )
+        table.add_row("", "", "")  # Separator
+        table.add_row("[bold]Plan Output[/bold]", "", "")
+        table.add_row(
+            "File Output",
+            str(config_obj.plan_output.enable_file_output),
+            "Automatically save plans to files",
+        )
+        table.add_row(
+            "Output Directory",
+            config_obj.plan_output.output_directory,
+            "Directory for plan files",
+        )
+        table.add_row(
+            "Filename Format",
+            config_obj.plan_output.filename_format,
+            "Template for plan filenames",
         )
 
         console.print(table)

@@ -1,5 +1,7 @@
 """Tests for the coding agent."""
 
+import tempfile
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -264,3 +266,129 @@ class TestCodingAgent:
         prompt = call_args.kwargs["prompt"]
         assert "review_feedback" in prompt.lower() or "review feedback" in prompt
         assert "division by zero" in prompt
+
+    def test_get_plan_content_from_context(self, coder_agent):
+        """Test getting plan content directly from context."""
+        context = {"plan_content": "This is a detailed implementation plan"}
+        
+        plan_content = coder_agent._get_plan_content(context)
+        
+        assert plan_content == "This is a detailed implementation plan"
+
+    def test_get_plan_content_from_file(self, coder_agent):
+        """Test reading plan content from file."""
+        plan_content = """---
+# Planning Session Metadata
+- **Generated**: 2024-01-01T12:00:00
+- **Task**: Create user authentication
+---
+
+# Implementation Plan
+
+This is the main plan content with detailed steps:
+1. Create user model
+2. Implement authentication middleware
+3. Add login/logout endpoints
+"""
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+            temp_file.write(plan_content)
+            temp_file.flush()
+            
+            context = {"plan_file": temp_file.name}
+            
+            result = coder_agent._get_plan_content(context)
+            
+            assert "This is the main plan content" in result
+            assert "Create user model" in result
+            assert "# Planning Session Metadata" not in result  # Metadata should be stripped
+            
+            # Clean up
+            Path(temp_file.name).unlink()
+
+    def test_get_plan_content_file_not_found(self, coder_agent):
+        """Test handling of missing plan file."""
+        context = {"plan_file": "/nonexistent/plan.md"}
+        
+        result = coder_agent._get_plan_content(context)
+        
+        assert result is None
+
+    def test_get_plan_content_fallback_to_implementation_plan(self, coder_agent):
+        """Test fallback to implementation_plan context when no plan file."""
+        context = {"implementation_plan": "Legacy plan format"}
+        
+        result = coder_agent._get_plan_content(context)
+        
+        assert result is None  # Should return None, allowing fallback to work in prompt
+
+    def test_plan_content_integration_in_prompt(self, coder_agent):
+        """Test that plan content is integrated into the coding prompt."""
+        task = "Implement user authentication"
+        context = {
+            "plan_content": "1. Create User model\n2. Add authentication middleware"
+        }
+        
+        result = coder_agent.execute(task, context)
+        
+        assert result.success is True
+        call_args = coder_agent.ollama_client.generate.call_args
+        prompt = call_args.kwargs["prompt"]
+        assert "Implementation Plan" in prompt
+        assert "Create User model" in prompt
+        assert "authentication middleware" in prompt
+
+    def test_plan_file_integration_in_prompt(self, coder_agent):
+        """Test that plan file content is integrated into the coding prompt."""
+        plan_content = """---
+# Planning Session Metadata
+- **Task**: Authentication system
+---
+
+# Implementation Plan
+
+Detailed implementation steps:
+1. Create User model with validation
+2. Implement JWT authentication
+3. Create login/logout endpoints
+"""
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+            temp_file.write(plan_content)
+            temp_file.flush()
+            
+            task = "Implement user authentication"
+            context = {"plan_file": temp_file.name}
+            
+            result = coder_agent.execute(task, context)
+            
+            assert result.success is True
+            call_args = coder_agent.ollama_client.generate.call_args
+            prompt = call_args.kwargs["prompt"]
+            assert "Implementation Plan" in prompt
+            assert "Create User model with validation" in prompt
+            assert "JWT authentication" in prompt
+            
+            # Clean up
+            Path(temp_file.name).unlink()
+
+    def test_plan_content_priority_over_file(self, coder_agent):
+        """Test that direct plan_content takes priority over plan_file."""
+        plan_file_content = """# Implementation Plan
+File-based plan content"""
+        
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+            temp_file.write(plan_file_content)
+            temp_file.flush()
+            
+            context = {
+                "plan_content": "Direct plan content",
+                "plan_file": temp_file.name
+            }
+            
+            result = coder_agent._get_plan_content(context)
+            
+            assert result == "Direct plan content"
+            
+            # Clean up
+            Path(temp_file.name).unlink()
