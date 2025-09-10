@@ -406,6 +406,11 @@ class TestConfigCLI:
         mock_config.agents.testing = "deepseek-coder:6.7b"
         mock_config.agents.reviewing = "llama3.1:8b"
 
+        # Mock plan output config
+        mock_config.plan_output.enable_file_output = True
+        mock_config.plan_output.output_directory = "./plans"
+        mock_config.plan_output.filename_format = "plan_{timestamp}_{task_hash}.md"
+
         mock_config_manager.config_path = "/test/config.yml"
         mock_config_manager.load_config.return_value = mock_config
 
@@ -418,6 +423,10 @@ class TestConfigCLI:
         assert "Configuration" in result.output
         assert "llama3.1:8b" in result.output
         assert "localhost:11434" in result.output
+        # Check plan output configuration is displayed
+        assert "Plan Output" in result.output
+        assert "True" in result.output  # enable_file_output
+        assert "./plans" in result.output  # output_directory
 
     @patch("local_agents.cli.config_manager")
     def test_config_set(self, mock_config_manager, cli_runner):

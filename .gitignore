@@ -333,6 +333,11 @@ test_calculator_*.py
 *_generated_*
 *_temp_*
 
+# Test-generated plan files
+plans/
+plan_*.md
+PLAN_FILE_FEATURE_SUMMARY.md
+
 # Example output files that shouldn't be committed
 example_*.py
 example_*.js
