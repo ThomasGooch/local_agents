@@ -212,6 +212,12 @@ def plan(
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save code to file")
 @click.option(
+    "--output-dir",
+    "-d",
+    type=click.Path(),
+    help="Directory where files should be created (default: current directory)",
+)
+@click.option(
     "--context",
     "-c",
     type=click.Path(exists=True),
@@ -230,6 +236,7 @@ def code(
     spec: Optional[str],
     model: Optional[str],
     output: Optional[str],
+    output_dir: Optional[str],
     context: Optional[str],
     plan: Optional[str],
     stream: bool,
@@ -259,6 +266,14 @@ def code(
         agent.display_info()
 
         context_data = {}
+
+        # Set output directory (default to current working directory)
+        if not output_dir:
+            output_dir = str(Path.cwd())
+        context_data["output_directory"] = output_dir
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        console.print(f"[dim]Files will be created in: {output_dir}[/dim]")
+
         if context:
             context_path = Path(context)
             if context_path.is_file():
@@ -314,6 +329,12 @@ def code(
 )
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save tests to file")
+@click.option(
+    "--output-dir",
+    "-d",
+    type=click.Path(),
+    help="Directory where test files should be created (default: current directory)",
+)
 @click.option("--run", is_flag=True, help="Run tests after generation")
 @click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def test(
@@ -321,6 +342,7 @@ def test(
     framework: Optional[str],
     model: Optional[str],
     output: Optional[str],
+    output_dir: Optional[str],
     run: bool,
     stream: bool,
 ) -> None:
@@ -352,6 +374,13 @@ def test(
         agent.display_info()
 
         context_data = {}
+
+        # Set output directory (default to current working directory)
+        if not output_dir:
+            output_dir = str(Path.cwd())
+        context_data["output_directory"] = output_dir
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        console.print(f"[dim]Test files will be created in: {output_dir}[/dim]")
 
         if target_path.exists():
             if target_path.is_file():
@@ -393,12 +422,19 @@ def test(
 @click.option("--focus", help="Focus area (security, performance, style, etc.)")
 @click.option("--model", "-m", help="Override model for this task")
 @click.option("--output", "-o", type=click.Path(), help="Save review to file")
+@click.option(
+    "--output-dir",
+    "-d",
+    type=click.Path(),
+    help="Directory where review files should be created (default: current directory)",
+)
 @click.option("--stream/--no-stream", default=True, help="Stream output in real-time")
 def review(
     target: str,
     focus: Optional[str],
     model: Optional[str],
     output: Optional[str],
+    output_dir: Optional[str],
     stream: bool,
 ) -> None:
     """Analyze and review code."""
@@ -434,6 +470,13 @@ def review(
         agent.display_info()
 
         context_data = {}
+
+        # Set output directory (default to current working directory)
+        if not output_dir:
+            output_dir = str(Path.cwd())
+        context_data["output_directory"] = output_dir
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        console.print(f"[dim]Review files will be created in: {output_dir}[/dim]")
 
         if target_path.is_file():
             context_data["target_file"] = target
