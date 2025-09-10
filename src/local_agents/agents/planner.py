@@ -16,7 +16,7 @@ console = Console()
 class PlanningAgent(BaseAgent):
     """Agent specialized in creating detailed implementation plans."""
 
-    def __init__(self, model: Optional[str] = None, **kwargs):
+    def __init__(self, model: Optional[str] = None, ollama_client=None, **kwargs):
         super().__init__(
             agent_type="plan",
             role="Senior Software Architect and Project Planner",
@@ -25,6 +25,7 @@ class PlanningAgent(BaseAgent):
                 "break down complex tasks into manageable steps"
             ),
             model=model,
+            ollama_client=ollama_client,
             **kwargs,
         )
 
@@ -132,8 +133,14 @@ followed.
             return None
 
         try:
-            # Create output directory
-            output_dir = Path(plan_config.output_directory).expanduser().resolve()
+            # Create output directory - resolve relative to current working directory
+            configured_dir = Path(plan_config.output_directory).expanduser()
+            if configured_dir.is_absolute():
+                output_dir = configured_dir
+            else:
+                # Resolve relative to the current working directory, not the agent's directory
+                output_dir = Path.cwd() / configured_dir
+            
             output_dir.mkdir(parents=True, exist_ok=True)
 
             # Generate filename

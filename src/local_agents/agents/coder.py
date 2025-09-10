@@ -11,7 +11,7 @@ from ..file_manager import FileManager
 class CodingAgent(BaseAgent):
     """Agent specialized in generating and modifying code."""
 
-    def __init__(self, model: Optional[str] = None, **kwargs):
+    def __init__(self, model: Optional[str] = None, ollama_client=None, **kwargs):
         super().__init__(
             agent_type="code",
             role="Senior Software Engineer and Code Generator",
@@ -20,6 +20,7 @@ class CodingAgent(BaseAgent):
                 "practices and integrates well with existing codebases"
             ),
             model=model,
+            ollama_client=ollama_client,
             **kwargs,
         )
         self.file_manager = None
@@ -38,7 +39,15 @@ class CodingAgent(BaseAgent):
             working_dir = (
                 context.get("output_directory") or context.get("directory", ".") if context else "."
             )
-            self.file_manager = FileManager(working_dir)
+            # Resolve relative paths to current working directory like Planning Agent
+            working_path = Path(working_dir).expanduser()
+            if working_path.is_absolute():
+                resolved_dir = working_path
+            else:
+                # Resolve relative to the current working directory where lagents was called
+                resolved_dir = Path.cwd() / working_path
+            
+            self.file_manager = FileManager(str(resolved_dir))
 
         prompt = self._build_coding_prompt(task, context)
         response = self._call_ollama(prompt, stream=stream)

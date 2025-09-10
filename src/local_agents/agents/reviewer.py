@@ -38,7 +38,7 @@ class AnalysisFinding:
 class ReviewAgent(BaseAgent):
     """Agent specialized in code review and quality analysis."""
 
-    def __init__(self, model: Optional[str] = None, **kwargs):
+    def __init__(self, model: Optional[str] = None, ollama_client=None, **kwargs):
         super().__init__(
             agent_type="review",
             role="Senior Code Reviewer and Quality Analyst",
@@ -47,6 +47,7 @@ class ReviewAgent(BaseAgent):
                 "for maintainability, security, and performance"
             ),
             model=model,
+            ollama_client=ollama_client,
             **kwargs,
         )
         self.file_manager = None
@@ -65,7 +66,15 @@ class ReviewAgent(BaseAgent):
             working_dir = (
                 context.get("output_directory") or context.get("directory", ".") if context else "."
             )
-            self.file_manager = FileManager(working_dir)
+            # Resolve relative paths to current working directory like Planning Agent
+            working_path = Path(working_dir).expanduser()
+            if working_path.is_absolute():
+                resolved_dir = working_path
+            else:
+                # Resolve relative to the current working directory where lagents was called
+                resolved_dir = Path.cwd() / working_path
+            
+            self.file_manager = FileManager(str(resolved_dir))
 
         # Enhance context with automated analysis
         self._add_automated_analysis(context)
