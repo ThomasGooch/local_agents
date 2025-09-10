@@ -140,7 +140,7 @@ followed.
             else:
                 # Resolve relative to the current working directory, not the agent's directory
                 output_dir = Path.cwd() / configured_dir
-            
+
             output_dir.mkdir(parents=True, exist_ok=True)
 
             # Generate filename
