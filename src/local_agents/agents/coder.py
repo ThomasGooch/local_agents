@@ -46,7 +46,7 @@ class CodingAgent(BaseAgent):
             else:
                 # Resolve relative to the current working directory where lagents was called
                 resolved_dir = Path.cwd() / working_path
-            
+
             self.file_manager = FileManager(str(resolved_dir))
 
         prompt = self._build_coding_prompt(task, context)
