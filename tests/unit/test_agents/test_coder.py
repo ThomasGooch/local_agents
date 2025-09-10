@@ -270,9 +270,9 @@ class TestCodingAgent:
     def test_get_plan_content_from_context(self, coder_agent):
         """Test getting plan content directly from context."""
         context = {"plan_content": "This is a detailed implementation plan"}
-        
+
         plan_content = coder_agent._get_plan_content(context)
-        
+
         assert plan_content == "This is a detailed implementation plan"
 
     def test_get_plan_content_from_file(self, coder_agent):
@@ -290,47 +290,45 @@ This is the main plan content with detailed steps:
 2. Implement authentication middleware
 3. Add login/logout endpoints
 """
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as temp_file:
             temp_file.write(plan_content)
             temp_file.flush()
-            
+
             context = {"plan_file": temp_file.name}
-            
+
             result = coder_agent._get_plan_content(context)
-            
+
             assert "This is the main plan content" in result
             assert "Create user model" in result
             assert "# Planning Session Metadata" not in result  # Metadata should be stripped
-            
+
             # Clean up
             Path(temp_file.name).unlink()
 
     def test_get_plan_content_file_not_found(self, coder_agent):
         """Test handling of missing plan file."""
         context = {"plan_file": "/nonexistent/plan.md"}
-        
+
         result = coder_agent._get_plan_content(context)
-        
+
         assert result is None
 
     def test_get_plan_content_fallback_to_implementation_plan(self, coder_agent):
         """Test fallback to implementation_plan context when no plan file."""
         context = {"implementation_plan": "Legacy plan format"}
-        
+
         result = coder_agent._get_plan_content(context)
-        
+
         assert result is None  # Should return None, allowing fallback to work in prompt
 
     def test_plan_content_integration_in_prompt(self, coder_agent):
         """Test that plan content is integrated into the coding prompt."""
         task = "Implement user authentication"
-        context = {
-            "plan_content": "1. Create User model\n2. Add authentication middleware"
-        }
-        
+        context = {"plan_content": "1. Create User model\n2. Add authentication middleware"}
+
         result = coder_agent.execute(task, context)
-        
+
         assert result.success is True
         call_args = coder_agent.ollama_client.generate.call_args
         prompt = call_args.kwargs["prompt"]
@@ -352,23 +350,23 @@ Detailed implementation steps:
 2. Implement JWT authentication
 3. Create login/logout endpoints
 """
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as temp_file:
             temp_file.write(plan_content)
             temp_file.flush()
-            
+
             task = "Implement user authentication"
             context = {"plan_file": temp_file.name}
-            
+
             result = coder_agent.execute(task, context)
-            
+
             assert result.success is True
             call_args = coder_agent.ollama_client.generate.call_args
             prompt = call_args.kwargs["prompt"]
             assert "Implementation Plan" in prompt
             assert "Create User model with validation" in prompt
             assert "JWT authentication" in prompt
-            
+
             # Clean up
             Path(temp_file.name).unlink()
 
@@ -376,19 +374,16 @@ Detailed implementation steps:
         """Test that direct plan_content takes priority over plan_file."""
         plan_file_content = """# Implementation Plan
 File-based plan content"""
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as temp_file:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as temp_file:
             temp_file.write(plan_file_content)
             temp_file.flush()
-            
-            context = {
-                "plan_content": "Direct plan content",
-                "plan_file": temp_file.name
-            }
-            
+
+            context = {"plan_content": "Direct plan content", "plan_file": temp_file.name}
+
             result = coder_agent._get_plan_content(context)
-            
+
             assert result == "Direct plan content"
-            
+
             # Clean up
             Path(temp_file.name).unlink()

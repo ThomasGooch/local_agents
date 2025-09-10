@@ -226,7 +226,7 @@ class TestPlanningAgent:
 
                 result = planner_agent.execute(task, context)
                 plan_file_path = Path(result.context["plan_file"])
-                file_content = plan_file_path.read_text(encoding='utf-8')
+                file_content = plan_file_path.read_text(encoding="utf-8")
 
                 # Check metadata section
                 assert "# Planning Session Metadata" in file_content
